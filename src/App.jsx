@@ -90,12 +90,12 @@ function App() {
           LinkedIn
         </a>
         <a
-          href="https://twitter.com/yourusername"
+          href="https://x.com/rikaciminieri"
           target="_blank"
           rel="noopener noreferrer"
           className="px-4 py-2 bg-white dark:bg-gray-800 text-blue-500 dark:text-blue-400 font-semibold rounded-full shadow-md hover:bg-blue-500 hover:text-white dark:hover:bg-blue-700 transition"
         >
-          Twitter
+          X
         </a>
       </section>
     </div>
