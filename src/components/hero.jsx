@@ -14,7 +14,7 @@ export default function Hero({ isJapanese, rikaImage }) {
         className="w-36 h-36 rounded-full shadow-lg mb-4 mx-auto"
       />
       <h1 className="text-4xl font-extrabold mb-2 animate-pulse text-white dark:text-gray-100">
-        👋🏼, I&apos;m Rika!
+        {isJapanese ? "👋🏼 莉香です！" : "👋🏼, I'm Rika!"}
       </h1>
       <p className="text-lg font-light text-white dark:text-gray-300">
         {isJapanese
