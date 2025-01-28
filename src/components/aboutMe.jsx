@@ -1,10 +1,24 @@
 import PropTypes from "prop-types";
+import { useState } from "react";
+import { onePieceTheories } from "../definitions/onePieceTheories";
 
 AboutMe.propTypes = {
   isJapanese: PropTypes.bool.isRequired,
 };
 
 export default function AboutMe({ isJapanese }) {
+  const [currentTheory, setCurrentTheory] = useState(null);
+
+  const getRandomTheory = () => {
+    const theories = onePieceTheories[isJapanese ? "jp" : "en"];
+    const randomIndex = Math.floor(Math.random() * theories.length);
+    setCurrentTheory(theories[randomIndex]);
+  };
+
+  const clearTheory = () => {
+    setCurrentTheory(null);
+  };
+
   const content = {
     en: [
       "Helping women and POC thrive in tech @ LWT 🏳️‍🌈✨",
@@ -27,8 +41,47 @@ export default function AboutMe({ isJapanese }) {
       {/* Description Section */}
       <div className="max-w-2xl mx-auto prose prose-lg font-semibold text-white dark:text-gray-200">
         {currentContent.map((paragraph, index) => (
-          <p key={index} className="mb-4">
-            {paragraph}
+          <p key={index} className="mb-4 relative">
+            {paragraph.includes("One Piece") ||
+            paragraph.includes("ワンピース") ? (
+              <p>
+                {isJapanese ? (
+                  <>
+                    仕事をしていないときは、絵を描いたり 🎨、ピラティスをしたり
+                    🧘‍♀️、小さな本の隠れ家を作ったり 📚✨、
+                    <span
+                      onMouseEnter={getRandomTheory}
+                      onMouseLeave={clearTheory}
+                      className="cursor-help relative underline decoration-dotted decoration-2 hover:text-pink-300 dark:hover:text-blue-300 transition-colors duration-200"
+                    >
+                      ワンピースの考察
+                    </span>
+                    に夢中になったりしています 🏴‍☠️。
+                  </>
+                ) : (
+                  <>
+                    When I&apos;m not working, you&apos;ll find me painting 🎨,
+                    doing pilates 🧘‍♀️, crafting tiny book nooks 📚✨, or diving
+                    into{" "}
+                    <span
+                      onMouseEnter={getRandomTheory}
+                      onMouseLeave={clearTheory}
+                      className="cursor-help relative underline decoration-dotted decoration-2 hover:text-pink-300 dark:hover:text-blue-300 transition-colors duration-200"
+                    >
+                      One Piece theories
+                    </span>{" "}
+                    🏴‍☠️.
+                  </>
+                )}
+                {currentTheory && (
+                  <div className="absolute left-0 top-full mt-2 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-sm text-gray-800 dark:text-gray-200 w-full z-10 transition-opacity duration-200">
+                    {currentTheory}
+                  </div>
+                )}
+              </p>
+            ) : (
+              paragraph
+            )}
           </p>
         ))}
       </div>
