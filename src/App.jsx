@@ -1,15 +1,35 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useSearchParams,
+  useNavigate,
+} from "react-router-dom";
 import rikaImage from "./assets/rika.jpeg";
 import DarkModeToggle from "./components/darkModeToggle";
 import LanguageToggle from "./components/languageToggle";
 import Hero from "./components/hero";
 import AboutMe from "./components/aboutMe";
 import SocialLinks from "./components/socialLinks";
+import PropTypes from "prop-types";
 
-function App() {
+MainContent.propTypes = {
+  forcedLanguage: PropTypes.string.isRequired,
+};
+
+function MainContent({ forcedLanguage }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
-  const [isJapanese, setIsJapanese] = useState(false);
+  const [isJapanese, setIsJapanese] = useState(
+    forcedLanguage === "jp" || searchParams.get("lang") === "jp"
+  );
+
+  useEffect(() => {
+    setIsJapanese(forcedLanguage === "jp" || searchParams.get("lang") === "jp");
+  }, [forcedLanguage, searchParams]);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -17,7 +37,9 @@ function App() {
   };
 
   const toggleLanguage = () => {
-    setIsJapanese(!isJapanese);
+    const newLanguage = !isJapanese;
+    setSearchParams({ lang: newLanguage ? "jp" : "en" });
+    navigate(newLanguage ? "/jp" : "/");
   };
 
   return (
@@ -35,6 +57,17 @@ function App() {
         <SocialLinks />
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MainContent forcedLanguage="en" />} />
+        <Route path="/jp" element={<MainContent forcedLanguage="jp" />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
