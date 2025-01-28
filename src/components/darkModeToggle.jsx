@@ -44,8 +44,8 @@ export default function DarkModeToggle({ darkMode, toggleDarkMode }) {
       </svg>
       <span
         className={`${
-          darkMode ? "translate-x-8" : "translate-x-1"
-        } inline-block w-5 h-5 transform bg-white rounded-full transition-transform duration-200 ease-in-out`}
+          darkMode ? "translate-x-7" : "translate-x-1"
+        } inline-block w-6 h-5 transform bg-white rounded-full transition-transform duration-200 ease-in-out`}
       />
     </button>
   );
