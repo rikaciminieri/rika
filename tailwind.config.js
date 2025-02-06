@@ -22,29 +22,29 @@ export default {
         },
         sparkle: {
           "0%": {
-            transform: "translate(-50%, 0) scale(0)",
+            transform: "translate(-50%, 0) scale(0) rotate(0deg)",
             opacity: "0",
           },
-          "50%": {
-            transform: "translate(-150%, -20px) scale(1)",
+          "30%": {
+            transform: "translate(-60%, -20px) scale(1) rotate(15deg)",
             opacity: "1",
           },
           "100%": {
-            transform: "translate(-250%, -10px) scale(0)",
+            transform: "translate(-120%, -30px) scale(0.5) rotate(-15deg)",
             opacity: "0",
           },
         },
         "sparkle-delayed": {
           "0%": {
-            transform: "translate(-50%, 0) scale(0)",
+            transform: "translate(-50%, 0) scale(0) rotate(0deg)",
             opacity: "0",
           },
-          "50%": {
-            transform: "translate(50%, -20px) scale(1)",
+          "30%": {
+            transform: "translate(30%, -15px) scale(1.1) rotate(-10deg)",
             opacity: "1",
           },
           "100%": {
-            transform: "translate(150%, -10px) scale(0)",
+            transform: "translate(100%, -25px) scale(0.6) rotate(10deg)",
             opacity: "0",
           },
         },
@@ -67,8 +67,8 @@ export default {
       },
       animation: {
         "reveal-pop": "reveal-pop 0.4s ease-out forwards",
-        sparkle: "sparkle 1.2s ease-out forwards",
-        "sparkle-delayed": "sparkle-delayed 1.2s ease-out 0.1s forwards",
+        sparkle: "sparkle 1.5s ease-out forwards",
+        "sparkle-delayed": "sparkle-delayed 1.5s ease-out 0.2s forwards",
         "text-reveal": "text-reveal 0.5s ease-out 0.3s forwards",
         blink: "blink 1s step-end infinite",
       },
