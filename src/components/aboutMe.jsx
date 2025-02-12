@@ -44,9 +44,9 @@ export default function AboutMe({ isJapanese }) {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto prose prose-lg font-semibold text-white dark:text-gray-200">
         {currentContent.map((paragraph, index) => (
-          <p key={index} className="mb-4 relative">
+          <div key={index} className="mb-4 relative">
             {renderParagraph(paragraph)}
-          </p>
+          </div>
         ))}
       </div>
     </div>
