@@ -53,7 +53,7 @@ const GrilledCheese = ({ isJapanese = false }) => {
   return (
     <div className="max-w-4xl mx-auto">
       <button
-        onClick={() => navigate("/")}
+        onClick={() => (isJapanese ? navigate("/jp") : navigate("/"))}
         className="mb-6 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
       >
         {isJapanese ? "⬅️ ホームに戻る" : "⬅️ Back to Home"}
@@ -65,8 +65,9 @@ const GrilledCheese = ({ isJapanese = false }) => {
           : "Grilled Cheese Olympics 🏅🧀"}
       </h1>
       <h3 className="text-center text-gray-900 dark:text-white mb-8">
-        I&apos;m on the hunt to find the best grilled cheese in America. Here
-        are my favorites so far.
+        {isJapanese
+          ? "アメリカで最高のグリルドチーズを探す旅に出てる。今のところのお気に入りはこれ！"
+          : "I'm on the hunt to find the best grilled cheese in America. Here are my favorites so far."}
       </h3>
 
       {/* Top 3 Sandwiches */}

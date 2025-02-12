@@ -25,7 +25,7 @@ export default function Hero({ isJapanese, rikaImage }) {
               to="/grilled-cheese/jp"
               className="underline hover:text-yellow-400 transition-colors"
             >
-              グリルドチーズ愛好家
+              グリルドチーズ大好き人間
             </Link>
           </>
         ) : (
