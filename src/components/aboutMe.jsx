@@ -1,7 +1,8 @@
 import PropTypes from "prop-types";
-import { aboutMeContent } from "../definitions/aboutMeContent";
+import { aboutMeContent } from "../definitions/aboutMeContent.jsx";
 import HoverReveal from "./HoverReveal";
 import { onePieceTheories } from "../definitions/onePieceTheories";
+import React from "react";
 
 AboutMe.propTypes = {
   isJapanese: PropTypes.bool.isRequired,
@@ -12,7 +13,11 @@ export default function AboutMe({ isJapanese }) {
   const theories = onePieceTheories[isJapanese ? "jp" : "en"];
 
   const renderParagraph = (paragraph) => {
-    if (paragraph.includes("One Piece") || paragraph.includes("ワンピース")) {
+    // If paragraph is a string, handle One Piece case
+    if (
+      typeof paragraph === "string" &&
+      (paragraph.includes("One Piece") || paragraph.includes("ワンピース"))
+    ) {
       return isJapanese ? (
         <p>
           仕事をしていないときは、絵を描いたり 🎨、ピラティスをしたり
@@ -37,7 +42,12 @@ export default function AboutMe({ isJapanese }) {
         </p>
       );
     }
-    return paragraph;
+    // If it's already a JSX element, return it as is
+    if (React.isValidElement(paragraph)) {
+      return paragraph;
+    }
+    // Otherwise, wrap it in a p tag
+    return <p>{paragraph}</p>;
   };
 
   return (

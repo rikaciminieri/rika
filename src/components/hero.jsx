@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-
+import { decorationStyles } from "../definitions/reusableStyles";
 Hero.propTypes = {
   isJapanese: PropTypes.bool.isRequired,
   rikaImage: PropTypes.string.isRequired,
@@ -23,7 +23,7 @@ export default function Hero({ isJapanese, rikaImage }) {
             フルスタックエンジニア | 問題解決者 | 自称コメディアン |{" "}
             <Link
               to="/grilled-cheese/jp"
-              className="underline hover:text-yellow-400 transition-colors"
+              className={decorationStyles.underline}
             >
               グリルドチーズ大好き人間
             </Link>
@@ -31,10 +31,7 @@ export default function Hero({ isJapanese, rikaImage }) {
         ) : (
           <>
             Full-Stack Engineer | Problem Solver | Self-proclaimed Comedian |{" "}
-            <Link
-              to="/grilled-cheese"
-              className="underline hover:text-yellow-400 transition-colors"
-            >
+            <Link to="/grilled-cheese" className={decorationStyles.underline}>
               Grilled Cheese Enthusiast
             </Link>
           </>

@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useState, useCallback, useRef, useEffect } from "react";
-
+import { decorationStyles } from "../definitions/reusableStyles";
 HoverReveal.propTypes = {
   content: PropTypes.arrayOf(PropTypes.string).isRequired,
   triggerText: PropTypes.string.isRequired,
@@ -61,7 +61,7 @@ export default function HoverReveal({ content, triggerText, className = "" }) {
       onClick={isMobile ? handleInteraction : undefined}
     >
       <span
-        className={`cursor-pointer underline decoration-dotted decoration-2 hover:text-pink-500 dark:hover:text-blue-300 transition-colors duration-200 ${className}`}
+        className={`cursor-pointer ${decorationStyles.underline} ${className}`}
       >
         {triggerText}
       </span>
