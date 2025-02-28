@@ -12,7 +12,6 @@ Hero.propTypes = {
 export default function Hero({ isJapanese, rikaImage }) {
   const [style, trigger] = useBoop({
     rotation: 10,
-    timing: 300,
     springConfig: {
       tension: 600,
       friction: 10,
