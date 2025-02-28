@@ -22,7 +22,7 @@ This is my personal website built with React and sprinkled with lots of personal
 
 1. Clone this repo
 2. Run `npm install` to get the dependencies
-3. Run `npm start` to start the development server
+3. Run `npm run dev` to start the development server
 4. Visit `http://localhost:5173` and voilà! ✨
 
 ## 🤝 Let's Connect!
