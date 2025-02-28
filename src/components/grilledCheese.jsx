@@ -3,8 +3,11 @@ import andytownGc from "../assets/andytown-gc.jpg";
 import starbucksGc from "../assets/starbucks-gc.jpg";
 import meltGc from "../assets/melt-gc.jpg";
 import { useNavigate } from "react-router-dom";
+import useBoop from "../hooks/useBoop";
+import { animated } from "react-spring";
 const GrilledCheese = ({ isJapanese = false }) => {
   const navigate = useNavigate();
+  const [style, trigger] = useBoop({ x: -2 });
   const grilledCheeses = [
     {
       name: isJapanese
@@ -53,10 +56,25 @@ const GrilledCheese = ({ isJapanese = false }) => {
   return (
     <div className="max-w-4xl mx-auto">
       <button
+        onMouseEnter={trigger}
         onClick={() => (isJapanese ? navigate("/jp") : navigate("/"))}
-        className="mb-6 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+        className="mb-6 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
       >
-        {isJapanese ? "⬅️ ホームに戻る" : "⬅️ Back to Home"}
+        {isJapanese ? (
+          <>
+            <animated.span style={style} className="inline-block">
+              ⬅️
+            </animated.span>{" "}
+            ホームに戻る
+          </>
+        ) : (
+          <>
+            <animated.span style={style} className="inline-block">
+              ⬅️
+            </animated.span>{" "}
+            Back to Home
+          </>
+        )}
       </button>
 
       <h1 className="text-4xl font-bold text-center text-gray-900 dark:text-white mb-8">
