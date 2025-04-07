@@ -38,3 +38,44 @@
 .card:hover {
   box-shadow: 0 0 20px rgba(255, 183, 0, 0.6);
 }
+
+@keyframes emoji-spring {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.7);
+    opacity: 1;
+  }
+
+  20% {
+    transform: translate(
+        calc(var(--velocityX) * 40px),
+        calc(var(--velocityY) * 40px)
+      )
+      rotate(calc(var(--rotation) * 0.3)) scale(var(--scale));
+    opacity: 0.95;
+  }
+
+  50% {
+    transform: translate(
+        calc(var(--velocityX) * 70px),
+        calc(var(--velocityY) * 70px)
+      )
+      rotate(calc(var(--rotation) * 0.6)) scale(var(--scale));
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: translate(
+        calc(var(--velocityX) * 100px),
+        calc(var(--velocityY) * 100px)
+      )
+      rotate(var(--rotation)) scale(var(--scale));
+    opacity: 0;
+  }
+}
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out forwards;
+}
