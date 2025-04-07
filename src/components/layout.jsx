@@ -44,7 +44,7 @@ function Layout({ children, forcedLanguage }) {
     : children;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-pink-200 via-pink-300 to-purple-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-white fade-in px-8 sm:px-6 py-24">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-pink-300 via-purple-400 to-pink-300 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-white fade-in px-8 sm:px-6 py-24">
       <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-8 flex flex-col items-center">
         <div>
           <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
