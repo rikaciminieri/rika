@@ -2,7 +2,7 @@ import { decorationStyles } from "./reusableStyles";
 export const aboutMeContent = {
   en: [
     <>
-      Helping women and POC thrive in tech @{" "}
+      Helping folks from underrepresented groups thrive in tech @{" "}
       <a
         className={decorationStyles.underline}
         href="https://lwtsquad.com/"

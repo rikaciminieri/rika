@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { aboutMeContent } from "../definitions/aboutMeContent.jsx";
 import HoverReveal from "./HoverReveal";
-import { onePieceTheories } from "../definitions/onePieceTheories";
+import { onePieceTheories } from "../definitions/onePiece.js";
 import React from "react";
 
 AboutMe.propTypes = {
@@ -19,7 +19,7 @@ export default function AboutMe({ isJapanese }) {
       (paragraph.includes("One Piece") || paragraph.includes("ワンピース"))
     ) {
       return isJapanese ? (
-        <p>
+        <div className="text-base">
           仕事をしていないときは、絵を描いたり 🎨、ピラティスをしたり
           🧘‍♀️、小さな本の隠れ家を作ったり 📚✨、
           <HoverReveal
@@ -28,9 +28,9 @@ export default function AboutMe({ isJapanese }) {
             triggerText="ワンピースの考察"
           />
           に夢中になったりしています 🏴‍☠️。
-        </p>
+        </div>
       ) : (
-        <p>
+        <div className="text-base">
           When I&apos;m not working, you&apos;ll find me painting 🎨, doing
           pilates 🧘‍♀️, crafting tiny book nooks 📚✨, or diving into{" "}
           <HoverReveal
@@ -39,7 +39,7 @@ export default function AboutMe({ isJapanese }) {
             triggerText="One Piece theories"
           />{" "}
           🏴‍☠️.
-        </p>
+        </div>
       );
     }
     // If it's already a JSX element, return it as is
