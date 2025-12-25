@@ -2,16 +2,16 @@ import { decorationStyles } from "./reusableStyles";
 export const aboutMeContent = {
   en: [
     <>
-      Helping folks from underrepresented groups thrive in tech @{" "}
+      Bringing people together through live experiences @{" "}
       <a
         className={decorationStyles.underline}
-        href="https://lwtsquad.com/"
+        href="https://www.eventbrite.com/"
         target="_blank"
         rel="noopener noreferrer"
       >
-        LWT
+        Eventbrite
       </a>{" "}
-      🏳️‍🌈✨
+      🧡✨
     </>,
     "Former microbiology student 🧫🔬 turned tech advocate 💻, finding new ways to support and empower others.",
     "When I'm not working, you'll find me painting 🎨, doing pilates 🧘‍♀️, crafting tiny book nooks 📚✨, or diving into One Piece theories 🏴‍☠️.",
@@ -19,16 +19,16 @@ export const aboutMeContent = {
   ],
   jp: [
     <>
-      テック業界にて、女性と有色人種の方々の支援に尽力しています @{" "}
+      ライブ体験で、人と人がつながる瞬間をつくっています @{" "}
       <a
         className={decorationStyles.underline}
-        href="https://lwtsquad.com/"
+        href="https://www.eventbrite.com/"
         target="_blank"
         rel="noopener noreferrer"
       >
-        LWT
+        Eventbrite
       </a>{" "}
-      🏳️‍🌈✨
+      🧡✨
     </>,
     "微生物学専攻の学生 🧫🔬 から、テックアドボケイト 💻 に転身。クリエイティブな方法で人々をサポートし、エンパワーメントすることに情熱を注いでいます。",
     "仕事をしていないときは、絵を描いたり 🎨、ピラティスをしたり 🧘‍♀️、小さな本の隠れ家を作ったり 📚✨、ワンピースの考察に夢中になったりしています 🏴‍☠️。",
