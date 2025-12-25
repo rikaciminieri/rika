@@ -49,6 +49,20 @@ export default function HoverReveal({
 
   const handleMouseEnter = useCallback(
     (event) => {
+      // If content is already displayed, close it (toggle behavior)
+      if (displayedContent) {
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+        }
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+        setDisplayedContent("");
+        setIsTyping(false);
+        return;
+      }
+
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -60,16 +74,11 @@ export default function HoverReveal({
       }
 
       // Get the trigger element's position for emoji spawn
-      if (event?.target && !displayedContent) {
+      if (event?.target) {
         const rect = event.target.getBoundingClientRect();
         const x = rect.left + rect.width / 2;
         const y = rect.top;
         createEmojis(x, y);
-      }
-
-      if (displayedContent) {
-        setDisplayedContent("");
-        return;
       }
 
       const randomIndex = Math.floor(Math.random() * content.length);
@@ -109,7 +118,7 @@ export default function HoverReveal({
   }, []);
 
   const getVariantStyles = () => {
-    return "bg-white dark:bg-black rounded-lg shadow-lg p-4";
+    return "bg-white dark:bg-black rounded-lg shadow-lg";
   };
 
   return (
@@ -126,20 +135,31 @@ export default function HoverReveal({
           {triggerText}
         </span>
         {displayedContent && (
-          <>
-            <div
-              className={`absolute left-1/2 ${
-                isMobile ? "fixed top-1/2 -translate-y-1/2" : "top-full"
-              } mt-2 translate-x-1/2 min-w-[250px] w-[80%] ml-10 sm:w-auto max-w-[600px] z-50 animate-reveal-pop ${getVariantStyles()}`}
-            >
-              <div className="relative z-10">
-                <span className="opacity-0 animate-text-reveal inline-block text-black dark:text-white">
+          <div
+            className={`${
+              isMobile
+                ? "fixed left-1/2 top-1/2 -translate-y-1/2 w-[85%] max-w-[500px] max-h-[70vh] overflow-y-auto mx-auto"
+                : "absolute left-1/2 top-full mt-2 w-auto min-w-[250px] max-w-[600px]"
+            } z-50 animate-reveal-pop ${getVariantStyles()}`}
+          >
+            <div className={`relative z-10 ${isMobile ? "p-5" : "p-4"}`}>
+              {isMobile && (
+                <button
+                  onClick={handleMouseLeave}
+                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl font-bold leading-none z-20 w-8 h-8 flex items-center justify-center"
+                  aria-label="Close"
+                >
+                  ×
+                </button>
+              )}
+              <div className={isMobile ? "pr-10" : ""}>
+                <span className="opacity-0 animate-text-reveal inline-block text-black dark:text-white break-words">
                   {displayedContent}
                   {isTyping && <span className="animate-blink">|</span>}
                 </span>
               </div>
             </div>
-          </>
+          </div>
         )}
       </span>
 
