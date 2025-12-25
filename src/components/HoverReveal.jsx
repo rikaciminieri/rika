@@ -9,14 +9,21 @@ HoverReveal.propTypes = {
   content: PropTypes.arrayOf(PropTypes.string).isRequired,
   triggerText: PropTypes.string.isRequired,
   className: PropTypes.string,
+  audioSrc: PropTypes.string,
 };
 
-export default function HoverReveal({ content, triggerText, className = "" }) {
+export default function HoverReveal({
+  content,
+  triggerText,
+  className = "",
+  audioSrc,
+}) {
   const { emojis, createEmojis } = useEmojiSpring(onePieceEmojis);
   const [displayedContent, setDisplayedContent] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const timeoutRef = useRef(null);
+  const audioRef = useRef(null);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -25,10 +32,31 @@ export default function HoverReveal({ content, triggerText, className = "" }) {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const handleInteraction = useCallback(
+  // Initialize audio
+  useEffect(() => {
+    if (audioSrc) {
+      audioRef.current = new Audio(audioSrc);
+      audioRef.current.loop = true;
+      audioRef.current.volume = 0.5;
+    }
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, [audioSrc]);
+
+  const handleMouseEnter = useCallback(
     (event) => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
+      }
+
+      // Play audio
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(() => {});
       }
 
       // Get the trigger element's position for emoji spawn
@@ -65,6 +93,21 @@ export default function HoverReveal({ content, triggerText, className = "" }) {
     [content, displayedContent, createEmojis]
   );
 
+  const handleMouseLeave = useCallback(() => {
+    // Stop audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+
+    // Clear text and stop typing animation
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setDisplayedContent("");
+    setIsTyping(false);
+  }, []);
+
   const getVariantStyles = () => {
     return "bg-white dark:bg-black rounded-lg shadow-lg p-4";
   };
@@ -73,9 +116,9 @@ export default function HoverReveal({ content, triggerText, className = "" }) {
     <>
       <span
         className="inline relative"
-        onMouseEnter={!isMobile ? handleInteraction : undefined}
-        onMouseLeave={!isMobile ? handleInteraction : undefined}
-        onClick={isMobile ? handleInteraction : undefined}
+        onMouseEnter={!isMobile ? handleMouseEnter : undefined}
+        onMouseLeave={!isMobile ? handleMouseLeave : undefined}
+        onClick={isMobile ? handleMouseEnter : undefined}
       >
         <span
           className={`cursor-pointer ${decorationStyles.underline} ${className}`}

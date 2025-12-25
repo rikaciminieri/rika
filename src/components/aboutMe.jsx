@@ -26,6 +26,7 @@ export default function AboutMe({ isJapanese }) {
             content={theories}
             variant="map"
             triggerText="ワンピースの考察"
+            audioSrc="/one-piece-theme.mp3"
           />
           に夢中になったりしています 🏴‍☠️。
         </div>
@@ -37,6 +38,7 @@ export default function AboutMe({ isJapanese }) {
             content={theories}
             variant="map"
             triggerText="One Piece theories"
+            audioSrc="/one-piece-theme.mp3"
           />{" "}
           🏴‍☠️.
         </div>
