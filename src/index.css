@@ -1,6 +1,83 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "tailwindcss";
+
+@variant dark (.dark &);
+
+@theme {
+  --color-custom-purple: #8134df;
+
+  --animate-reveal-pop: reveal-pop 0.4s ease-out forwards;
+  --animate-sparkle: sparkle 1.5s ease-out forwards;
+  --animate-sparkle-delayed: sparkle-delayed 1.5s ease-out 0.2s forwards;
+  --animate-text-reveal: text-reveal 0.5s ease-out 0.3s forwards;
+  --animate-blink: blink 1s step-end infinite;
+}
+
+@keyframes reveal-pop {
+  0% {
+    transform: translate(-50%, 10px) scale(0.95);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -5px) scale(1.05);
+  }
+  100% {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes sparkle {
+  0% {
+    transform: translate(-50%, 0) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  30% {
+    transform: translate(-60%, -20px) scale(1) rotate(15deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-120%, -30px) scale(0.5) rotate(-15deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle-delayed {
+  0% {
+    transform: translate(-50%, 0) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  30% {
+    transform: translate(30%, -15px) scale(1.1) rotate(-10deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(100%, -25px) scale(0.6) rotate(10deg);
+    opacity: 0;
+  }
+}
+
+@keyframes text-reveal {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+    filter: blur(10px);
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
 
 /* You can keep some custom base styles if needed, but most can be handled by Tailwind */
 :root {

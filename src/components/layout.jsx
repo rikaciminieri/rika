@@ -12,7 +12,9 @@ Layout.propTypes = {
 function Layout({ children, forcedLanguage }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(
+    document.documentElement.classList.contains("dark")
+  );
   const [isJapanese, setIsJapanese] = useState(
     forcedLanguage === "jp" || searchParams.get("lang") === "jp"
   );
@@ -20,6 +22,14 @@ function Layout({ children, forcedLanguage }) {
   useEffect(() => {
     setIsJapanese(forcedLanguage === "jp" || searchParams.get("lang") === "jp");
   }, [forcedLanguage, searchParams]);
+
+  useEffect(() => {
+    // Sync state with DOM class
+    const isDark = document.documentElement.classList.contains("dark");
+    if (isDark !== darkMode) {
+      setDarkMode(isDark);
+    }
+  }, [darkMode]);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
