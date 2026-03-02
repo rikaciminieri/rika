@@ -716,6 +716,311 @@ body.uv-mode .colony-gallery .colony-inner {
   color: #666;
   cursor: pointer;
 }
+
+/* =================== FLAGELLA =================== */
+.colony-op::after,
+.colony-japan::after {
+  content: '';
+  position: absolute;
+  width: 60px; height: 4px;
+  top: 50%; right: -55px;
+  background: transparent;
+  border-bottom: 2px solid;
+  animation: flagellaWave 1.5s ease-in-out infinite;
+  pointer-events: none;
+  opacity: 0.4;
+}
+.colony-op::after {
+  border-color: var(--op-color);
+}
+.colony-japan::after {
+  border-color: var(--japan-color);
+  right: auto; left: -55px;
+  animation-delay: 0.3s;
+}
+@keyframes flagellaWave {
+  0% { transform: translateY(-50%) scaleY(1) rotate(0deg); clip-path: polygon(0 0, 20% 40%, 40% 0%, 60% 40%, 80% 0%, 100% 40%, 100% 100%, 80% 60%, 60% 100%, 40% 60%, 20% 100%, 0 60%); }
+  50% { transform: translateY(-50%) scaleY(-1) rotate(5deg); }
+  100% { transform: translateY(-50%) scaleY(1) rotate(0deg); }
+}
+
+/* =================== GRAM STAINING =================== */
+body.gram-positive .colony-inner {
+  transition: all 0.5s;
+}
+body.gram-positive .colony-eng .colony-inner,
+body.gram-positive .colony-japan .colony-inner,
+body.gram-positive .colony-gallery .colony-inner,
+body.gram-positive .colony-currently .colony-inner {
+  background: radial-gradient(circle, rgba(128,0,128,0.4) 0%, rgba(128,0,128,0.15) 100%) !important;
+  border-color: rgba(128,0,128,0.4) !important;
+}
+body.gram-positive .colony-op .colony-inner,
+body.gram-positive .colony-gc .colony-inner {
+  background: radial-gradient(circle, rgba(255,150,180,0.3) 0%, rgba(255,150,180,0.1) 100%) !important;
+  border-color: rgba(255,150,180,0.3) !important;
+  opacity: 0.7;
+}
+
+body.gram-negative .colony-op .colony-inner,
+body.gram-negative .colony-gc .colony-inner {
+  background: radial-gradient(circle, rgba(255,50,100,0.5) 0%, rgba(255,50,100,0.2) 100%) !important;
+  border-color: rgba(255,50,100,0.5) !important;
+  box-shadow: 0 0 30px rgba(255,50,100,0.3) !important;
+}
+body.gram-negative .colony-eng .colony-inner,
+body.gram-negative .colony-japan .colony-inner,
+body.gram-negative .colony-gallery .colony-inner,
+body.gram-negative .colony-currently .colony-inner {
+  background: radial-gradient(circle, rgba(128,0,128,0.4) 0%, rgba(128,0,128,0.15) 100%) !important;
+  border-color: rgba(128,0,128,0.4) !important;
+}
+
+.gram-tooltip {
+  position: fixed;
+  bottom: 80px; right: 20px;
+  z-index: 700;
+  background: rgba(0,0,0,0.85);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 14px 18px;
+  max-width: 260px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.6;
+  display: none;
+  animation: fadeIn 0.3s;
+}
+.gram-tooltip.show { display: block; }
+.gram-tooltip h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #fff; }
+
+/* =================== PIPETTE TOOL =================== */
+body.pipette-mode { cursor: crosshair !important; }
+body.pipette-mode * { cursor: crosshair !important; }
+
+.inoculation {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(74,222,128,0.4) 0%, rgba(74,222,128,0.1) 100%);
+  border: 1px solid rgba(74,222,128,0.3);
+  pointer-events: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; color: rgba(255,255,255,0.6);
+  font-family: var(--mono);
+  animation: inocGrow 3.5s ease-out forwards;
+  z-index: 15;
+}
+@keyframes inocGrow {
+  0% { width: 5px; height: 5px; opacity: 0.8; }
+  30% { width: 30px; height: 30px; opacity: 1; }
+  100% { width: 30px; height: 30px; opacity: 0; }
+}
+.inoc-splash {
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(74,222,128,0.3);
+  pointer-events: none;
+  animation: inocSplash 0.6s ease-out forwards;
+}
+@keyframes inocSplash {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+/* =================== ENVIRONMENTAL CONTROLS =================== */
+.env-panel {
+  position: fixed;
+  bottom: 20px; right: 80px;
+  z-index: 600;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 16px;
+  width: 220px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-light);
+  display: none;
+}
+.env-panel.show { display: block; }
+.env-panel h4 {
+  font-size: 12px; font-weight: 700;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 6px;
+}
+.env-row {
+  margin-bottom: 12px;
+}
+.env-row label {
+  display: flex; justify-content: space-between;
+  margin-bottom: 4px; color: rgba(255,255,255,0.6);
+}
+.env-row input[type="range"] {
+  width: 100%; height: 4px;
+  -webkit-appearance: none; appearance: none;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px; outline: none;
+}
+.env-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+.env-status {
+  padding: 8px; border-radius: 6px;
+  background: rgba(255,255,255,0.05);
+  text-align: center;
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 8px;
+}
+.env-status.warning { color: #ef4444; background: rgba(239,68,68,0.1); }
+.env-status.optimal { color: #4ade80; background: rgba(74,222,128,0.1); }
+
+.heat-shock-flash {
+  position: fixed; inset: 0;
+  background: rgba(255,200,0,0.3);
+  pointer-events: none;
+  z-index: 8000;
+  animation: heatShockPulse 0.8s ease-out forwards;
+}
+@keyframes heatShockPulse {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* =================== CELL DIVISION =================== */
+.dividing-cell {
+  position: absolute;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 15;
+}
+.dividing-cell.phase-elongate {
+  animation: cellElongate 0.8s ease-in-out forwards;
+}
+.dividing-cell.phase-pinch {
+  animation: cellPinch 0.6s ease-in-out forwards;
+}
+@keyframes cellElongate {
+  0% { border-radius: 50%; transform: scaleX(1); }
+  100% { border-radius: 40%; transform: scaleX(1.8); }
+}
+@keyframes cellPinch {
+  0% { border-radius: 40%; transform: scaleX(1.8); }
+  50% { border-radius: 30% 30% 30% 30% / 50% 50% 50% 50%; transform: scaleX(2); }
+  100% { border-radius: 50%; transform: scaleX(1); opacity: 0; }
+}
+.daughter-cell {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: daughterAppear 0.5s ease-out forwards;
+  z-index: 15;
+}
+@keyframes daughterAppear {
+  0% { transform: scale(0.3); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* =================== GROWTH CURVE =================== */
+.growth-curve {
+  position: fixed;
+  top: 20px; left: 20px;
+  z-index: 550;
+  width: 180px; height: 120px;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 8px;
+}
+.growth-curve canvas {
+  width: 100%; height: 100%;
+}
+.growth-curve-label {
+  position: absolute;
+  bottom: 4px; left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 8px;
+  color: rgba(255,255,255,0.4);
+  white-space: nowrap;
+}
+
+/* =================== SPORULATION =================== */
+.endospore {
+  position: absolute;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.3);
+  pointer-events: none;
+  z-index: 25;
+  animation: sporeEject 2s ease-out forwards;
+}
+@keyframes sporeEject {
+  0% { transform: scale(0); opacity: 1; }
+  20% { transform: scale(1.5); opacity: 1; }
+  100% { transform: scale(1) translate(var(--sx), var(--sy)); opacity: 0; }
+}
+
+/* =================== LENS SMUDGE EASTER EGG =================== */
+.lens-smudge {
+  position: fixed; inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--smudge-x, 50%) var(--smudge-y, 50%),
+    rgba(200,180,150,0.4) 0%,
+    rgba(200,180,150,0.2) 20%,
+    transparent 40%);
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.lens-smudge.show { opacity: 1; pointer-events: auto; cursor: grab; }
+.smudge-message {
+  position: absolute; bottom: 30%; left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+}
+
+/* =================== GEAR 5 EASTER EGG =================== */
+.gear5-flash {
+  position: fixed; inset: 0;
+  z-index: 9500;
+  background: rgba(255,255,255,0.9);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--display);
+  font-size: 48px; font-weight: 800;
+  color: #ff0000;
+  letter-spacing: 0.1em;
+  animation: gear5Flash 0.5s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes gear5Flash {
+  0% { opacity: 1; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+body.gear5-mode .colony {
+  animation: gear5Bounce 0.5s ease-in-out infinite alternate !important;
+}
+body.gear5-mode .colony-inner {
+  filter: saturate(3) brightness(1.3) !important;
+}
+@keyframes gear5Bounce {
+  0% { transform: scale(1) translateY(0); }
+  100% { transform: scale(1.15) translateY(-10px); }
+}
 </style>
 </head>
 <body>
@@ -760,6 +1065,9 @@ body.uv-mode .colony-gallery .colony-inner {
   <button class="tb-btn" onclick="zoomIn()" title="Zoom in">🔍</button>
   <button class="tb-btn" onclick="zoomOut()" title="Zoom out">🔎</button>
   <button class="tb-btn" id="uvBtn" onclick="toggleUV()" title="UV illumination">🔬</button>
+  <button class="tb-btn" id="gramBtn" onclick="cycleGram()" title="Gram staining">💜</button>
+  <button class="tb-btn" id="pipetteBtn" onclick="togglePipette()" title="Pipette tool">🧪</button>
+  <button class="tb-btn" id="envBtn" onclick="toggleEnvPanel()" title="Environmental controls">🌡️</button>
   <div class="zoom-display" id="zoomLabel">1x</div>
 </div>
 
@@ -788,6 +1096,38 @@ body.uv-mode .colony-gallery .colony-inner {
     </div>
     <div class="guide-dismiss" onclick="dismissGuide()">Start Exploring</div>
   </div>
+</div>
+
+<!-- Gram Staining Tooltip -->
+<div class="gram-tooltip" id="gramTooltip">
+  <h4>Gram Staining</h4>
+  <p><strong>Gram+:</strong> Crystal violet stains thick peptidoglycan walls purple. Gram-negative bacteria (like E. coli) lose the stain and appear pink.</p>
+  <p style="margin-top:6px;"><strong>Fun fact:</strong> One Piece and Grilled Cheese colonies are Gram-negative because they're chaotic like that.</p>
+</div>
+
+<!-- Environmental Controls Panel -->
+<div class="env-panel" id="envPanel">
+  <h4>🌡️ Environmental Controls</h4>
+  <div class="env-row">
+    <label>Temperature <span id="tempValue">37°C</span></label>
+    <input type="range" id="tempSlider" min="4" max="60" value="37" oninput="updateEnv()">
+  </div>
+  <div class="env-row">
+    <label>pH <span id="phValue">7.0</span></label>
+    <input type="range" id="phSlider" min="2" max="12" value="7" step="0.5" oninput="updateEnv()">
+  </div>
+  <div class="env-status" id="envStatus">Optimal conditions</div>
+</div>
+
+<!-- Growth Curve -->
+<div class="growth-curve" id="growthCurve">
+  <canvas id="growthCanvas" width="164" height="96"></canvas>
+  <div class="growth-curve-label">Bacterial Growth Curve</div>
+</div>
+
+<!-- Lens Smudge Easter Egg -->
+<div class="lens-smudge" id="lensSmudge">
+  <div class="smudge-message">🔍 fingerprint detected — drag to wipe clean</div>
 </div>
 
 <script>
@@ -1507,12 +1847,481 @@ function makeLabelsVisible() {
   }, 2500);
 }
 
+// =================== GRAM STAINING ===================
+let gramMode = 'off'; // off, positive, negative
+function cycleGram() {
+  if (gramMode === 'off') {
+    gramMode = 'positive';
+    document.body.classList.add('gram-positive');
+    document.getElementById('gramBtn').style.background = 'rgba(128,0,128,0.5)';
+    document.getElementById('gramBtn').textContent = 'G+';
+    showGramTooltip();
+  } else if (gramMode === 'positive') {
+    gramMode = 'negative';
+    document.body.classList.remove('gram-positive');
+    document.body.classList.add('gram-negative');
+    document.getElementById('gramBtn').style.background = 'rgba(255,50,100,0.5)';
+    document.getElementById('gramBtn').textContent = 'G−';
+  } else {
+    gramMode = 'off';
+    document.body.classList.remove('gram-negative');
+    document.getElementById('gramBtn').style.background = '';
+    document.getElementById('gramBtn').textContent = '💜';
+    hideGramTooltip();
+  }
+}
+function showGramTooltip() {
+  document.getElementById('gramTooltip').classList.add('show');
+  setTimeout(hideGramTooltip, 8000);
+}
+function hideGramTooltip() {
+  document.getElementById('gramTooltip').classList.remove('show');
+}
+
+// =================== PIPETTE TOOL ===================
+let pipetteMode = false;
+const inocLabels = ['curiosity', 'grilled cheese energy', 'debugging power', 'vibes', 'kaizen', 'umami', 'nakama spirit', 'gear 5th energy'];
+
+function togglePipette() {
+  pipetteMode = !pipetteMode;
+  document.body.classList.toggle('pipette-mode', pipetteMode);
+  document.getElementById('pipetteBtn').classList.toggle('active', pipetteMode);
+}
+
+document.getElementById('dish').addEventListener('click', (e) => {
+  if (!pipetteMode) return;
+  const dish = document.getElementById('dish');
+  const rect = dish.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  // Create splash
+  for (let i = 0; i < 5; i++) {
+    const splash = document.createElement('div');
+    splash.className = 'inoc-splash';
+    splash.style.left = (x + (Math.random() - 0.5) * 30) + 'px';
+    splash.style.top = (y + (Math.random() - 0.5) * 30) + 'px';
+    dish.appendChild(splash);
+    setTimeout(() => splash.remove(), 600);
+  }
+
+  // Create colony
+  const inoc = document.createElement('div');
+  inoc.className = 'inoculation';
+  inoc.style.left = (x - 15) + 'px';
+  inoc.style.top = (y - 15) + 'px';
+  inoc.textContent = inocLabels[Math.floor(Math.random() * inocLabels.length)];
+  dish.appendChild(inoc);
+  setTimeout(() => inoc.remove(), 10000);
+});
+
+// =================== ENVIRONMENTAL CONTROLS ===================
+let envTemp = 37;
+let envPH = 7;
+let envAnimSpeed = 1;
+
+function toggleEnvPanel() {
+  document.getElementById('envPanel').classList.toggle('show');
+  document.getElementById('envBtn').classList.toggle('active');
+}
+
+function updateEnv() {
+  envTemp = parseInt(document.getElementById('tempSlider').value);
+  envPH = parseFloat(document.getElementById('phSlider').value);
+  document.getElementById('tempValue').textContent = envTemp + '°C';
+  document.getElementById('phValue').textContent = envPH.toFixed(1);
+
+  const status = document.getElementById('envStatus');
+
+  // Temperature effects
+  if (envTemp >= 35 && envTemp <= 40 && envPH >= 6 && envPH <= 8) {
+    status.textContent = '✓ Optimal growth conditions';
+    status.className = 'env-status optimal';
+    envAnimSpeed = 1;
+  } else if (envTemp < 20) {
+    status.textContent = '❄️ Cold — growth slowed dramatically';
+    status.className = 'env-status warning';
+    envAnimSpeed = 0.2;
+  } else if (envTemp > 50) {
+    status.textContent = '🔥 Lethal — colonies dying!';
+    status.className = 'env-status warning';
+    envAnimSpeed = 0.1;
+  } else if (envPH < 4 || envPH > 10) {
+    status.textContent = '⚠ Extreme pH — stress response';
+    status.className = 'env-status warning';
+    envAnimSpeed = 0.5;
+  } else {
+    status.textContent = '~ Sub-optimal conditions';
+    status.className = 'env-status';
+    envAnimSpeed = 0.7;
+  }
+
+  // Heat shock at 42°C
+  if (envTemp === 42) {
+    triggerHeatShock();
+  }
+
+  applyEnvEffects();
+  checkSporulationConditions();
+}
+
+function triggerHeatShock() {
+  const flash = document.createElement('div');
+  flash.className = 'heat-shock-flash';
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 800);
+
+  // Colonies flash briefly
+  document.querySelectorAll('.colony').forEach(c => {
+    c.style.filter = 'brightness(2)';
+    setTimeout(() => { c.style.filter = ''; }, 500);
+  });
+}
+
+function applyEnvEffects() {
+  document.querySelectorAll('.colony').forEach(colony => {
+    const isGC = colony.classList.contains('colony-gc');
+
+    // Temperature effects
+    if (envTemp > 50) {
+      colony.style.opacity = '0.3';
+      colony.style.transform = 'scale(0.8)';
+      colony.style.filter = 'blur(1px)';
+    } else if (envTemp < 20) {
+      colony.style.opacity = '0.7';
+      colony.style.transform = '';
+      colony.style.filter = '';
+    } else {
+      colony.style.opacity = '';
+      colony.style.transform = '';
+      colony.style.filter = '';
+    }
+
+    // pH effects - color shifts
+    if (envPH < 4) {
+      if (!isGC) { // GC is acid resistant!
+        colony.style.filter = 'hue-rotate(-30deg) saturate(1.5)';
+      }
+    } else if (envPH > 10) {
+      colony.style.filter = 'hue-rotate(60deg)';
+    }
+
+    // Animation speed
+    colony.style.animationDuration = (4 / envAnimSpeed) + 's';
+  });
+
+  // GC acid resistance message
+  if (envPH < 4) {
+    const gcLabel = document.querySelector('.colony-gc .colony-label');
+    if (gcLabel) gcLabel.textContent = lang === 'en' ? 'Grilled Cheese (acid resistant!)' : 'グリルドチーズ（酸耐性！）';
+  }
+}
+
+// =================== CELL DIVISION ===================
+function triggerCellDivision(colony) {
+  const rect = colony.getBoundingClientRect();
+  const dish = document.getElementById('dish');
+  const dishRect = dish.getBoundingClientRect();
+
+  const x = rect.left - dishRect.left + rect.width * (0.3 + Math.random() * 0.4);
+  const y = rect.top - dishRect.top + rect.height * (0.3 + Math.random() * 0.4);
+
+  const color = getComputedStyle(colony.querySelector('.colony-inner')).borderColor;
+
+  const cell = document.createElement('div');
+  cell.className = 'dividing-cell phase-elongate';
+  cell.style.left = x + 'px';
+  cell.style.top = y + 'px';
+  cell.style.background = color;
+  cell.style.opacity = '0.6';
+  dish.appendChild(cell);
+
+  setTimeout(() => {
+    cell.className = 'dividing-cell phase-pinch';
+
+    setTimeout(() => {
+      cell.remove();
+      // Create two daughter cells
+      for (let i = 0; i < 2; i++) {
+        const daughter = document.createElement('div');
+        daughter.className = 'daughter-cell';
+        daughter.style.width = '8px';
+        daughter.style.height = '8px';
+        daughter.style.background = color;
+        daughter.style.opacity = '0.5';
+        daughter.style.left = (x + (i === 0 ? -8 : 8)) + 'px';
+        daughter.style.top = y + 'px';
+        dish.appendChild(daughter);
+        setTimeout(() => daughter.remove(), 3000);
+      }
+    }, 600);
+  }, 800);
+}
+
+// Random division timer
+function startCellDivision() {
+  setInterval(() => {
+    if (envAnimSpeed < 0.3) return; // Too cold/hot
+    const colonyEls = document.querySelectorAll('.colony');
+    const randomColony = colonyEls[Math.floor(Math.random() * colonyEls.length)];
+    if (randomColony) triggerCellDivision(randomColony);
+  }, 15000 + Math.random() * 15000);
+}
+
+// Also trigger on colony hover
+document.querySelectorAll('.colony').forEach(c => {
+  c.addEventListener('mouseenter', () => {
+    setTimeout(() => triggerCellDivision(c), 500);
+  });
+});
+
+// =================== GROWTH CURVE ===================
+const growthCanvas = document.getElementById('growthCanvas');
+const growthCtx = growthCanvas.getContext('2d');
+let growthPhase = 0; // 0-1 progress through curve
+let growthDirection = 1;
+
+function drawGrowthCurve() {
+  const w = growthCanvas.width;
+  const h = growthCanvas.height;
+  growthCtx.clearRect(0, 0, w, h);
+
+  // Draw axes
+  growthCtx.strokeStyle = 'rgba(255,255,255,0.15)';
+  growthCtx.lineWidth = 1;
+  growthCtx.beginPath();
+  growthCtx.moveTo(20, 5);
+  growthCtx.lineTo(20, h - 15);
+  growthCtx.lineTo(w - 5, h - 15);
+  growthCtx.stroke();
+
+  // Phase labels
+  growthCtx.fillStyle = 'rgba(255,255,255,0.25)';
+  growthCtx.font = '7px monospace';
+  growthCtx.fillText('Lag', 28, h - 4);
+  growthCtx.fillText('Log', 60, h - 4);
+  growthCtx.fillText('Stat', 100, h - 4);
+  growthCtx.fillText('Death', 135, h - 4);
+
+  // Draw the S-curve
+  growthCtx.strokeStyle = 'rgba(74,222,128,0.6)';
+  growthCtx.lineWidth = 2;
+  growthCtx.beginPath();
+
+  for (let i = 0; i <= 100; i++) {
+    const t = i / 100;
+    const x = 20 + t * (w - 30);
+    let y;
+
+    if (t < 0.15) { // Lag phase
+      y = h - 20 - (t / 0.15) * 5;
+    } else if (t < 0.5) { // Log phase (exponential growth)
+      const logT = (t - 0.15) / 0.35;
+      y = h - 25 - logT * logT * 45;
+    } else if (t < 0.75) { // Stationary phase
+      y = h - 70 - Math.sin((t - 0.5) / 0.25 * Math.PI) * 2;
+    } else { // Death phase
+      const deathT = (t - 0.75) / 0.25;
+      y = h - 70 + deathT * deathT * 30;
+    }
+
+    if (i === 0) growthCtx.moveTo(x, y);
+    else growthCtx.lineTo(x, y);
+  }
+  growthCtx.stroke();
+
+  // Animated dot
+  const dotT = growthPhase;
+  const dotX = 20 + dotT * (w - 30);
+  let dotY;
+  if (dotT < 0.15) {
+    dotY = h - 20 - (dotT / 0.15) * 5;
+  } else if (dotT < 0.5) {
+    const logT = (dotT - 0.15) / 0.35;
+    dotY = h - 25 - logT * logT * 45;
+  } else if (dotT < 0.75) {
+    dotY = h - 70 - Math.sin((dotT - 0.5) / 0.25 * Math.PI) * 2;
+  } else {
+    const deathT = (dotT - 0.75) / 0.25;
+    dotY = h - 70 + deathT * deathT * 30;
+  }
+
+  growthCtx.fillStyle = '#4ade80';
+  growthCtx.beginPath();
+  growthCtx.arc(dotX, dotY, 4, 0, Math.PI * 2);
+  growthCtx.fill();
+
+  // Glow
+  growthCtx.fillStyle = 'rgba(74,222,128,0.3)';
+  growthCtx.beginPath();
+  growthCtx.arc(dotX, dotY, 8, 0, Math.PI * 2);
+  growthCtx.fill();
+
+  // Update phase
+  growthPhase += 0.002 * envAnimSpeed;
+  if (growthPhase > 1) growthPhase = 0;
+
+  requestAnimationFrame(drawGrowthCurve);
+}
+
+// =================== SPORULATION ===================
+let sporulationTimer = null;
+
+function triggerSporulation() {
+  document.querySelectorAll('.colony').forEach(colony => {
+    const rect = colony.getBoundingClientRect();
+    const dish = document.getElementById('dish');
+    const dishRect = dish.getBoundingClientRect();
+    const cx = rect.left - dishRect.left + rect.width / 2;
+    const cy = rect.top - dishRect.top + rect.height / 2;
+
+    for (let i = 0; i < 4 + Math.floor(Math.random() * 3); i++) {
+      setTimeout(() => {
+        const spore = document.createElement('div');
+        spore.className = 'endospore';
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 80 + Math.random() * 150;
+        spore.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
+        spore.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
+        spore.style.left = cx + 'px';
+        spore.style.top = cy + 'px';
+        dish.appendChild(spore);
+        setTimeout(() => spore.remove(), 10000);
+      }, i * 200);
+    }
+  });
+}
+
+// Trigger on extreme conditions
+function checkSporulationConditions() {
+  if (envTemp > 55 || envTemp < 8 || envPH < 3 || envPH > 11) {
+    triggerSporulation();
+  }
+}
+
+// Inactivity sporulation (2 min)
+let inactivitySporTimer = null;
+function resetInactivitySpor() {
+  clearTimeout(inactivitySporTimer);
+  inactivitySporTimer = setTimeout(triggerSporulation, 120000);
+}
+document.addEventListener('mousemove', resetInactivitySpor);
+document.addEventListener('click', resetInactivitySpor);
+resetInactivitySpor();
+
+// =================== EASTER EGG: LENS SMUDGE ===================
+let zoomClickCount = 0;
+let zoomClickTimer = null;
+
+// Wrap zoom functions to track rapid clicks
+function trackZoomClick() {
+  zoomClickCount++;
+  clearTimeout(zoomClickTimer);
+  zoomClickTimer = setTimeout(() => { zoomClickCount = 0; }, 3000);
+  if (zoomClickCount >= 5) {
+    zoomClickCount = 0;
+    showLensSmudge();
+  }
+}
+
+// Override the toolbar onclick to include tracking
+document.querySelector('.toolbar .tb-btn[title="Zoom in"]').addEventListener('click', trackZoomClick);
+document.querySelector('.toolbar .tb-btn[title="Zoom out"]').addEventListener('click', trackZoomClick);
+
+function showLensSmudge() {
+  const smudge = document.getElementById('lensSmudge');
+  smudge.style.setProperty('--smudge-x', (30 + Math.random() * 40) + '%');
+  smudge.style.setProperty('--smudge-y', (30 + Math.random() * 40) + '%');
+  smudge.classList.add('show');
+
+  let wiping = false;
+  const onDrag = (e) => {
+    if (!wiping) return;
+    smudge.style.opacity = Math.max(0, parseFloat(getComputedStyle(smudge).opacity) - 0.02);
+    if (parseFloat(getComputedStyle(smudge).opacity) <= 0.05) {
+      smudge.classList.remove('show');
+      smudge.style.opacity = '';
+      document.removeEventListener('mousemove', onDrag);
+    }
+  };
+  smudge.addEventListener('mousedown', () => { wiping = true; });
+  document.addEventListener('mousemove', onDrag);
+  document.addEventListener('mouseup', () => { wiping = false; });
+}
+
+// =================== EASTER EGG: MICROBE NAME GENERATOR ===================
+let emptyHoverTimer = null;
+document.getElementById('dish').addEventListener('mousemove', (e) => {
+  // Check if hovering over a colony
+  if (e.target.closest('.colony')) {
+    clearTimeout(emptyHoverTimer);
+    return;
+  }
+  clearTimeout(emptyHoverTimer);
+  emptyHoverTimer = setTimeout(() => {
+    const names = [
+      'Rikabacterium codesium',
+      'Grilledcheeseus maximus',
+      'Debuggeria persistens',
+      'Onepiecia theoreticus',
+      'Bridgertonia bingeworthii',
+      'Pilatesia flexibilis',
+      'Sarcasmus genuinus'
+    ];
+    const dish = document.getElementById('dish');
+    const rect = dish.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const label = document.createElement('div');
+    label.style.cssText = `position:absolute;left:${x}px;top:${y}px;font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.3);font-style:italic;pointer-events:none;white-space:nowrap;animation:fadeIn 0.5s;`;
+    label.textContent = names[Math.floor(Math.random() * names.length)];
+    dish.appendChild(label);
+    setTimeout(() => { label.style.opacity = '0'; label.style.transition = 'opacity 1s'; }, 4000);
+    setTimeout(() => label.remove(), 5000);
+  }, 5000);
+});
+
+// =================== EASTER EGG: GEAR 5 (KONAMI CODE) ===================
+const konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiIdx = 0;
+document.addEventListener('keydown', e => {
+  if (e.key === konamiCode[konamiIdx]) {
+    konamiIdx++;
+    if (konamiIdx === konamiCode.length) {
+      konamiIdx = 0;
+      activateGear5();
+    }
+  } else {
+    konamiIdx = 0;
+  }
+});
+
+function activateGear5() {
+  // Flash
+  const flash = document.createElement('div');
+  flash.className = 'gear5-flash';
+  flash.textContent = 'DRUMS OF LIBERATION';
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 500);
+
+  // Activate mode
+  document.body.classList.add('gear5-mode');
+
+  // Revert after 5s
+  setTimeout(() => {
+    document.body.classList.remove('gear5-mode');
+  }, 5000);
+}
+
 // =================== INIT ===================
 renderColonies();
 renderColonyNav();
 updateDish();
 startLamp();
 makeLabelsVisible();
+startCellDivision();
+drawGrowthCurve();
 </script>
 </body>
 </html>

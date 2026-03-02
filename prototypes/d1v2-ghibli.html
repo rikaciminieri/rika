@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RikaOS — Ghibli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&family=Klee+One:wght@400;600&family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #f5ede0;
+  --surface: #faf7f0;
+  --surface-2: #ede4d3;
+  --border: #d4c5a9;
+  --text: #3a2e1e;
+  --text-muted: #8a7e6a;
+  --accent: #c75c3a;
+  --green: #5a7a4a;
+  --blue: #4a6a8a;
+  --pink: #d4858a;
+  --amber: #c4943a;
+  --cloud: #e8dfd0;
+  --red: #c75c3a;
+  --taskbar-h: 72px;
+  --radius: 4px;
+  --win-header: 38px;
+  --font: 'Inter', 'Noto Sans JP', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Playfair Display', 'Klee One', serif;
+  --brush: 'Klee One', 'Noto Sans JP', serif;
+}
+
+body.night-mode {
+  --bg: #0f1020;
+  --surface: #1a1830;
+  --surface-2: #141228;
+  --border: #2a2840;
+  --text: #e8dfd0;
+  --text-muted: #8a7e9a;
+  --accent: #e8a050;
+  --cloud: #1a1830;
+}
+body.night-mode .desktop-bg { background: linear-gradient(180deg, #0a0820 0%, #0f1020 40%, #141230 100%); }
+body.night-mode .desktop-bg::before { opacity: 0; }
+body.night-mode .sky-stars { opacity: 1; }
+body.night-mode .taskbar { background: rgba(15,16,32,0.85); border-color: rgba(232,160,80,0.2); }
+body.night-mode .cloud { opacity: 0; }
+body.night-mode .soot-sprite { background: rgba(232,200,80,0.7); box-shadow: 0 0 6px rgba(232,200,80,0.4); }
+body.night-mode .petal { background: rgba(232,160,80,0.4); border-radius: 50%; }
+body.night-mode .window { border-color: rgba(232,160,80,0.2); box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 20px rgba(232,160,80,0.08); }
+
+html, body { height: 100%; overflow: hidden; font-family: var(--font); background: var(--bg); color: var(--text); }
+
+/* =================== BOOT SEQUENCE =================== */
+#boot-screen {
+  position: fixed; inset: 0; z-index: 99999;
+  background: #1a1510;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: var(--brush);
+  transition: opacity 0.8s;
+  overflow: hidden;
+}
+#boot-screen.done { opacity: 0; pointer-events: none; }
+
+.boot-brush-stroke {
+  font-family: var(--brush);
+  font-size: 72px; font-weight: 600;
+  color: #c75c3a;
+  opacity: 0;
+  filter: blur(2px);
+  transition: opacity 0.6s, filter 0.6s;
+}
+.boot-brush-stroke.visible { opacity: 1; filter: blur(0); }
+
+.boot-lines { font-size: 12px; color: #7a6e5a; text-align: left; width: 400px; max-width: 90vw; margin-top: 24px; font-family: var(--brush); }
+.boot-lines div { opacity: 0; animation: bootFade 0.3s forwards; }
+.boot-lines .ok { color: #5a7a4a; }
+.boot-lines .warn { color: #c4943a; }
+@keyframes bootFade { to { opacity: 1; } }
+
+.boot-ink-splatter {
+  position: absolute;
+  width: 100%; height: 100%;
+  background: radial-gradient(circle at 50% 50%, #1a1510 0%, transparent 70%);
+  transition: opacity 1s;
+}
+
+/* =================== DESKTOP =================== */
+#desktop {
+  position: fixed; inset: 0;
+  opacity: 0; transition: opacity 1s 0.3s;
+  display: flex; flex-direction: column;
+}
+#desktop.visible { opacity: 1; }
+
+.desktop-bg {
+  position: fixed; inset: 0; z-index: -1;
+  background: linear-gradient(180deg, #c8d8e8 0%, #e0d8c8 35%, #f0e8d8 60%, #f5ede0 100%);
+  overflow: hidden;
+  transition: background 1s;
+}
+
+/* Animated sky gradient */
+.desktop-bg::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg,
+    rgba(200,180,220,0.15) 0%,
+    rgba(220,180,160,0.1) 20%,
+    transparent 50%
+  );
+  animation: skyShift 60s ease-in-out infinite alternate;
+}
+@keyframes skyShift {
+  0% { opacity: 0.3; }
+  33% { opacity: 0.7; background: linear-gradient(180deg, rgba(220,180,160,0.2) 0%, rgba(200,170,140,0.15) 20%, transparent 50%); }
+  66% { opacity: 0.5; background: linear-gradient(180deg, rgba(180,160,200,0.15) 0%, rgba(200,160,180,0.1) 20%, transparent 50%); }
+  100% { opacity: 0.3; }
+}
+
+/* Paper grain texture */
+.desktop-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  pointer-events: none;
+}
+
+/* Clouds */
+.clouds { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.cloud {
+  position: absolute;
+  background: var(--cloud);
+  border-radius: 50%;
+  filter: blur(20px);
+  opacity: 0.4;
+  transition: opacity 1s;
+}
+
+/* Stars for night mode */
+.sky-stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 1s; }
+.sky-star {
+  position: absolute; width: 2px; height: 2px;
+  background: #e8dfd0; border-radius: 50%;
+  animation: twinkle 3s ease-in-out infinite;
+}
+@keyframes twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.9; } }
+
+/* Mountains */
+.mountains {
+  position: fixed; bottom: 0; left: 0; right: 0; height: 15vh;
+  z-index: 0; pointer-events: none;
+}
+.mountain {
+  position: absolute; bottom: 0;
+  border-left: 100px solid transparent;
+  border-right: 100px solid transparent;
+  border-bottom-style: solid;
+  opacity: 0.15;
+}
+
+/* Canvas watermark */
+.watermark-canvas { position: fixed; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
+
+/* Particles: soot sprites + petals */
+.particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.soot-sprite {
+  position: absolute;
+  width: 5px; height: 5px;
+  background: #3a2e1e;
+  border-radius: 50%;
+  opacity: 0.4;
+  transition: background 0.5s, box-shadow 0.5s;
+}
+.petal {
+  position: absolute;
+  width: 8px; height: 5px;
+  background: var(--pink);
+  border-radius: 50% 0 50% 0;
+  opacity: 0.5;
+  transform-origin: center;
+}
+@keyframes petalFall {
+  0% { transform: translateY(-5vh) rotate(0deg) translateX(0); opacity: 0; }
+  10% { opacity: 0.5; }
+  90% { opacity: 0.5; }
+  100% { transform: translateY(105vh) rotate(540deg) translateX(80px); opacity: 0; }
+}
+@keyframes sootWander {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(15px, -10px); }
+  50% { transform: translate(-8px, -20px); }
+  75% { transform: translate(20px, -5px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* =================== DESKTOP ICONS =================== */
+.desktop-icons {
+  flex: 1; padding: 24px;
+  display: flex; flex-direction: column; flex-wrap: wrap;
+  gap: 8px; align-content: start; max-width: 200px;
+}
+.desktop-icon {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; width: 84px; height: 84px; border-radius: 8px;
+  cursor: pointer; transition: all 0.2s; user-select: none;
+}
+.desktop-icon:hover { background: rgba(199,92,58,0.06); }
+.desktop-icon:active { transform: scale(0.95); }
+
+.desktop-icon .icon-img {
+  width: 52px; height: 52px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+}
+.desktop-icon:hover .icon-img {
+  transform: scale(1.08);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 0 12px rgba(199,92,58,0.1);
+}
+.desktop-icon .icon-img svg { width: 28px; height: 28px; display: block; }
+
+/* Icon gradient backgrounds */
+.icon-welcome { background: linear-gradient(135deg, #c75c3a, #d4858a); }
+.icon-projects { background: linear-gradient(135deg, #4a6a8a, #5a7a4a); }
+.icon-terminal { background: #2a2218; border: 1px solid #3a3228; }
+.icon-gallery { background: linear-gradient(135deg, #d4858a, #c4943a); }
+.icon-gc { background: linear-gradient(135deg, #c4943a, #d4a040); }
+.icon-trash { background: var(--surface-2); border: 1px solid var(--border); }
+.icon-currently { background: linear-gradient(135deg, #5a7a4a, #4a6a8a); }
+.icon-japan { background: linear-gradient(135deg, #c75c3a, #c4943a); }
+
+.desktop-icon .icon-label {
+  font-size: 10px; color: var(--text-muted); text-align: center;
+  line-height: 1.2; max-width: 80px; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
+  font-family: var(--brush);
+}
+
+/* =================== WINDOWS =================== */
+.window {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06), 0 2px 8px rgba(58,46,30,0.04);
+  display: flex; flex-direction: column;
+  min-width: 320px; min-height: 200px;
+  overflow: hidden;
+  animation: winOpen 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+}
+@keyframes winOpen {
+  from { transform: scaleY(0.1) scaleX(0.8); opacity: 0; }
+  50% { transform: scaleY(1.02) scaleX(1.01); opacity: 1; }
+  to { transform: scaleY(1) scaleX(1); opacity: 1; }
+}
+.window.minimized { animation: winMin 0.3s forwards; pointer-events: none; }
+@keyframes winMin { to { transform: scale(0.5) translateY(100vh); opacity: 0; } }
+.window.focused { box-shadow: 0 12px 40px rgba(0,0,0,0.08), 0 0 0 1px rgba(199,92,58,0.15); }
+
+.win-header {
+  height: var(--win-header);
+  background: linear-gradient(180deg, var(--surface-2), rgba(212,197,169,0.3));
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 12px;
+  cursor: grab; user-select: none; flex-shrink: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.win-header:active { cursor: grabbing; }
+.win-dots { display: flex; gap: 7px; }
+.win-dot {
+  width: 12px; height: 12px; border-radius: 50%; border: none;
+  cursor: pointer; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.win-dot:hover { transform: scale(1.3); }
+.win-dot.close { background: var(--red); }
+.win-dot.minimize { background: var(--amber); }
+.win-dot.maximize { background: var(--green); }
+.win-title {
+  flex: 1; text-align: center; font-size: 12px; font-weight: 500;
+  color: var(--text-muted); pointer-events: none; font-family: var(--brush);
+}
+.win-body { flex: 1; overflow: auto; padding: 20px; }
+.win-body::-webkit-scrollbar { width: 5px; }
+.win-body::-webkit-scrollbar-track { background: transparent; }
+.win-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.win-resize { position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; cursor: nwse-resize; }
+
+/* =================== TASKBAR (WOODEN SHELF) =================== */
+.taskbar {
+  position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%);
+  height: auto; width: auto; max-width: 90vw;
+  background: linear-gradient(180deg, #c4a878, #a88a60);
+  border: 1px solid rgba(138,106,58,0.4);
+  border-radius: 6px;
+  display: flex; align-items: center; padding: 6px 14px;
+  z-index: 9000; gap: 4px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.1);
+}
+
+.tb-start {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: var(--accent); color: #faf7f0;
+  font-size: 14px; font-weight: 700; font-family: var(--brush);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tb-start:hover { transform: scale(1.15) rotate(-5deg); }
+
+.tb-divider { width: 1px; height: 24px; background: rgba(58,46,30,0.2); margin: 0 8px; }
+.tb-apps { display: flex; gap: 3px; flex: 1; overflow-x: auto; }
+.tb-app {
+  padding: 5px 12px; border-radius: 4px; border: none;
+  background: transparent; color: #5a4a30;
+  font-family: var(--brush); font-size: 12px;
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.tb-app:hover { background: rgba(255,255,255,0.2); color: var(--text); }
+.tb-app.active { background: rgba(255,255,255,0.25); color: var(--text); }
+.tb-app .tb-app-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+
+@keyframes dockBounce {
+  0% { transform: translateY(0); }
+  20% { transform: translateY(-8px); }
+  40% { transform: translateY(0); }
+  55% { transform: translateY(-5px); }
+  70% { transform: translateY(0); }
+  85% { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}
+.tb-app.bouncing { animation: dockBounce 0.6s ease-out; }
+
+.tb-tray { display: flex; align-items: center; gap: 10px; margin-left: auto; font-size: 11px; color: #5a4a30; }
+.tb-tray-btn {
+  background: none; border: none; color: #5a4a30; cursor: pointer;
+  font-size: 14px; padding: 3px 6px; border-radius: 4px; transition: all 0.15s;
+}
+.tb-tray-btn:hover { background: rgba(255,255,255,0.2); }
+#clock { font-family: var(--mono); font-size: 11px; color: #5a4a30; }
+
+.lang-toggle-seg {
+  display: flex; border-radius: 4px; overflow: hidden;
+  border: 1px solid rgba(58,46,30,0.2); background: rgba(255,255,255,0.1);
+}
+.lang-seg {
+  padding: 2px 8px; border: none; background: transparent;
+  font-family: var(--brush); font-size: 11px; font-weight: 600;
+  color: #5a4a30; cursor: pointer; transition: all 0.15s;
+}
+.lang-seg.active { background: var(--accent); color: #faf7f0; }
+.lang-seg:hover:not(.active) { background: rgba(255,255,255,0.15); }
+
+/* =================== COMMAND PALETTE =================== */
+.cmd-overlay { position: fixed; inset: 0; background: rgba(58,46,30,0.4); backdrop-filter: blur(6px); z-index: 50000; display: none; align-items: flex-start; justify-content: center; padding-top: 20vh; }
+.cmd-overlay.open { display: flex; }
+.cmd-box { width: 540px; max-width: 90vw; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 24px 60px rgba(0,0,0,0.2); overflow: hidden; animation: cmdOpen 0.15s ease-out; }
+@keyframes cmdOpen { from { transform: scale(0.94) translateY(-12px); opacity: 0; } }
+.cmd-input { width: 100%; padding: 14px 18px; background: transparent; border: none; outline: none; color: var(--text); font-family: var(--brush); font-size: 15px; border-bottom: 1px solid var(--border); }
+.cmd-input::placeholder { color: var(--text-muted); }
+.cmd-results { max-height: 300px; overflow-y: auto; }
+.cmd-item { padding: 9px 18px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background 0.1s; font-size: 13px; font-family: var(--brush); }
+.cmd-item:hover, .cmd-item.selected { background: rgba(199,92,58,0.08); }
+.cmd-item .cmd-icon { font-size: 15px; width: 24px; text-align: center; font-family: var(--mono); }
+.cmd-item .cmd-label { flex: 1; }
+.cmd-item .cmd-hint { font-size: 10px; color: var(--text-muted); font-family: var(--mono); }
+
+/* =================== CONTEXT MENU =================== */
+.ctx-menu { position: fixed; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 5px; min-width: 190px; box-shadow: 0 10px 32px rgba(0,0,0,0.15); z-index: 60000; display: none; animation: ctxOpen 0.12s ease-out; }
+@keyframes ctxOpen { from { transform: scale(0.95); opacity: 0; } }
+.ctx-menu.open { display: block; }
+.ctx-item { padding: 7px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 10px; transition: background 0.1s; color: var(--text); font-family: var(--brush); }
+.ctx-item:hover { background: rgba(199,92,58,0.08); }
+.ctx-item .ctx-icon { width: 18px; text-align: center; font-family: var(--mono); font-size: 11px; }
+.ctx-sep { height: 1px; background: var(--border); margin: 3px 6px; }
+
+/* =================== APP STYLES =================== */
+.notepad-content { font-family: var(--brush); font-size: 14px; line-height: 1.9; color: var(--text); }
+.notepad-content h2 { font-family: var(--display); font-size: 22px; font-weight: 700; margin-bottom: 12px; color: var(--accent); }
+.notepad-content p { margin-bottom: 12px; }
+.notepad-content .aside { color: var(--text-muted); font-style: italic; font-size: 13px; }
+
+.terminal { font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--text); background: #f0e8d0; padding: 20px; height: 100%; border-left: 4px solid var(--accent); }
+.terminal .prompt { color: var(--accent); }
+.terminal .cmd-text { color: var(--text); }
+.terminal .output { color: var(--text-muted); white-space: pre-wrap; }
+.terminal .error { color: var(--red); }
+.terminal .highlight { color: var(--amber); }
+.term-input-line { display: flex; align-items: center; gap: 0; }
+.term-input { background: transparent; border: none; outline: none; color: var(--text); font-family: var(--mono); font-size: 13px; flex: 1; caret-color: var(--accent); }
+
+.projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.project-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 18px; cursor: pointer; transition: all 0.2s; }
+.project-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+.project-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; font-family: var(--brush); }
+.project-card p { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
+.project-card .tags { display: flex; gap: 5px; flex-wrap: wrap; }
+.project-card .tag { font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(199,92,58,0.08); color: var(--accent); }
+
+.gallery-scroll { display: flex; gap: 18px; overflow-x: auto; padding-bottom: 14px; scroll-snap-type: x mandatory; }
+.gallery-scroll::-webkit-scrollbar { height: 3px; }
+.gallery-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.gallery-item { flex-shrink: 0; width: 240px; scroll-snap-align: start; }
+.gallery-thumb { width: 100%; height: 180px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 44px; margin-bottom: 10px; border: 1px solid var(--border); }
+.gallery-item h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; font-family: var(--brush); }
+.gallery-item p { font-size: 11px; color: var(--text-muted); }
+
+.gc-podium { display: flex; align-items: flex-end; justify-content: center; gap: 14px; margin-bottom: 28px; }
+.gc-podium-item { text-align: center; padding: 14px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border); }
+.gc-podium-item.gold { border-color: var(--amber); order: 2; }
+.gc-podium-item.silver { border-color: #94a3b8; order: 1; }
+.gc-podium-item.bronze { border-color: #a07040; order: 3; }
+.gc-medal { font-size: 28px; font-family: var(--display); }
+.gc-name { font-size: 13px; font-weight: 600; margin-top: 6px; font-family: var(--brush); }
+.gc-score { font-size: 10px; color: var(--text-muted); font-family: var(--mono); }
+.gc-bracket { display: flex; gap: 36px; align-items: center; overflow-x: auto; padding: 14px 0; }
+.gc-round { display: flex; flex-direction: column; gap: 16px; flex-shrink: 0; }
+.gc-match { background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.gc-matchup { padding: 7px 12px; font-size: 11px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+.gc-matchup:last-child { border-bottom: none; }
+.gc-matchup.winner { color: var(--accent); font-weight: 600; }
+
+.finder { height: 100%; display: flex; flex-direction: column; }
+.finder-toolbar { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid var(--border); background: var(--surface-2); font-size: 11px; color: var(--text-muted); }
+.finder-path { font-family: var(--mono); font-size: 10px; color: var(--text-muted); flex: 1; }
+.finder-list { flex: 1; overflow-y: auto; }
+.finder-item { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid rgba(0,0,0,0.03); cursor: pointer; transition: background 0.1s; font-size: 12px; }
+.finder-item:hover { background: rgba(199,92,58,0.04); }
+.finder-item.disabled { opacity: 0.35; cursor: not-allowed; }
+.finder-item.disabled:hover { background: transparent; }
+.finder-item .fi-icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
+.finder-item .fi-name { flex: 1; font-family: var(--brush); }
+.finder-item .fi-meta { font-size: 10px; color: var(--text-muted); font-family: var(--mono); }
+.finder-item .fi-size { font-size: 10px; color: var(--text-muted); font-family: var(--mono); min-width: 50px; text-align: right; }
+.finder-preview { padding: 20px; animation: fadeIn 0.2s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.finder-preview h3 { font-size: 15px; margin-bottom: 10px; font-family: var(--display); }
+.finder-preview p { font-size: 12px; color: var(--text-muted); line-height: 1.7; margin-bottom: 8px; }
+.finder-preview-back { font-size: 11px; color: var(--accent); cursor: pointer; margin-bottom: 14px; display: inline-block; }
+.finder-preview-back:hover { text-decoration: underline; }
+
+.currently-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.currently-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+.currently-card h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 7px; font-family: var(--mono); }
+.currently-card .item { font-size: 12px; padding: 3px 0; display: flex; align-items: center; gap: 7px; }
+.currently-card .item-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+
+/* =================== CURSOR TRAIL =================== */
+.cursor-dot {
+  position: fixed; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--accent); pointer-events: none; z-index: 99998;
+  opacity: 0.3; transition: opacity 0.5s, transform 0.5s;
+}
+.cursor-dot.fade { opacity: 0; transform: scale(0); }
+
+/* =================== WINDOW SNAP =================== */
+.snap-indicator {
+  position: fixed; background: rgba(199,92,58,0.08);
+  border: 2px dashed var(--accent); border-radius: var(--radius);
+  z-index: 50; pointer-events: none; transition: all 0.15s ease-out;
+}
+
+/* =================== TOAST =================== */
+.melody-toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--surface); border: 1px solid var(--accent);
+  border-radius: 8px; padding: 8px 18px; font-size: 12px;
+  color: var(--accent); font-family: var(--brush);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08); z-index: 99999;
+  animation: toastIn 0.3s ease-out, toastOut 0.3s ease-in 2.5s forwards;
+  pointer-events: none;
+}
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-16px); } }
+@keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(-16px); } }
+
+.sparkle {
+  position: fixed; width: 6px; height: 6px; pointer-events: none; z-index: 99999;
+}
+.sparkle::before, .sparkle::after { content: ''; position: absolute; background: var(--accent); border-radius: 1px; }
+.sparkle::before { width: 100%; height: 2px; top: 50%; transform: translateY(-50%); }
+.sparkle::after { width: 2px; height: 100%; left: 50%; transform: translateX(-50%); }
+
+/* =================== SCREENSAVER =================== */
+.screensaver { position: fixed; inset: 0; background: #0a0820; z-index: 80000; display: none; cursor: pointer; overflow: hidden; }
+.screensaver.active { display: block; }
+.screensaver-moon {
+  position: absolute; width: 80px; height: 80px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #f0e8d0, #c4a43a);
+  right: 15%; bottom: 60%; opacity: 0;
+  animation: moonRise 8s ease-out forwards;
+  box-shadow: 0 0 40px rgba(232,200,120,0.3);
+}
+@keyframes moonRise { from { bottom: 20%; opacity: 0; } to { bottom: 60%; opacity: 1; } }
+.screensaver-text {
+  position: absolute; bottom: 12%; width: 100%; text-align: center;
+  font-family: var(--brush); font-size: 14px; color: rgba(232,223,208,0.25);
+  letter-spacing: 0.08em;
+}
+
+/* =================== KONAMI =================== */
+.cheese-rain { position: fixed; inset: 0; pointer-events: none; z-index: 90000; }
+.cheese-drop { position: absolute; font-size: 28px; animation: cheeseFall linear forwards; }
+@keyframes cheeseFall { from { transform: translateY(-50px) rotate(0deg); } to { transform: translateY(110vh) rotate(360deg); } }
+
+/* =================== DESKTOP TOY =================== */
+.desktop-toy {
+  position: fixed; pointer-events: none; z-index: 5;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--accent), #8a5030);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* =================== TANUKI EASTER EGG =================== */
+.tanuki {
+  position: fixed; z-index: 9500; pointer-events: none;
+  bottom: 70px; left: 50%;
+  animation: tanukiPeek 2s ease-in-out forwards;
+}
+@keyframes tanukiPeek {
+  0% { transform: translateX(-50%) translateY(30px); opacity: 0; }
+  20% { transform: translateX(-50%) translateY(0); opacity: 1; }
+  80% { transform: translateX(-50%) translateY(0); opacity: 1; }
+  100% { transform: translateX(-50%) translateY(30px); opacity: 0; }
+}
+
+/* =================== RAIN EFFECT =================== */
+.rain-drop {
+  position: fixed; width: 1px; pointer-events: none; z-index: 70000;
+  background: linear-gradient(180deg, transparent, rgba(100,140,180,0.4));
+  animation: rainFall linear forwards;
+}
+@keyframes rainFall {
+  from { transform: translateY(-20px); }
+  to { transform: translateY(100vh); }
+}
+
+/* =================== MOBILE =================== */
+@media (max-width: 768px) {
+  .desktop-icons { flex-direction: row; flex-wrap: wrap; max-width: 100%; justify-content: center; padding: 16px; }
+  .window { position: fixed !important; inset: 0 !important; width: 100vw !important; height: calc(100vh - var(--taskbar-h)) !important; border-radius: 0 !important; min-width: unset !important; min-height: unset !important; }
+  .watermark-canvas { display: none; }
+  .taskbar { left: 6px; right: 6px; transform: none; width: auto; max-width: none; bottom: 6px; padding: 5px 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- BOOT SCREEN -->
+<div id="boot-screen">
+  <div class="boot-ink-splatter" id="bootInk"></div>
+  <div class="boot-brush-stroke" id="bootLogo">RikaOS</div>
+  <div class="boot-lines" id="bootLines"></div>
+</div>
+
+<!-- DESKTOP -->
+<div id="desktop">
+  <div class="desktop-bg"></div>
+  <div class="clouds" id="clouds"></div>
+  <div class="sky-stars" id="skyStars"></div>
+  <div class="mountains" id="mountains"></div>
+  <div class="particles" id="particles"></div>
+  <div class="cheese-rain" id="cheeseRain"></div>
+  <canvas class="watermark-canvas" id="watermarkCanvas"></canvas>
+  <div class="desktop-icons" id="desktopIcons"></div>
+  <div id="windowContainer"></div>
+
+  <!-- Taskbar (wooden shelf) -->
+  <div class="taskbar">
+    <button class="tb-start" title="Start">印</button>
+    <div class="tb-divider"></div>
+    <div class="tb-apps" id="tbApps"></div>
+    <div class="tb-tray">
+      <button class="tb-tray-btn" id="nightToggle" onclick="toggleNightMode()" title="Toggle night mode">灯</button>
+      <div class="lang-toggle-seg" id="langToggle">
+        <button class="lang-seg active" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-seg" data-lang="jp" onclick="setLang('jp')">JP</button>
+      </div>
+      <span id="clock"></span>
+    </div>
+  </div>
+</div>
+
+<!-- Command Palette -->
+<div class="cmd-overlay" id="cmdOverlay" onclick="if(event.target===this)closeCmdPalette()">
+  <div class="cmd-box">
+    <input class="cmd-input" id="cmdInput" placeholder="Search..." oninput="filterCommands()" onkeydown="handleCmdKey(event)">
+    <div class="cmd-results" id="cmdResults"></div>
+  </div>
+</div>
+
+<!-- Context Menu -->
+<div class="ctx-menu" id="ctxMenu"></div>
+
+<!-- Screensaver -->
+<div class="screensaver" id="screensaver" onclick="hideScreensaver()">
+  <div class="screensaver-moon"></div>
+  <div class="screensaver-text">the artist is dreaming — click to wake</div>
+</div>
+
+<script>
+// =================== STATE ===================
+let lang = 'en';
+let windows = [];
+let nextZ = 100;
+let nextWinId = 1;
+let focusedWinId = null;
+let idleTimer = null;
+const IDLE_TIMEOUT = 120000;
+let nightMode = false;
+
+// =================== SOUND SYSTEM ===================
+let audioCtx = null;
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+document.addEventListener('click', () => { initAudio(); startAmbientHum(); }, { once: true });
+
+function playBoop(freq = 440, duration = 0.08, vol = 0.1, type = 'sine') {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(freq * 0.7, audioCtx.currentTime + duration);
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + duration);
+}
+
+// Wood block "tok" sound for icon hover
+function playTok() {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.04);
+  gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + 0.06);
+}
+
+function playWindowOpen() {
+  if (!audioCtx) return;
+  // Paper unfurl + wind chime
+  const noise = audioCtx.createOscillator();
+  const g1 = audioCtx.createGain();
+  noise.type = 'sawtooth'; noise.frequency.setValueAtTime(150, audioCtx.currentTime);
+  noise.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.15);
+  g1.gain.setValueAtTime(0.03, audioCtx.currentTime);
+  g1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+  noise.connect(g1).connect(audioCtx.destination); noise.start(); noise.stop(audioCtx.currentTime + 0.15);
+  // Chime
+  setTimeout(() => {
+    const chime = audioCtx.createOscillator(); const g2 = audioCtx.createGain();
+    chime.type = 'sine'; chime.frequency.setValueAtTime(1200, audioCtx.currentTime);
+    g2.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    g2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+    chime.connect(g2).connect(audioCtx.destination); chime.start(); chime.stop(audioCtx.currentTime + 0.3);
+  }, 100);
+}
+
+function playWindowClose() {
+  if (!audioCtx) return;
+  playBoop(300, 0.08, 0.05, 'triangle');
+  setTimeout(() => playBoop(200, 0.1, 0.03, 'sine'), 40);
+}
+
+function playTypeBoop() {
+  if (!audioCtx) return;
+  // Brush on paper
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(300 + Math.random() * 200, audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+  osc.connect(gain).connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.03);
+}
+
+let ambientNode = null;
+function startAmbientHum() {
+  if (!audioCtx || ambientNode) return;
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  osc.type = 'sine'; osc.frequency.setValueAtTime(80, audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.004, audioCtx.currentTime);
+  osc.connect(gain).connect(audioCtx.destination); osc.start();
+  ambientNode = osc;
+}
+
+// Musical icon scale — Japanese pentatonic (miyako-bushi)
+const musicalScale = {
+  welcome:   { freq: 293.66, note: 'D4' },
+  projects:  { freq: 311.13, note: 'Eb4' },
+  terminal:  { freq: 392.00, note: 'G4' },
+  gallery:   { freq: 440.00, note: 'A4' },
+  currently: { freq: 466.16, note: 'Bb4' },
+  gc:        { freq: 587.33, note: 'D5' },
+  japan:     { freq: 622.25, note: 'Eb5' },
+  trash:     { freq: 783.99, note: 'G5' },
+};
+const scaleOrder = ['welcome','projects','terminal','gallery','currently','gc','japan','trash'];
+let scaleProgress = 0;
+let melodyUnlocked = false;
+
+function playScaleNote(appId) {
+  const note = musicalScale[appId];
+  if (!note) return;
+  playTok();
+  playBoop(note.freq, 0.2, 0.06, 'sine');
+  if (scaleOrder[scaleProgress] === appId) {
+    scaleProgress++;
+    if (scaleProgress >= scaleOrder.length && !melodyUnlocked) { melodyUnlocked = true; triggerMelodyUnlocked(); }
+  } else if (scaleOrder[0] === appId) { scaleProgress = 1; }
+  else { scaleProgress = 0; }
+}
+
+function triggerMelodyUnlocked() {
+  scaleOrder.forEach((id, i) => { setTimeout(() => playBoop(musicalScale[id].freq, 0.25, 0.08, 'sine'), i * 100); });
+  document.querySelectorAll('.desktop-icon').forEach(icon => {
+    const rect = icon.getBoundingClientRect();
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => {
+        const sp = document.createElement('div'); sp.className = 'sparkle';
+        sp.style.left = (rect.left + Math.random() * rect.width) + 'px';
+        sp.style.top = (rect.top + Math.random() * rect.height) + 'px';
+        sp.style.animation = 'sparkle 0.6s ease-out forwards';
+        document.body.appendChild(sp); setTimeout(() => sp.remove(), 600);
+      }, i * 120);
+    }
+  });
+  const toast = document.createElement('div'); toast.className = 'melody-toast';
+  toast.textContent = '♪ melody unlocked ♪';
+  document.body.appendChild(toast); setTimeout(() => toast.remove(), 3000);
+}
+
+// =================== I18N ===================
+const i18n = {
+  en: {
+    welcome_title: 'Welcome to RikaOS',
+    welcome_body: `<p>Hey! I'm <strong>Rika Ciminieri</strong> — half-Japanese full-stack engineer at Eventbrite.</p>
+<p>Former microbiology student turned tech advocate. I pivoted from petri dishes to pixels because I realized I liked debugging code more than debugging cell cultures.</p>
+<p>I paint, build tiny book nooks, do pilates, have deeply researched One Piece theories, and rank grilled cheeses competitively. I go to Japan almost every year.</p>
+<p class="aside">Currently into: Bridgerton, The Traitors, Heated Rivalry, learning AI, Monopoly Deal, and learning how to sing.</p>
+<p class="aside">Pro tip: Press ⌘K to open the command palette. Right-click anywhere for more options.</p>`,
+    about: 'About', projects: 'Projects', terminal: 'Terminal', gallery: 'Gallery',
+    gc: 'Grilled Cheese', trash: 'Trash', currently: 'Currently', japan: 'Japan',
+  },
+  jp: {
+    welcome_title: 'RikaOSへようこそ',
+    welcome_body: `<p>こんにちは！<strong>Rika Ciminieri</strong>です。日米ハーフのフルスタックエンジニアで、Eventbriteで働いています。</p>
+<p>元微生物学の学生からテック業界へ転身。シャーレの培養よりコードのデバッグの方が好きだと気づきました。</p>
+<p>絵を描いたり、小さなブックヌックを作ったり、ピラティスをしたり、ワンピースの考察を深く研究したり、グリルドチーズのランキングも本気でやっています。</p>
+<p class="aside">ヒント: ⌘Kでコマンドパレットを開けます。右クリックでメニューも。</p>`,
+    about: 'プロフィール', projects: 'プロジェクト', terminal: 'ターミナル', gallery: 'ギャラリー',
+    gc: 'グリルドチーズ', trash: 'ゴミ箱', currently: '今ハマってる', japan: '日本',
+  }
+};
+function t(key) { return i18n[lang][key] || i18n.en[key] || key; }
+
+// =================== CSS-ART ICON SVGs (Ink Brush Style) ===================
+const iconSVGs = {
+  welcome: '<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="11" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" fill="none" opacity="0.8"/><circle cx="16" cy="16" r="3" fill="rgba(255,255,255,0.5)"/></svg>',
+  projects: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"><rect x="6" y="10" width="20" height="14" rx="1.5" fill="rgba(255,255,255,0.1)"/><path d="M6 26h20M10 15h8M10 18h12M10 21h6"/></svg>',
+  terminal: '<svg viewBox="0 0 32 32" fill="none"><rect x="5" y="7" width="22" height="18" rx="2" fill="rgba(90,122,74,0.15)" stroke="rgba(90,122,74,0.6)" stroke-width="1.2"/><text x="10" y="20" font-family="monospace" font-size="11" font-weight="bold" fill="rgba(90,122,74,0.9)">›_</text><rect x="20" y="15" width="1.5" height="6" rx="0.5" fill="rgba(90,122,74,0.5)"><animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/></rect></svg>',
+  gallery: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.3"><ellipse cx="16" cy="17" rx="11" ry="9" fill="rgba(255,255,255,0.1)"/><circle cx="11" cy="14" r="2.2" fill="#d4858a" stroke="none"/><circle cx="17" cy="11" r="1.8" fill="#c4943a" stroke="none"/><circle cx="22" cy="16" r="1.8" fill="#5a7a4a" stroke="none"/><circle cx="13" cy="21" r="1.5" fill="#4a6a8a" stroke="none"/></svg>',
+  currently: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"><ellipse cx="16" cy="20" rx="6" ry="4" fill="rgba(255,255,255,0.1)"/><path d="M12 16v4M20 16v4"/><path d="M14 10q-1-4 2-4q3 0 2 4" stroke-width="1.2" opacity="0.5"/><path d="M16 10q-1-3 1.5-3" stroke-width="1" opacity="0.4"/></svg>',
+  gc: '<svg viewBox="0 0 32 32" fill="none"><rect x="8" y="9" width="16" height="4" rx="2" fill="rgba(255,255,255,0.35)" stroke="rgba(255,255,255,0.5)" stroke-width="0.8"/><path d="M8 13Q12 17 16 13Q20 17 24 13" fill="rgba(255,210,120,0.4)" stroke="rgba(255,210,120,0.5)" stroke-width="0.8"/><rect x="8" y="15" width="16" height="4" rx="2" fill="rgba(255,255,255,0.3)" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/><path d="M12 19q.5 2.5 1 0M19 19q.5 2 1 0" stroke="rgba(255,210,120,0.5)" stroke-width="1.3" stroke-linecap="round"/></svg>',
+  japan: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round"><line x1="10" y1="12" x2="10" y2="27"/><line x1="22" y1="12" x2="22" y2="27"/><path d="M7 12Q16 8 25 12" stroke-width="2.5"/><line x1="9" y1="16" x2="23" y2="16" stroke-width="1.3"/></svg>',
+  trash: '<svg viewBox="0 0 32 32" fill="none"><path d="M10 14 C10 14, 8 26, 16 26 C24 26, 22 14, 22 14" fill="rgba(138,126,106,0.2)" stroke="rgba(138,126,106,0.5)" stroke-width="1.2"/><path d="M10 14 Q16 12 22 14" stroke="rgba(138,126,106,0.5)" stroke-width="1.2" fill="none"/><path d="M12 11 Q16 8 20 11" stroke="rgba(138,126,106,0.4)" stroke-width="1.3" fill="none" stroke-linecap="round"/><circle cx="14" cy="19" r="1.2" fill="rgba(138,126,106,0.5)"/><circle cx="18" cy="19" r="1.2" fill="rgba(138,126,106,0.5)"/><path d="M14 22 Q16 23.5 18 22" stroke="rgba(138,126,106,0.5)" stroke-width="0.9" fill="none" stroke-linecap="round"/></svg>',
+};
+
+// =================== APPS ===================
+const apps = [
+  { id: 'welcome', iconCls: 'icon-welcome', label: () => t('about'), w: 520, h: 420 },
+  { id: 'projects', iconCls: 'icon-projects', label: () => t('projects'), w: 700, h: 500 },
+  { id: 'terminal', iconCls: 'icon-terminal', label: () => t('terminal'), w: 640, h: 420 },
+  { id: 'gallery', iconCls: 'icon-gallery', label: () => t('gallery'), w: 680, h: 460 },
+  { id: 'currently', iconCls: 'icon-currently', label: () => t('currently'), w: 480, h: 400 },
+  { id: 'gc', iconCls: 'icon-gc', label: () => t('gc'), w: 720, h: 520 },
+  { id: 'japan', iconCls: 'icon-japan', label: () => t('japan'), w: 520, h: 440 },
+  { id: 'trash', iconCls: 'icon-trash', label: () => t('trash'), w: 560, h: 420 },
+];
+
+// =================== BOOT ===================
+const bootMessages = [
+  { text: 'RikaOS v2.1 (ghibli) — awakening...', delay: 0 },
+  { text: 'unrolling scroll of /dev/portfolio...       [OK]', cls: 'ok', delay: 300 },
+  { text: 'brewing tea for bilingual engine...         [OK]', cls: 'ok', delay: 600 },
+  { text: 'summoning soot sprites...                   [OK]', cls: 'ok', delay: 900 },
+  { text: 'painting clouds by hand...                  [OK]', cls: 'ok', delay: 1100 },
+  { text: 'onsen.service — too relaxed to start        [WARN]', cls: 'warn', delay: 1300 },
+  { text: 'all spirits accounted for. welcome home.', cls: 'ok', delay: 1600 },
+];
+
+function runBoot() {
+  const logo = document.getElementById('bootLogo');
+  const container = document.getElementById('bootLines');
+  // Ink brush reveal
+  setTimeout(() => logo.classList.add('visible'), 300);
+  bootMessages.forEach(msg => {
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.textContent = msg.text;
+      if (msg.cls) div.classList.add(msg.cls);
+      container.appendChild(div);
+    }, msg.delay + 800);
+  });
+  setTimeout(() => {
+    document.getElementById('boot-screen').classList.add('done');
+    document.getElementById('desktop').classList.add('visible');
+    initScreensaverStars();
+    setTimeout(() => {
+      document.getElementById('boot-screen').style.display = 'none';
+      openApp('welcome');
+    }, 800);
+  }, 3200);
+}
+
+function initScreensaverStars() {
+  const ss = document.getElementById('screensaver');
+  for (let i = 0; i < 50; i++) {
+    const star = document.createElement('div');
+    star.className = 'sky-star';
+    star.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*60}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*3}s;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;`;
+    ss.insertBefore(star, ss.firstChild);
+  }
+}
+
+// =================== CLOUDS + MOUNTAINS + PARTICLES ===================
+function initClouds() {
+  const c = document.getElementById('clouds');
+  for (let i = 0; i < 6; i++) {
+    const cloud = document.createElement('div');
+    cloud.className = 'cloud';
+    const size = 100 + Math.random() * 200;
+    cloud.style.cssText = `width:${size}px;height:${size*0.5}px;top:${5+Math.random()*20}%;left:${Math.random()*100}%;animation:cloudDrift ${40+Math.random()*40}s linear infinite;`;
+    c.appendChild(cloud);
+  }
+}
+
+function initMountains() {
+  const m = document.getElementById('mountains');
+  const colors = ['#8a9a7a', '#7a8a6a', '#6a7a5a'];
+  for (let i = 0; i < 5; i++) {
+    const mt = document.createElement('div');
+    mt.className = 'mountain';
+    const height = 60 + Math.random() * 80;
+    mt.style.cssText = `left:${-5+i*22}%;border-bottom:${height}px solid ${colors[i%3]};border-left-width:${80+Math.random()*60}px;border-right-width:${80+Math.random()*60}px;`;
+    m.appendChild(mt);
+  }
+}
+
+function initParticles() {
+  const c = document.getElementById('particles');
+  // Soot sprites
+  for (let i = 0; i < 8; i++) {
+    const s = document.createElement('div');
+    s.className = 'soot-sprite';
+    s.style.cssText = `left:${Math.random()*100}%;top:${30+Math.random()*50}%;animation:sootWander ${8+Math.random()*8}s ease-in-out infinite;animation-delay:${Math.random()*5}s;`;
+    c.appendChild(s);
+  }
+  // Cherry blossom petals
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.style.cssText = `left:${Math.random()*100}%;animation:petalFall ${18+Math.random()*12}s linear infinite;animation-delay:${Math.random()*20}s;`;
+    c.appendChild(p);
+  }
+}
+
+function initNightStars() {
+  const c = document.getElementById('skyStars');
+  for (let i = 0; i < 60; i++) {
+    const star = document.createElement('div');
+    star.className = 'sky-star';
+    star.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*70}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*4}s;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;`;
+    c.appendChild(star);
+  }
+}
+
+// =================== DESKTOP ICONS ===================
+function renderDesktopIcons() {
+  const container = document.getElementById('desktopIcons');
+  container.innerHTML = '';
+  apps.forEach(app => {
+    const el = document.createElement('div');
+    el.className = 'desktop-icon';
+    el.ondblclick = () => openApp(app.id);
+    el.onmouseenter = () => playScaleNote(app.id);
+    el.innerHTML = `<div class="icon-img ${app.iconCls}">${iconSVGs[app.id] || ''}</div><div class="icon-label">${app.label()}</div>`;
+    container.appendChild(el);
+  });
+}
+
+// =================== WINDOW MANAGER ===================
+function openApp(appId) {
+  const existing = windows.find(w => w.appId === appId && !w.minimized);
+  if (existing) { focusWindow(existing.id); return; }
+  const existingMin = windows.find(w => w.appId === appId && w.minimized);
+  if (existingMin) {
+    existingMin.minimized = false;
+    const el = document.getElementById(`win-${existingMin.id}`);
+    if (el) { el.classList.remove('minimized'); el.style.display = ''; }
+    focusWindow(existingMin.id); updateTaskbar(); return;
+  }
+  const app = apps.find(a => a.id === appId);
+  if (!app) return;
+  const id = nextWinId++;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const winW = Math.min(app.w, vw - 40), winH = Math.min(app.h, vh - 100);
+  const openCount = windows.filter(w => !w.minimized).length;
+  const offsetX = Math.min(220 + openCount * 30, vw - winW - 20);
+  const offsetY = Math.min(30 + openCount * 25, vh - winH - 80);
+  const win = { id, appId, x: offsetX, y: offsetY, w: winW, h: winH, z: nextZ++, minimized: false };
+  windows.push(win);
+  renderWindow(win, app);
+  focusWindow(id);
+  updateTaskbar();
+  playWindowOpen();
+  setTimeout(() => {
+    const tbApp = document.querySelector(`.tb-app[data-app="${appId}"]`);
+    if (tbApp) { tbApp.classList.add('bouncing'); tbApp.addEventListener('animationend', () => tbApp.classList.remove('bouncing'), { once: true }); }
+  }, 350);
+}
+
+function renderWindow(win, app) {
+  const el = document.createElement('div');
+  el.className = 'window'; el.id = `win-${win.id}`;
+  el.style.cssText = `left:${win.x}px;top:${win.y}px;width:${win.w}px;height:${win.h}px;z-index:${win.z};`;
+  el.onmousedown = () => focusWindow(win.id);
+  el.innerHTML = `
+    <div class="win-header" onmousedown="startDrag(event,${win.id})">
+      <div class="win-dots">
+        <button class="win-dot close" onclick="closeWindow(${win.id})"></button>
+        <button class="win-dot minimize" onclick="minimizeWindow(${win.id})"></button>
+        <button class="win-dot maximize" onclick="maximizeWindow(${win.id})"></button>
+      </div>
+      <div class="win-title">${app.label()}</div>
+    </div>
+    <div class="win-body" id="win-body-${win.id}"></div>
+    <div class="win-resize" onmousedown="startResize(event,${win.id})"></div>`;
+  document.getElementById('windowContainer').appendChild(el);
+  renderAppContent(win.id, app.id);
+}
+
+function renderAppContent(winId, appId) {
+  const body = document.getElementById(`win-body-${winId}`);
+  if (!body) return;
+  switch (appId) {
+    case 'welcome':
+      body.innerHTML = `<div class="notepad-content"><h2>${t('welcome_title')}</h2>${t('welcome_body')}</div>`;
+      break;
+    case 'projects':
+      body.innerHTML = `<div class="projects-grid">
+        <div class="project-card"><h3>This Portfolio</h3><p>A custom OS-style portfolio built from scratch. The site itself is the proof of competence — the code is the portfolio.</p><div class="tags"><span class="tag">React</span><span class="tag">Vite</span><span class="tag">Tailwind</span><span class="tag">TypeScript</span></div></div>
+        <div class="project-card"><h3>Bilingual CMS</h3><p>Content management system with first-class EN/JP support. Vertical text, proper typography, and cultural sensitivity built in.</p><div class="tags"><span class="tag">Next.js</span><span class="tag">i18n</span><span class="tag">MDX</span></div></div>
+        <div class="project-card"><h3>Event Platform</h3><p>Contributed to Eventbrite's core event discovery and ticketing. Search, recommendations, and checkout flows used by millions.</p><div class="tags"><span class="tag">React</span><span class="tag">Python</span><span class="tag">GraphQL</span></div></div>
+        <div class="project-card"><h3>Lab Dashboard</h3><p>Real-time microbiology lab monitoring dashboard from my pre-tech days. Tracked cultures, experiments, and contamination alerts.</p><div class="tags"><span class="tag">D3.js</span><span class="tag">Flask</span><span class="tag">WebSockets</span></div></div>
+        <div class="project-card"><h3>Grilled Cheese API</h3><p>A RESTful API for ranking grilled cheese sandwiches. Because someone had to bring rigor to this field.</p><div class="tags"><span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">PostgreSQL</span></div></div>
+        <div class="project-card"><h3>AI Experiments</h3><p>Currently exploring AI-assisted development tools and agents. Building in public as I learn.</p><div class="tags"><span class="tag">Claude API</span><span class="tag">Python</span><span class="tag">LLMs</span></div></div>
+      </div>`;
+      break;
+    case 'terminal':
+      body.style.padding = '0';
+      body.innerHTML = `<div class="terminal" id="term-${winId}">
+        <div id="term-output-${winId}"><span class="output">RikaOS 書道 Terminal — type "help" for commands\n\n</span></div>
+        <div class="term-input-line"><span class="prompt">墨 rika ~ % </span><input class="term-input" id="term-input-${winId}" autofocus onkeydown="if(event.key==='Enter')execTermCmd(${winId});else playTypeBoop();"></div>
+      </div>`;
+      setTimeout(() => { const inp = document.getElementById(`term-input-${winId}`); if (inp) inp.focus(); }, 100);
+      break;
+    case 'gallery':
+      body.innerHTML = `<h3 style="font-family:var(--display);font-size:17px;font-weight:700;margin-bottom:14px;">The Gallery</h3>
+      <div class="gallery-scroll">
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#ff9a56,#ff6b3d);">🎨</div><h4>Sunset Over Shibuya</h4><p>Paint-by-numbers, acrylic on canvas. Made for a friend who studied abroad in Tokyo.</p></div>
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#8b5e3c,#c4956a);">🏠</div><h4>Hobbit Hole Book Nook</h4><p>My first book nook! Balsa wood, LED lights, and way too much hot glue.</p></div>
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#1a73e8,#4ecdc4);">🌊</div><h4>The Great Wave (Remix)</h4><p>Paint-by-numbers reinterpretation of Hokusai's classic. Took 3 weekends.</p></div>
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">📚</div><h4>Diagon Alley Nook</h4><p>Harry Potter-themed book nook with tiny shop windows that actually light up.</p></div>
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#ff8fa3,#ffb7c5);">🌸</div><h4>Cherry Blossom Garden</h4><p>After my last Kyoto trip. The pinks are slightly wrong and I love it.</p></div>
+      </div>`;
+      break;
+    case 'currently':
+      body.innerHTML = `<h3 style="font-family:var(--display);font-size:17px;font-weight:700;margin-bottom:14px;">What I'm Into Right Now</h3>
+        <div class="currently-grid">
+          <div class="currently-card"><h4>Watching</h4><div class="item"><span class="item-dot" style="background:var(--pink);"></span> Bridgerton (rewatching... again)</div><div class="item"><span class="item-dot" style="background:var(--red);"></span> The Traitors</div><div class="item"><span class="item-dot" style="background:var(--amber);"></span> Terrace House</div></div>
+          <div class="currently-card"><h4>Reading</h4><div class="item"><span class="item-dot" style="background:var(--accent);"></span> Heated Rivalry</div><div class="item"><span class="item-dot" style="background:var(--green);"></span> One Piece (always)</div></div>
+          <div class="currently-card"><h4>Playing</h4><div class="item"><span class="item-dot" style="background:var(--green);"></span> Monopoly Deal</div><div class="item"><span class="item-dot" style="background:var(--blue);"></span> Learning to sing</div></div>
+          <div class="currently-card"><h4>Learning</h4><div class="item"><span class="item-dot" style="background:var(--amber);"></span> AI & LLMs</div><div class="item"><span class="item-dot" style="background:var(--pink);"></span> Building agents</div><div class="item"><span class="item-dot" style="background:var(--green);"></span> Singing (badly)</div></div>
+          <div class="currently-card"><h4>Listening</h4><div class="item"><span class="item-dot" style="background:var(--pink);"></span> Yoasobi — Idol</div><div class="item"><span class="item-dot" style="background:var(--accent);"></span> Dodo</div><div class="item"><span class="item-dot" style="background:var(--green);"></span> City Pop playlists</div></div>
+          <div class="currently-card"><h4>Hills I'll Die On</h4><div class="item"><span class="item-dot" style="background:var(--red);"></span> MJ is the king of pop</div><div class="item"><span class="item-dot" style="background:var(--amber);"></span> The Rock's Jumanji is good</div><div class="item"><span class="item-dot" style="background:var(--green);"></span> Health > everything</div></div>
+        </div>`;
+      break;
+    case 'japan':
+      body.innerHTML = `<h3 style="font-family:var(--display);font-size:17px;font-weight:700;margin-bottom:4px;">日本 — Japan</h3>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:18px;font-family:var(--brush);">Heritage, not decoration. I go almost every year.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:12px;"><h4 style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:6px;font-family:var(--mono);">♨️ Onsen Rankings</h4><div style="font-size:12px;line-height:2;">🥇 Kurokawa, Kumamoto<br>🥈 Hakone open-air<br>🥉 Kinosaki, Hyogo</div></div>
+          <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:12px;"><h4 style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:6px;font-family:var(--mono);">🏪 Konbini Tier List</h4><div style="font-size:12px;line-height:2;">S tier: 7-Eleven<br>A tier: FamilyMart<br>B tier: Lawson</div></div>
+          <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:12px;"><h4 style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:6px;font-family:var(--mono);">📺 Drama Corner</h4><div style="font-size:12px;line-height:1.8;">Hana Yori Dango — GOAT<br>Terrace House — deeply formative<br>Currently: nothing tops these</div></div>
+          <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:12px;"><h4 style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:6px;font-family:var(--mono);">🎵 Now Playing</h4><div style="font-size:12px;line-height:1.8;">Yoasobi — Idol (on repeat)<br>Dodo<br>City Pop playlists at 2am</div></div>
+        </div>`;
+      break;
+    case 'gc':
+      body.innerHTML = `<h3 style="font-family:var(--display);font-size:17px;font-weight:700;margin-bottom:18px;">The Grilled Cheese Olympics</h3>
+        <div class="gc-podium">
+          <div class="gc-podium-item silver"><div class="gc-medal">銀</div><div class="gc-name">Truffle Melt</div><div class="gc-score">38/40</div></div>
+          <div class="gc-podium-item gold"><div class="gc-medal">金</div><div class="gc-name">The Classic</div><div class="gc-score">39/40</div></div>
+          <div class="gc-podium-item bronze"><div class="gc-medal">銅</div><div class="gc-name">Brie & Fig</div><div class="gc-score">36/40</div></div>
+        </div>
+        <h4 style="font-size:13px;font-weight:600;margin-bottom:10px;font-family:var(--brush);">Tournament Bracket</h4>
+        <div class="gc-bracket">
+          <div class="gc-round"><div class="gc-match"><div class="gc-matchup winner">The Classic</div><div class="gc-matchup">Caprese</div></div><div class="gc-match"><div class="gc-matchup winner">Truffle Melt</div><div class="gc-matchup">French Onion</div></div><div class="gc-match"><div class="gc-matchup winner">Brie & Fig</div><div class="gc-matchup">Jalapeño Popper</div></div><div class="gc-match"><div class="gc-matchup">Starbucks One</div><div class="gc-matchup winner">Kimchi GC</div></div></div>
+          <div class="gc-round"><div class="gc-match"><div class="gc-matchup winner">The Classic</div><div class="gc-matchup">Truffle Melt</div></div><div class="gc-match"><div class="gc-matchup winner">Brie & Fig</div><div class="gc-matchup">Kimchi GC</div></div></div>
+          <div class="gc-round"><div class="gc-match"><div class="gc-matchup winner">The Classic 🏆</div><div class="gc-matchup">Brie & Fig</div></div></div>
+        </div>`;
+      break;
+    case 'trash':
+      body.style.padding = '0';
+      body.innerHTML = `<div class="finder" id="finder-${winId}"><div class="finder-toolbar"><span class="finder-path">/Users/rika/Desktop/definitely-not-important/</span><span style="font-family:var(--mono);font-size:9px;">12 items</span></div><div class="finder-list" id="finder-list-${winId}"></div></div>`;
+      renderFinderList(winId);
+      break;
+  }
+}
+
+// =================== FINDER ===================
+const finderFiles = [
+  { icon: '📄', name: 'resume_final_FINAL_v3.docx', size: '847 KB', meta: 'Modified: way too many times', clickable: true, content: { title: 'resume_final_FINAL_v3.docx', body: '<p>Wait, you actually opened this?</p><p>The real resume is the portfolio you\'re currently standing inside of. But nice try.</p><p style="margin-top:14px;font-style:italic;color:var(--text-muted);">— Rika, who has been through 47 versions of this document</p>' }},
+  { icon: '📊', name: 'grilled-cheese-spreadsheet-v47.xlsx', size: '2.1 MB', meta: 'The sacred texts', clickable: true, content: { title: 'The Sacred Spreadsheet', body: '<p>This spreadsheet has 47 versions because grilled cheese ranking is an iterative science.</p><p>Columns include: Cheese Pull (x/10), Crunch Factor (x/10), Flavor (x/10), and Vibes (x/10).</p><p>The "Vibes" column was controversial. I stand by it.</p>' }},
+  { icon: '📁', name: 'photos-from-kyoto-2024/', size: '—', meta: 'Folder', disabled: true },
+  { icon: '🎵', name: 'yoasobi-idol-loop-3hr.mp3', size: '312 MB', meta: 'No regrets', clickable: true, content: { title: 'yoasobi-idol-loop-3hr.mp3', body: '<p>Three hours of Idol by Yoasobi on loop.</p><p>This is what peak productivity sounds like.</p><p style="font-family:var(--mono);font-size:11px;margin-top:10px;color:var(--green);">♪ ♫ ♬ 誰もが目を奪われていく... ♬ ♫ ♪</p>' }},
+  { icon: '📝', name: 'one-piece-theories-too-unhinged.txt', size: '94 KB', meta: 'Classified', disabled: true },
+  { icon: '🖼️', name: 'book-nook-progress-shots/', size: '—', meta: 'Folder', disabled: true },
+  { icon: '📄', name: 'cover-letter-that-goes-too-hard.pdf', size: '156 KB', meta: 'They said "be authentic"', clickable: true, content: { title: 'Cover Letter That Goes Too Hard', body: '<p>"Dear Hiring Manager,</p><p>I once spent 3 months building a grilled cheese ranking API. Not because anyone asked me to, but because I believe every passion deserves well-structured data.</p><p>I bring this same energy to everything I build."</p>' }},
+  { icon: '📁', name: 'screenshots-of-bugs-i-fixed/', size: '—', meta: 'The trophy case', disabled: true },
+  { icon: '📄', name: 'things-i-will-learn-next.md', size: '12 KB', meta: 'Always growing', clickable: true, content: { title: 'Things I Want to Learn Next', body: '<p>• Rust (because everyone says I should)<br>• WebGL / Three.js<br>• How to sing (seriously)<br>• Better Japanese kanji<br>• How to make the perfect croissant<br>• Prompt engineering</p>' }},
+  { icon: '🎮', name: 'monopoly-deal-win-streak.log', size: '4 KB', meta: 'Undefeated (almost)', disabled: true },
+  { icon: '📄', name: 'bridgerton-hot-takes.txt', size: '28 KB', meta: 'Spoilers inside', clickable: true, content: { title: 'Bridgerton Hot Takes', body: '<p>• Season 2 > Season 1<br>• The enemies-to-lovers tension was *chef\'s kiss*<br>• Anthony Bridgerton character development arc is elite<br>• I have rewatched the rain scene 14 times</p>' }},
+  { icon: '📁', name: 'env-files-definitely-not-secrets/', size: '—', meta: 'Nice try, hacker', disabled: true },
+];
+
+function renderFinderList(winId) {
+  const list = document.getElementById(`finder-list-${winId}`);
+  if (!list) return;
+  list.innerHTML = finderFiles.map((f, i) => `<div class="finder-item ${f.disabled?'disabled':''}" ${f.clickable?`onclick="openFinderFile(${winId},${i})"`:''}>
+    <span class="fi-icon">${f.icon}</span><span class="fi-name">${f.name}</span><span class="fi-meta">${f.meta}</span><span class="fi-size">${f.size}</span></div>`).join('');
+}
+function openFinderFile(winId, idx) {
+  const file = finderFiles[idx]; if (!file?.content) return;
+  const list = document.getElementById(`finder-list-${winId}`);
+  list.innerHTML = `<div class="finder-preview"><div class="finder-preview-back" onclick="renderFinderList(${winId})">← Back</div><h3>${file.content.title}</h3>${file.content.body}</div>`;
+}
+
+// =================== WINDOW MANAGEMENT ===================
+function focusWindow(id) {
+  focusedWinId = id;
+  const win = windows.find(w => w.id === id);
+  if (win) win.z = nextZ++;
+  document.querySelectorAll('.window').forEach(el => {
+    el.classList.remove('focused');
+    const wid = parseInt(el.id.replace('win-', ''));
+    const w = windows.find(x => x.id === wid);
+    if (w) el.style.zIndex = w.z;
+  });
+  const el = document.getElementById(`win-${id}`);
+  if (el) el.classList.add('focused');
+  updateTaskbar();
+}
+
+function closeWindow(id) {
+  playWindowClose();
+  const el = document.getElementById(`win-${id}`);
+  if (el) { el.style.transition = 'transform 0.25s, opacity 0.25s'; el.style.transform = 'scaleY(0.1) rotate(2deg)'; el.style.opacity = '0'; setTimeout(() => el.remove(), 250); }
+  windows = windows.filter(w => w.id !== id);
+  if (focusedWinId === id) focusedWinId = null;
+  updateTaskbar();
+}
+
+function minimizeWindow(id) {
+  playBoop(300, 0.06, 0.04);
+  const win = windows.find(w => w.id === id); if (win) win.minimized = true;
+  const el = document.getElementById(`win-${id}`); if (el) el.classList.add('minimized');
+  if (focusedWinId === id) focusedWinId = null;
+  updateTaskbar();
+}
+
+function maximizeWindow(id) {
+  const el = document.getElementById(`win-${id}`); if (!el) return;
+  const win = windows.find(w => w.id === id); if (!win) return;
+  if (win._maximized) {
+    el.style.left = win._prevX+'px'; el.style.top = win._prevY+'px';
+    el.style.width = win._prevW+'px'; el.style.height = win._prevH+'px';
+    win._maximized = false;
+  } else {
+    win._prevX=win.x; win._prevY=win.y; win._prevW=win.w; win._prevH=win.h;
+    el.style.left='0'; el.style.top='0'; el.style.width='100vw';
+    el.style.height=`calc(100vh - var(--taskbar-h))`;
+    win._maximized = true;
+  }
+  focusWindow(id);
+}
+
+// =================== DRAG & RESIZE ===================
+let dragState = null;
+function startDrag(e, winId) {
+  if (e.target.classList.contains('win-dot')) return;
+  e.preventDefault();
+  const el = document.getElementById(`win-${winId}`);
+  const rect = el.getBoundingClientRect();
+  dragState = { type:'drag', winId, startX:e.clientX, startY:e.clientY, origX:rect.left, origY:rect.top };
+  focusWindow(winId);
+}
+function startResize(e, winId) {
+  e.preventDefault(); e.stopPropagation();
+  const el = document.getElementById(`win-${winId}`);
+  const rect = el.getBoundingClientRect();
+  dragState = { type:'resize', winId, startX:e.clientX, startY:e.clientY, origW:rect.width, origH:rect.height };
+  focusWindow(winId);
+}
+
+let snapIndicator = null, currentSnapSide = null;
+const SNAP_THRESHOLD = 20;
+function updateSnapIndicator(mx) {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  let side = null;
+  if (mx < SNAP_THRESHOLD) side = 'left';
+  else if (mx > vw - SNAP_THRESHOLD) side = 'right';
+  if (side) {
+    if (!snapIndicator) { snapIndicator = document.createElement('div'); snapIndicator.className = 'snap-indicator'; document.body.appendChild(snapIndicator); }
+    if (side === 'left') snapIndicator.style.cssText = `left:4px;top:4px;width:${vw/2-8}px;height:${vh-84}px;`;
+    else snapIndicator.style.cssText = `left:${vw/2+4}px;top:4px;width:${vw/2-8}px;height:${vh-84}px;`;
+  } else { removeSnapIndicator(); }
+  return side;
+}
+function removeSnapIndicator() { if (snapIndicator) { snapIndicator.remove(); snapIndicator = null; } }
+function snapWindow(winId, side) {
+  const el = document.getElementById(`win-${winId}`); const win = windows.find(w => w.id === winId);
+  if (!el || !win) return;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  if (side === 'left') { el.style.left='4px'; el.style.top='4px'; el.style.width=(vw/2-8)+'px'; el.style.height=(vh-84)+'px'; }
+  else { el.style.left=(vw/2+4)+'px'; el.style.top='4px'; el.style.width=(vw/2-8)+'px'; el.style.height=(vh-84)+'px'; }
+  win.x=parseInt(el.style.left); win.y=parseInt(el.style.top); win.w=parseInt(el.style.width); win.h=parseInt(el.style.height);
+  playBoop(200, 0.04, 0.06, 'triangle');
+  removeSnapIndicator();
+}
+
+document.addEventListener('mousemove', e => {
+  if (!dragState) return;
+  const el = document.getElementById(`win-${dragState.winId}`); if (!el) return;
+  const win = windows.find(w => w.id === dragState.winId);
+  if (dragState.type === 'drag') {
+    const nx = dragState.origX + (e.clientX - dragState.startX);
+    const ny = dragState.origY + (e.clientY - dragState.startY);
+    el.style.left = nx+'px'; el.style.top = ny+'px';
+    if (win) { win.x=nx; win.y=ny; win._maximized=false; }
+    currentSnapSide = updateSnapIndicator(e.clientX);
+  } else if (dragState.type === 'resize') {
+    const nw = Math.max(320, dragState.origW + (e.clientX - dragState.startX));
+    const nh = Math.max(200, dragState.origH + (e.clientY - dragState.startY));
+    el.style.width = nw+'px'; el.style.height = nh+'px';
+    if (win) { win.w=nw; win.h=nh; }
+  }
+});
+document.addEventListener('mouseup', () => {
+  if (dragState && currentSnapSide) { snapWindow(dragState.winId, currentSnapSide); currentSnapSide = null; }
+  removeSnapIndicator(); dragState = null;
+});
+
+// =================== TASKBAR ===================
+function updateTaskbar() {
+  const container = document.getElementById('tbApps');
+  container.innerHTML = '';
+  windows.forEach(win => {
+    const app = apps.find(a => a.id === win.appId); if (!app) return;
+    const btn = document.createElement('button');
+    btn.className = 'tb-app' + (win.id === focusedWinId && !win.minimized ? ' active' : '');
+    btn.dataset.app = win.appId;
+    btn.innerHTML = `<span class="tb-app-dot"></span>${app.label()}`;
+    btn.onclick = () => { if (win.minimized) { win.minimized=false; const el=document.getElementById(`win-${win.id}`); if(el){el.classList.remove('minimized');el.style.display='';} } focusWindow(win.id); };
+    container.appendChild(btn);
+  });
+}
+
+// =================== CLOCK ===================
+function updateClock() { const n = new Date(); document.getElementById('clock').textContent = n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0'); }
+setInterval(updateClock, 1000); updateClock();
+
+// =================== TERMINAL ===================
+function execTermCmd(winId) {
+  const input = document.getElementById(`term-input-${winId}`);
+  const output = document.getElementById(`term-output-${winId}`);
+  if (!input || !output) return;
+  const cmd = input.value.trim(); input.value = '';
+  playTypeBoop();
+  output.innerHTML += `<span class="prompt">墨 rika ~ % </span><span class="cmd-text">${escHtml(cmd)}</span>\n`;
+  const result = processCmd(cmd);
+  if (result) output.innerHTML += `<span class="output">${result}</span>\n`;
+  output.innerHTML += '\n';
+  const term = document.getElementById(`term-${winId}`);
+  if (term) term.scrollTop = term.scrollHeight;
+}
+
+function processCmd(cmd) {
+  const parts = cmd.split(/\s+/);
+  const c = parts[0]?.toLowerCase();
+  switch (c) {
+    case '': return '';
+    case 'help': return `Available commands:
+  <span class="highlight">help</span>        — show this scroll of wisdom
+  <span class="highlight">whoami</span>      — who is the brush wielder?
+  <span class="highlight">ls</span>          — list scrolls
+  <span class="highlight">cat</span> [file]  — read a scroll
+  <span class="highlight">open</span> [app]  — open a window
+  <span class="highlight">clear</span>       — clean the canvas
+  <span class="highlight">neofetch</span>    — system spirits
+  <span class="highlight">fortune</span>     — wisdom from the wind
+  <span class="highlight">cowsay</span> [msg] — the forest speaks
+  <span class="highlight">rain</span>        — summon rain
+  <span class="highlight">history</span>     — past brushstrokes`;
+    case 'whoami': return `Rika Ciminieri\nHalf-Japanese full-stack engineer @ Eventbrite\nFormer microbiology student · Pilates enthusiast · Book nook builder\nFluent in: TypeScript, Python, Japanese, sarcasm`;
+    case 'ls': return apps.map(a => `  ${a.label()}`).join('\n');
+    case 'cat':
+      const file = parts[1];
+      if (!file) return '<span class="error">usage: cat [scroll]</span>';
+      if (file === 'about.md') return `# Rika Ciminieri\n\nHalf-Japanese full-stack engineer at Eventbrite.\nFormer microbiology student turned tech advocate.\n\nI build things that make people smile.`;
+      if (file === 'skills.md') return `# Tech Stack\n\nFrontend:  React, TypeScript, Tailwind, Next.js, Vite\nBackend:   Python, Node.js, Express, FastAPI, GraphQL\nData:      PostgreSQL, Redis, MongoDB\nInfra:     AWS, Docker, CI/CD, Vercel`;
+      if (file === 'currently.md') return `# Currently Into\n\nWatching: Bridgerton (again), The Traitors\nReading:  Heated Rivalry, One Piece\nPlaying:  Monopoly Deal\nLearning: AI/LLMs, how to sing`;
+      return `<span class="error">cat: ${escHtml(file)}: No such scroll</span>`;
+    case 'open':
+      const appName = parts[1]?.replace('.app','');
+      if (appName && apps.find(a => a.id === appName)) { setTimeout(() => openApp(appName), 100); return `Opening ${appName}...`; }
+      return `<span class="error">open: unknown scroll</span>\nAvailable: ${apps.map(a => a.id).join(', ')}`;
+    case 'clear': setTimeout(() => { const w = windows.find(w => w.appId === 'terminal'); if (w) { const o = document.getElementById(`term-output-${w.id}`); if (o) o.innerHTML = ''; } }, 10); return '';
+    case 'neofetch': return `\n  <span class="highlight">    ╔═══╗  </span>   rika@ghibli-os
+  <span class="highlight">    ║ 印 ║  </span>   ──────────────
+  <span class="highlight">    ╚═══╝  </span>   OS: RikaOS v2.1 (ghibli)
+                  Shell: 書道-terminal
+                  Languages: EN, JP
+                  Theme: hand-painted
+                  Spirits: soot sprites ×8
+                  Mood: peaceful`;
+    case 'fortune':
+      const f = ['"The wind tells me you should take a break and make tea."','"Every bug fixed is a soot sprite set free."','"Have you tried turning it off and watching the clouds?"','"The best code is written after a long walk in the forest."','"Even Totoro takes naps."'];
+      return f[Math.floor(Math.random()*f.length)];
+    case 'cowsay':
+      const msg = parts.slice(1).join(' ') || 'moo';
+      return ` ┌${'─'.repeat(msg.length+2)}┐\n │ ${escHtml(msg)} │\n └${'─'.repeat(msg.length+2)}┘\n        \\   ^__^\n         \\  (oo)\\_______\n            (__)\\       )\\/\\\n                ||----w |\n                ||     ||`;
+    case 'rain': triggerRain(); return 'The sky darkens... rain begins to fall.';
+    case 'sudo': return '<span class="error">The forest spirits do not recognize sudo.</span>';
+    case 'rm': return '<span class="error">You cannot cut down the forest.</span>';
+    case 'exit': return 'Where would the wind take you? You are already home.';
+    case 'history': return `  1  brew install tea\n  2  git commit -m "painted new clouds"\n  3  cat haiku.md\n  4  ssh rika@onsen-finder.local\n  5  npm run meditate\n  6  history`;
+    default: return `<span class="error">command not found: ${escHtml(c)}</span>\nType <span class="highlight">help</span> for available commands.`;
+  }
+}
+function escHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+// =================== COMMAND PALETTE ===================
+const cmdItems = [
+  { icon: '◎', label: 'Open About', hint: 'welcome', action: () => openApp('welcome') },
+  { icon: '筆', label: 'Open Projects', hint: 'engineering', action: () => openApp('projects') },
+  { icon: '>_', label: 'Open Terminal', hint: 'commands', action: () => openApp('terminal') },
+  { icon: '画', label: 'Open Gallery', hint: 'art + nooks', action: () => openApp('gallery') },
+  { icon: '茶', label: 'Open Currently', hint: 'watching/reading', action: () => openApp('currently') },
+  { icon: 'GC', label: 'Open Grilled Cheese', hint: 'rankings', action: () => openApp('gc') },
+  { icon: '日', label: 'Open Japan', hint: 'heritage', action: () => openApp('japan') },
+  { icon: '箱', label: 'Open Trash', hint: 'files', action: () => openApp('trash') },
+  { icon: '語', label: 'Toggle Language', hint: 'EN ↔ JP', action: () => toggleLang() },
+  { icon: '✕', label: 'Close All', hint: '', action: () => closeAllWindows() },
+];
+let cmdSelectedIdx = 0;
+function openCmdPalette() { document.getElementById('cmdOverlay').classList.add('open'); const inp = document.getElementById('cmdInput'); inp.value = ''; inp.focus(); cmdSelectedIdx = 0; filterCommands(); }
+function closeCmdPalette() { document.getElementById('cmdOverlay').classList.remove('open'); }
+function filterCommands() {
+  const q = document.getElementById('cmdInput').value.toLowerCase();
+  const filtered = cmdItems.filter(item => item.label.toLowerCase().includes(q) || item.hint.toLowerCase().includes(q));
+  const container = document.getElementById('cmdResults');
+  cmdSelectedIdx = Math.min(cmdSelectedIdx, filtered.length - 1);
+  container.innerHTML = filtered.map((item, i) => `<div class="cmd-item ${i === cmdSelectedIdx ? 'selected' : ''}" onclick="cmdItems.find(c=>c.label==='${item.label}').action();closeCmdPalette();" onmouseenter="cmdSelectedIdx=${i};filterCommands();">
+    <span class="cmd-icon">${item.icon}</span><span class="cmd-label">${item.label}</span><span class="cmd-hint">${item.hint}</span></div>`).join('');
+}
+function handleCmdKey(e) {
+  const items = document.getElementById('cmdResults').querySelectorAll('.cmd-item');
+  if (e.key==='ArrowDown') { e.preventDefault(); cmdSelectedIdx = Math.min(cmdSelectedIdx+1, items.length-1); filterCommands(); }
+  if (e.key==='ArrowUp') { e.preventDefault(); cmdSelectedIdx = Math.max(cmdSelectedIdx-1, 0); filterCommands(); }
+  if (e.key==='Enter') { items[cmdSelectedIdx]?.click(); }
+  if (e.key==='Escape') { closeCmdPalette(); }
+}
+
+// =================== CONTEXT MENU ===================
+document.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  const menu = document.getElementById('ctxMenu');
+  const items = [
+    { icon: '◎', label: 'Open About', action: () => openApp('welcome') },
+    { icon: '筆', label: 'Open Projects', action: () => openApp('projects') },
+    { icon: '>_', label: 'Open Terminal', action: () => openApp('terminal') },
+    { sep: true },
+    { icon: '語', label: lang === 'en' ? 'Switch to 日本語' : 'Switch to English', action: () => toggleLang() },
+    { icon: '⌘K', label: 'Command Palette', action: () => openCmdPalette() },
+  ];
+  menu.innerHTML = items.map(item => item.sep ? '<div class="ctx-sep"></div>' : `<div class="ctx-item"><span class="ctx-icon">${item.icon}</span>${item.label}</div>`).join('');
+  const ctxItems = menu.querySelectorAll('.ctx-item');
+  let idx = 0;
+  items.forEach(item => { if (item.sep) return; ctxItems[idx].onclick = () => { item.action(); menu.classList.remove('open'); }; idx++; });
+  menu.style.left = Math.min(e.clientX, window.innerWidth - 210) + 'px';
+  menu.style.top = Math.min(e.clientY, window.innerHeight - 280) + 'px';
+  menu.classList.add('open');
+});
+document.addEventListener('click', () => document.getElementById('ctxMenu').classList.remove('open'));
+
+// =================== LANGUAGE ===================
+function setLang(newLang) {
+  lang = newLang;
+  document.querySelectorAll('.lang-seg').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+  renderDesktopIcons();
+  windows.forEach(win => {
+    const app = apps.find(a => a.id === win.appId);
+    if (app && win.appId !== 'terminal') {
+      const titleEl = document.querySelector(`#win-${win.id} .win-title`);
+      if (titleEl) titleEl.textContent = app.label();
+      renderAppContent(win.id, win.appId);
+    }
+  });
+  updateTaskbar();
+  updateWatermark();
+}
+function toggleLang() { setLang(lang === 'en' ? 'jp' : 'en'); }
+
+// =================== NIGHT MODE ===================
+function toggleNightMode() {
+  nightMode = !nightMode;
+  document.body.classList.toggle('night-mode', nightMode);
+  document.getElementById('nightToggle').textContent = nightMode ? '月' : '灯';
+  updateWatermark();
+}
+
+// =================== KEYBOARD SHORTCUTS ===================
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); const o = document.getElementById('cmdOverlay'); o.classList.contains('open') ? closeCmdPalette() : openCmdPalette(); }
+  if (e.key === 'Escape') closeCmdPalette();
+  resetIdleTimer();
+});
+document.addEventListener('mousemove', resetIdleTimer);
+
+// =================== KONAMI CODE ===================
+const konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiIdx = 0;
+document.addEventListener('keydown', e => {
+  if (e.key === konamiCode[konamiIdx]) { konamiIdx++; if (konamiIdx === konamiCode.length) { konamiIdx = 0; cheeseRain(); } } else { konamiIdx = 0; }
+});
+function cheeseRain() {
+  const c = document.getElementById('cheeseRain');
+  for (let i = 0; i < 35; i++) { const d = document.createElement('div'); d.className = 'cheese-drop'; d.textContent = '🧀'; d.style.left = Math.random()*100+'vw'; d.style.animationDuration = (2+Math.random()*3)+'s'; d.style.animationDelay = Math.random()*2+'s'; d.style.fontSize = (18+Math.random()*24)+'px'; c.appendChild(d); }
+  setTimeout(() => { c.innerHTML = ''; }, 6000);
+}
+
+// =================== SCREENSAVER ===================
+function resetIdleTimer() { clearTimeout(idleTimer); hideScreensaver(); idleTimer = setTimeout(showScreensaver, IDLE_TIMEOUT); }
+function showScreensaver() {
+  document.getElementById('screensaver').classList.add('active');
+  if (audioCtx) { playBoop(330, 0.4, 0.04, 'sine'); setTimeout(() => playBoop(220, 0.5, 0.03, 'sine'), 200); }
+}
+function hideScreensaver() { document.getElementById('screensaver').classList.remove('active'); }
+function closeAllWindows() { [...windows].forEach(w => closeWindow(w.id)); }
+
+// =================== CURSOR TRAIL ===================
+let trailDots = [], lastTrailTime = 0;
+document.addEventListener('mousemove', e => {
+  const now = Date.now();
+  if (now - lastTrailTime < 60) return;
+  lastTrailTime = now;
+  const dot = document.createElement('div');
+  dot.className = 'cursor-dot';
+  dot.style.left = (e.clientX - 2) + 'px'; dot.style.top = (e.clientY - 2) + 'px';
+  document.body.appendChild(dot);
+  trailDots.push(dot);
+  requestAnimationFrame(() => dot.classList.add('fade'));
+  setTimeout(() => { dot.remove(); trailDots = trailDots.filter(d => d !== dot); }, 500);
+  while (trailDots.length > 6) { const old = trailDots.shift(); old.remove(); }
+});
+
+// =================== WATERMARK ===================
+const rippleCanvas = document.getElementById('watermarkCanvas');
+const rippleCtx = rippleCanvas.getContext('2d');
+let rippleW, rippleH, rippleGrid, ripplePrevGrid, rippleRefImage;
+const RIPPLE_RES = 4;
+let rippleGridW, rippleGridH;
+const RIPPLE_DAMPING = 0.96;
+
+function initRippleCanvas() {
+  rippleW = window.innerWidth; rippleH = window.innerHeight;
+  rippleCanvas.width = rippleW; rippleCanvas.height = rippleH;
+  rippleGridW = Math.ceil(rippleW / RIPPLE_RES);
+  rippleGridH = Math.ceil(rippleH / RIPPLE_RES);
+  rippleGrid = new Float32Array(rippleGridW * rippleGridH);
+  ripplePrevGrid = new Float32Array(rippleGridW * rippleGridH);
+  renderWatermarkText();
+}
+
+function renderWatermarkText() {
+  rippleCtx.clearRect(0, 0, rippleW, rippleH);
+  const text = lang === 'jp' ? '莉香チミニエリ' : 'RIKA CIMINIERI';
+  const fontSize = lang === 'jp' ? 140 : 110;
+  const fontFamily = lang === 'jp' ? "'Klee One', serif" : "'Playfair Display', serif";
+  rippleCtx.font = `700 ${fontSize}px ${fontFamily}`;
+  rippleCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#c75c3a';
+  rippleCtx.globalAlpha = 0.05;
+  rippleCtx.textAlign = 'right'; rippleCtx.textBaseline = 'bottom';
+  rippleCtx.fillText(text, rippleW - 50, rippleH - 60);
+  rippleCtx.globalAlpha = 1.0;
+  rippleRefImage = rippleCtx.getImageData(0, 0, rippleW, rippleH);
+  rippleGrid.fill(0); ripplePrevGrid.fill(0);
+}
+function updateWatermark() { renderWatermarkText(); }
+
+let mouseRippleX = -1, mouseRippleY = -1;
+document.addEventListener('mousemove', e => {
+  mouseRippleX = Math.floor(e.clientX / RIPPLE_RES);
+  mouseRippleY = Math.floor(e.clientY / RIPPLE_RES);
+});
+
+function rippleFrame() {
+  if (mouseRippleX >= 1 && mouseRippleX < rippleGridW - 1 && mouseRippleY >= 1 && mouseRippleY < rippleGridH - 1) {
+    rippleGrid[mouseRippleY * rippleGridW + mouseRippleX] = 400;
+  }
+  const newGrid = new Float32Array(rippleGridW * rippleGridH);
+  for (let y = 1; y < rippleGridH - 1; y++) {
+    for (let x = 1; x < rippleGridW - 1; x++) {
+      const idx = y * rippleGridW + x;
+      newGrid[idx] = (rippleGrid[idx-1]+rippleGrid[idx+1]+rippleGrid[idx-rippleGridW]+rippleGrid[idx+rippleGridW]) / 2 - ripplePrevGrid[idx];
+      newGrid[idx] *= RIPPLE_DAMPING;
+    }
+  }
+  ripplePrevGrid = rippleGrid; rippleGrid = newGrid;
+  if (!rippleRefImage) return requestAnimationFrame(rippleFrame);
+  const imgData = new ImageData(new Uint8ClampedArray(rippleRefImage.data), rippleW, rippleH);
+  const pixels = imgData.data;
+  for (let y = 1; y < rippleGridH - 1; y++) {
+    for (let x = 1; x < rippleGridW - 1; x++) {
+      const idx = y * rippleGridW + x;
+      const disp = rippleGrid[idx];
+      if (Math.abs(disp) < 0.5) continue;
+      const oX = Math.round((rippleGrid[idx-1]-rippleGrid[idx+1])*0.5);
+      const oY = Math.round((rippleGrid[idx-rippleGridW]-rippleGrid[idx+rippleGridW])*0.5);
+      for (let py = 0; py < RIPPLE_RES; py++) {
+        for (let px = 0; px < RIPPLE_RES; px++) {
+          const dX = x*RIPPLE_RES+px, dY = y*RIPPLE_RES+py;
+          const sX = Math.min(Math.max(dX+oX,0),rippleW-1), sY = Math.min(Math.max(dY+oY,0),rippleH-1);
+          const di = (dY*rippleW+dX)*4, si = (sY*rippleW+sX)*4;
+          pixels[di]=rippleRefImage.data[si]; pixels[di+1]=rippleRefImage.data[si+1];
+          pixels[di+2]=rippleRefImage.data[si+2]; pixels[di+3]=rippleRefImage.data[si+3];
+          // Ink bleed bloom
+          const ad = Math.abs(disp);
+          if (ad > 3) {
+            const b = Math.min(ad/20, 1);
+            pixels[di] = Math.min(255, pixels[di] + b*40);
+            pixels[di+3] = Math.min(255, pixels[di+3] + b*80);
+          }
+        }
+      }
+    }
+  }
+  rippleCtx.putImageData(imgData, 0, 0);
+  requestAnimationFrame(rippleFrame);
+}
+window.addEventListener('resize', initRippleCanvas);
+
+// =================== EASTER EGG: TANUKI (CLICK SHELF 5x) ===================
+let shelfClicks = 0, shelfClickTimer = null;
+document.querySelector('.taskbar').addEventListener('click', (e) => {
+  if (e.target.closest('.tb-start, .tb-app, .tb-tray-btn, .lang-seg')) return;
+  shelfClicks++;
+  clearTimeout(shelfClickTimer);
+  shelfClickTimer = setTimeout(() => { shelfClicks = 0; }, 2000);
+  if (shelfClicks >= 5) {
+    shelfClicks = 0;
+    const tanuki = document.createElement('div');
+    tanuki.className = 'tanuki';
+    tanuki.innerHTML = '<svg viewBox="0 0 40 40" width="40" height="40"><circle cx="20" cy="20" r="14" fill="#8a6a3a"/><circle cx="14" cy="16" r="3" fill="#3a2e1e"/><circle cx="26" cy="16" r="3" fill="#3a2e1e"/><circle cx="14" cy="15" r="1.2" fill="white"/><circle cx="26" cy="15" r="1.2" fill="white"/><ellipse cx="20" cy="22" rx="4" ry="2.5" fill="#c4a878"/><circle cx="20" cy="21" r="1.5" fill="#3a2e1e"/><path d="M16 26 Q20 29 24 26" stroke="#3a2e1e" stroke-width="1" fill="none"/></svg>';
+    document.body.appendChild(tanuki);
+    playBoop(600, 0.1, 0.08, 'sine');
+    setTimeout(() => playBoop(800, 0.1, 0.06, 'sine'), 150);
+    setTimeout(() => tanuki.remove(), 2200);
+  }
+});
+
+// =================== EASTER EGG: RAIN ===================
+function triggerRain() {
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const drop = document.createElement('div');
+      drop.className = 'rain-drop';
+      drop.style.cssText = `left:${Math.random()*100}vw;height:${15+Math.random()*20}px;animation-duration:${0.4+Math.random()*0.3}s;`;
+      document.body.appendChild(drop);
+      setTimeout(() => drop.remove(), 800);
+    }, Math.random() * 4000);
+  }
+  // Rain sound
+  if (audioCtx) {
+    const bufSize = audioCtx.sampleRate * 5;
+    const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * 0.015;
+    const src = audioCtx.createBufferSource();
+    const filt = audioCtx.createBiquadFilter();
+    filt.type = 'lowpass'; filt.frequency.setValueAtTime(800, audioCtx.currentTime);
+    src.buffer = buf; src.connect(filt).connect(audioCtx.destination); src.start();
+  }
+}
+
+// =================== EASTER EGG: TOTORO SILHOUETTE IN SCREENSAVER ===================
+// After 30s in screensaver, show a brief silhouette
+let totorTimer = null;
+const origShowSS = showScreensaver;
+showScreensaver = function() {
+  origShowSS();
+  totorTimer = setTimeout(() => {
+    const ss = document.getElementById('screensaver');
+    if (!ss.classList.contains('active')) return;
+    const sil = document.createElement('div');
+    sil.style.cssText = 'position:absolute;bottom:10%;left:40%;width:120px;height:160px;background:#0a0820;border-radius:50% 50% 40% 40%;opacity:0;transition:opacity 1s;z-index:1;';
+    // Ears
+    sil.innerHTML = '<div style="position:absolute;top:-20px;left:15px;width:25px;height:35px;background:#0a0820;border-radius:50% 50% 40% 40%;transform:rotate(-10deg);"></div><div style="position:absolute;top:-20px;right:15px;width:25px;height:35px;background:#0a0820;border-radius:50% 50% 40% 40%;transform:rotate(10deg);"></div>';
+    ss.appendChild(sil);
+    requestAnimationFrame(() => sil.style.opacity = '0.6');
+    setTimeout(() => { sil.style.opacity = '0'; setTimeout(() => sil.remove(), 1000); }, 3000);
+  }, 30000);
+};
+const origHideSS = hideScreensaver;
+hideScreensaver = function() { clearTimeout(totorTimer); origHideSS(); };
+
+// =================== DESKTOP TOY ===================
+document.getElementById('desktop').addEventListener('dblclick', (e) => {
+  if (e.target.closest('.desktop-icon, .window, .taskbar')) return;
+  const toy = document.createElement('div'); toy.className = 'desktop-toy';
+  toy.style.left = e.clientX+'px'; toy.style.top = e.clientY+'px';
+  document.body.appendChild(toy);
+  playBoop(500, 0.05, 0.05, 'sine');
+  let vx = (Math.random()-0.5)*7, vy = -7-Math.random()*4, px = e.clientX, py = e.clientY, life = 0;
+  function animate() {
+    vy += 0.3; vx *= 0.99; px += vx; py += vy;
+    const floor = window.innerHeight - 80;
+    if (py > floor) { py = floor; vy = -vy*0.6; if (Math.abs(vy)<1) vy=0; playBoop(150+Math.random()*100, 0.02, 0.02, 'triangle'); }
+    if (px<0||px>window.innerWidth-14) { vx=-vx; px=Math.max(0,Math.min(px,window.innerWidth-14)); }
+    toy.style.left=px+'px'; toy.style.top=py+'px';
+    life++;
+    if (life<180 && (Math.abs(vx)>0.1||Math.abs(vy)>0.5||py<floor)) requestAnimationFrame(animate);
+    else { toy.style.transition='opacity 0.5s'; toy.style.opacity='0'; setTimeout(()=>toy.remove(),500); }
+  }
+  requestAnimationFrame(animate);
+});
+
+// =================== INIT ===================
+renderDesktopIcons();
+resetIdleTimer();
+initRippleCanvas();
+requestAnimationFrame(rippleFrame);
+initClouds();
+initMountains();
+initParticles();
+initNightStars();
+
+const skipBoot = window.location.hash === '#skipboot';
+if (skipBoot) {
+  document.getElementById('boot-screen').style.display = 'none';
+  document.getElementById('desktop').classList.add('visible');
+  initScreensaverStars();
+  openApp('welcome');
+} else {
+  runBoot();
+}
+
+// Cloud drift animation (added via JS since CSS @keyframes can't use random values easily)
+const style = document.createElement('style');
+style.textContent = `@keyframes cloudDrift { 0% { transform: translateX(0); } 100% { transform: translateX(calc(100vw + 200px)); } }`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>

@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RikaOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&family=Klee+One:wght@400;600&family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =================== RESET & STRUCTURAL (shared, uses var()) =================== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #fdf6f3; --surface: #ffffff; --surface-2: #fef1ed;
+  --border: #f0ddd8; --text: #3d2c3e; --text-muted: #9a8a9c;
+  --accent: #f4a0b5; --accent-glow: rgba(244,160,181,0.25);
+  --pink: #e88fc0; --green: #7ecba3; --amber: #f5c97e;
+  --red: #f07070; --blue: #97b8f0; --teal: #7ec9c0;
+  --lavender: #c4b0e8; --peach: #f8c4a4; --gold: #f5c97e;
+  --brown: #8a6a3a;
+  --taskbar-h: 88px; --radius: 16px; --win-header: 40px;
+  --font: 'Inter', 'Noto Sans JP', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+  --brush: 'Klee One', 'Noto Sans JP', serif;
+}
+
+html, body { height: 100%; overflow: hidden; font-family: var(--font); background: var(--bg); color: var(--text); }
+
+/* Boot screen */
+#boot-screen {
+  position: fixed; inset: 0; z-index: 99999;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: var(--mono); transition: opacity 0.6s; overflow: hidden;
+}
+#boot-screen.done { opacity: 0; pointer-events: none; }
+.boot-lines { font-size: 12px; text-align: left; width: 400px; max-width: 90vw; }
+.boot-lines div { opacity: 0; animation: bootFade 0.3s forwards; }
+@keyframes bootFade { to { opacity: 1; } }
+.boot-bar { width: 400px; max-width: 90vw; height: 3px; border-radius: 2px; margin-top: 24px; overflow: hidden; }
+.boot-bar-fill { height: 100%; width: 0; border-radius: 2px; animation: bootFill 2.2s ease-in-out forwards; }
+@keyframes bootFill { to { width: 100%; } }
+
+/* Desktop */
+#desktop { position: fixed; inset: 0; opacity: 0; transition: opacity 0.8s 0.3s; display: flex; flex-direction: column; }
+#desktop.visible { opacity: 1; }
+.desktop-bg { position: fixed; inset: 0; z-index: -1; background: var(--bg); overflow: hidden; }
+.watermark-canvas { position: fixed; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
+.floating-particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+
+/* Desktop icons */
+.desktop-icons { flex: 1; padding: 24px; display: flex; flex-direction: column; flex-wrap: wrap; gap: 8px; align-content: start; max-width: 200px; }
+.desktop-icon { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 84px; height: 84px; border-radius: 12px; cursor: pointer; transition: all 0.15s; user-select: none; }
+.desktop-icon:active { transform: scale(0.95); }
+.desktop-icon .icon-img { width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; position: relative; overflow: hidden; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.desktop-icon .icon-img svg { width: 28px; height: 28px; display: block; }
+.desktop-icon .icon-label { font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.2; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Windows */
+.window { position: absolute; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 16px 48px rgba(0,0,0,0.08); display: flex; flex-direction: column; min-width: 320px; min-height: 200px; overflow: hidden; }
+.window.minimized { pointer-events: none; }
+.win-header { height: var(--win-header); background: var(--surface-2); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 12px; cursor: grab; user-select: none; flex-shrink: 0; border-radius: var(--radius) var(--radius) 0 0; }
+.win-header:active { cursor: grabbing; }
+.win-dots { display: flex; gap: 7px; }
+.win-dot { width: 13px; height: 13px; border-radius: 50%; border: none; cursor: pointer; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+.win-dot:hover { transform: scale(1.3); }
+.win-dot.close { background: var(--red); }
+.win-dot.minimize { background: var(--amber); }
+.win-dot.maximize { background: var(--green); }
+.win-title { flex: 1; text-align: center; font-size: 12px; font-weight: 500; color: var(--text-muted); pointer-events: none; }
+.win-body { flex: 1; overflow: auto; padding: 20px; }
+.win-body::-webkit-scrollbar { width: 6px; }
+.win-body::-webkit-scrollbar-track { background: transparent; }
+.win-body::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; opacity: 0.5; }
+.win-resize { position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; cursor: nwse-resize; }
+
+/* Taskbar */
+.taskbar { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); height: auto; width: auto; max-width: 90vw; backdrop-filter: blur(20px) saturate(1.5); border-radius: 22px; display: flex; align-items: center; padding: 8px 16px; z-index: 9000; gap: 4px; }
+.tb-start { width: 40px; height: 40px; border-radius: 14px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); font-weight: 700; font-family: var(--display); }
+.tb-start:hover { transform: scale(1.15) rotate(-5deg); }
+.tb-divider { width: 1px; height: 28px; background: var(--border); margin: 0 8px; }
+.tb-apps { display: flex; gap: 3px; flex: 1; overflow-x: auto; }
+.tb-app { padding: 6px 14px; border-radius: 12px; border: none; background: transparent; color: var(--text-muted); font-family: var(--font); font-size: 12px; cursor: pointer; white-space: nowrap; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); display: flex; align-items: center; gap: 6px; }
+.tb-app .tb-app-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+.tb-tray { display: flex; align-items: center; gap: 12px; margin-left: auto; font-size: 12px; color: var(--text-muted); }
+.tb-tray-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 12px; font-family: var(--mono); transition: color 0.15s; padding: 4px 8px; border-radius: 6px; }
+#clock { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+.lang-toggle-seg { display: flex; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); background: var(--surface-2); }
+.lang-seg { padding: 3px 10px; border: none; background: transparent; font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+.lang-seg.active { background: var(--accent); color: #fff; }
+
+/* Command palette */
+.cmd-overlay { position: fixed; inset: 0; background: rgba(42,32,48,0.5); backdrop-filter: blur(8px); z-index: 50000; display: none; align-items: flex-start; justify-content: center; padding-top: 20vh; }
+.cmd-overlay.open { display: flex; }
+.cmd-box { width: 560px; max-width: 90vw; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.5); overflow: hidden; animation: cmdOpen 0.15s ease-out; }
+@keyframes cmdOpen { from { transform: scale(0.94) translateY(-12px); opacity: 0; } }
+.cmd-input { width: 100%; padding: 16px 20px; background: transparent; border: none; outline: none; color: var(--text); font-family: var(--font); font-size: 16px; border-bottom: 1px solid var(--border); }
+.cmd-input::placeholder { color: var(--text-muted); }
+.cmd-results { max-height: 320px; overflow-y: auto; }
+.cmd-item { padding: 10px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background 0.1s; font-size: 14px; }
+.cmd-item .cmd-icon { font-size: 18px; width: 28px; text-align: center; }
+.cmd-item .cmd-label { flex: 1; }
+.cmd-item .cmd-hint { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+
+/* Context menu */
+.ctx-menu { position: fixed; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 6px; min-width: 200px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); z-index: 60000; display: none; animation: ctxOpen 0.12s ease-out; }
+@keyframes ctxOpen { from { transform: scale(0.95); opacity: 0; } }
+.ctx-menu.open { display: block; }
+.ctx-item { padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 10px; transition: background 0.1s; color: var(--text); }
+.ctx-item .ctx-icon { width: 20px; text-align: center; }
+.ctx-sep { height: 1px; background: var(--border); margin: 4px 8px; }
+/* Submenu for themes */
+.ctx-submenu { position: relative; }
+.ctx-submenu-list { position: absolute; left: 100%; top: -6px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; min-width: 140px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); display: none; }
+.ctx-submenu:hover .ctx-submenu-list { display: block; }
+.ctx-submenu-list .ctx-item { font-size: 12px; }
+
+/* App content styles */
+.notepad-content { font-family: var(--font); font-size: 14px; line-height: 1.8; color: var(--text); }
+.notepad-content h2 { font-family: var(--display); font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+.notepad-content p { margin-bottom: 12px; }
+.notepad-content .aside { color: var(--text-muted); font-style: italic; font-size: 13px; }
+
+.terminal { font-family: var(--mono); font-size: 13px; line-height: 1.7; padding: 20px; height: 100%; }
+.terminal .prompt { color: var(--accent); }
+.terminal .cmd-text { color: var(--text); }
+.terminal .output { color: var(--text-muted); white-space: pre-wrap; }
+.terminal .error { color: var(--red); }
+.terminal .highlight { color: var(--amber); }
+.term-input-line { display: flex; align-items: center; gap: 0; }
+.term-input { background: transparent; border: none; outline: none; color: var(--text); font-family: var(--mono); font-size: 13px; flex: 1; caret-color: var(--accent); }
+
+.projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.project-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.2s; }
+.project-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.project-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.project-card p { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
+.project-card .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.project-card .tag { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 6px; background: rgba(244,160,181,0.1); color: var(--accent); }
+
+.gallery-scroll { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 16px; scroll-snap-type: x mandatory; }
+.gallery-scroll::-webkit-scrollbar { height: 4px; }
+.gallery-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.gallery-item { flex-shrink: 0; width: 260px; scroll-snap-align: start; }
+.gallery-thumb { width: 100%; height: 200px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 48px; margin-bottom: 10px; border: 1px solid var(--border); }
+.gallery-item h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.gallery-item p { font-size: 12px; color: var(--text-muted); }
+
+.gc-podium { display: flex; align-items: flex-end; justify-content: center; gap: 16px; margin-bottom: 32px; }
+.gc-podium-item { text-align: center; padding: 16px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+.gc-podium-item.gold { border-color: #e8b84a; order: 2; }
+.gc-podium-item.silver { border-color: #94a3b8; order: 1; }
+.gc-podium-item.bronze { border-color: #d97706; order: 3; }
+.gc-medal { font-size: 32px; }
+.gc-name { font-size: 14px; font-weight: 600; margin-top: 8px; }
+.gc-score { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+.gc-bracket { display: flex; gap: 40px; align-items: center; overflow-x: auto; padding: 16px 0; }
+.gc-round { display: flex; flex-direction: column; gap: 20px; flex-shrink: 0; }
+.gc-match { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.gc-matchup { padding: 8px 14px; font-size: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+.gc-matchup:last-child { border-bottom: none; }
+.gc-matchup.winner { color: var(--accent); font-weight: 600; }
+
+.finder { height: 100%; display: flex; flex-direction: column; }
+.finder-toolbar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--surface-2); font-size: 12px; color: var(--text-muted); }
+.finder-path { font-family: var(--mono); font-size: 11px; color: var(--text-muted); flex: 1; }
+.finder-list { flex: 1; overflow-y: auto; }
+.finder-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer; transition: background 0.1s; font-size: 13px; }
+.finder-item.disabled { opacity: 0.35; cursor: not-allowed; }
+.finder-item.disabled:hover { background: transparent; }
+.finder-item .fi-icon { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
+.finder-item .fi-name { flex: 1; }
+.finder-item .fi-meta { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+.finder-item .fi-size { font-size: 11px; color: var(--text-muted); font-family: var(--mono); min-width: 60px; text-align: right; }
+.finder-preview { padding: 24px; animation: fadeIn 0.2s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.finder-preview h3 { font-size: 16px; margin-bottom: 12px; font-family: var(--display); }
+.finder-preview p { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 8px; }
+.finder-preview-back { font-size: 12px; color: var(--accent); cursor: pointer; margin-bottom: 16px; display: inline-block; }
+.finder-preview-back:hover { text-decoration: underline; }
+
+.currently-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.currently-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.currently-card h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 8px; font-family: var(--mono); }
+.currently-card .item { font-size: 13px; padding: 4px 0; display: flex; align-items: center; gap: 8px; }
+.currently-card .item-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* Cursor trail */
+.cursor-dot { position: fixed; pointer-events: none; z-index: 99998; transition: opacity 0.4s, transform 0.4s; }
+.cursor-dot.fade { opacity: 0; transform: scale(0); }
+
+/* Screensaver */
+.screensaver { position: fixed; inset: 0; z-index: 80000; display: none; cursor: pointer; overflow: hidden; }
+.screensaver.active { display: block; }
+
+/* Konami cheese rain */
+.cheese-rain { position: fixed; inset: 0; pointer-events: none; z-index: 90000; }
+.cheese-drop { position: absolute; font-size: 32px; animation: cheeseFall linear forwards; }
+@keyframes cheeseFall { from { transform: translateY(-50px) rotate(0deg); } to { transform: translateY(110vh) rotate(360deg); } }
+
+/* Clock tooltip */
+.clock-tooltip { position: absolute; bottom: calc(var(--taskbar-h) + 8px); right: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-size: 12px; color: var(--text); box-shadow: 0 8px 24px rgba(0,0,0,0.15); white-space: nowrap; pointer-events: none; animation: tooltipFade 0.2s ease-out; z-index: 9999; }
+@keyframes tooltipFade { from { opacity: 0; transform: translateY(4px); } }
+
+/* GC wallpaper */
+.gc-wallpaper { position: fixed; inset: 0; z-index: 1; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ctext x='10' y='35' font-size='24'%3E%F0%9F%A7%80%3C/text%3E%3C/svg%3E"); background-size: 60px 60px; opacity: 0; transition: opacity 0.5s; }
+.gc-wallpaper.show { opacity: 0.15; }
+
+/* Toast */
+.melody-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--accent); border-radius: 12px; padding: 10px 20px; font-size: 13px; color: var(--accent); font-family: var(--font); box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 99999; animation: toastIn 0.3s ease-out, toastOut 0.3s ease-in 2.5s forwards; pointer-events: none; }
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
+@keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
+
+/* Dock bounce */
+@keyframes dockBounce { 0% { transform: translateY(0); } 20% { transform: translateY(-10px); } 40% { transform: translateY(0); } 55% { transform: translateY(-6px); } 70% { transform: translateY(0); } 85% { transform: translateY(-2px); } 100% { transform: translateY(0); } }
+.tb-app.bouncing { animation: dockBounce 0.6s ease-out; }
+
+/* Snap indicator */
+.snap-indicator { position: fixed; background: rgba(244,160,181,0.12); border: 2px dashed var(--accent); border-radius: var(--radius); z-index: 50; pointer-events: none; transition: all 0.15s ease-out; }
+
+/* Desktop toy */
+.desktop-toy { position: fixed; pointer-events: none; z-index: 5; width: 18px; height: 18px; border-radius: 50%; }
+
+/* Sparkle */
+@keyframes sparkle { 0% { transform: scale(0) rotate(0deg); opacity: 1; } 50% { transform: scale(1.2) rotate(180deg); opacity: 1; } 100% { transform: scale(0) rotate(360deg); opacity: 0; } }
+.sparkle { position: fixed; width: 8px; height: 8px; pointer-events: none; z-index: 99999; animation: sparkle 0.6s ease-out forwards; }
+.sparkle::before, .sparkle::after { content: ''; position: absolute; background: var(--accent); border-radius: 1px; }
+.sparkle::before { width: 100%; height: 2px; top: 50%; left: 0; transform: translateY(-50%); }
+.sparkle::after { width: 2px; height: 100%; left: 50%; top: 0; transform: translateX(-50%); }
+
+/* Theme transition overlay */
+.theme-transition { position: fixed; inset: 0; z-index: 95000; background: #000; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+.theme-transition.active { opacity: 1; pointer-events: all; }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .desktop-icons { flex-direction: row; flex-wrap: wrap; max-width: 100%; justify-content: center; padding: 16px; }
+  .window { position: fixed !important; inset: 0 !important; width: 100vw !important; height: calc(100vh - var(--taskbar-h)) !important; border-radius: 0 !important; min-width: unset !important; min-height: unset !important; }
+  .watermark-canvas { display: none; }
+  .cmd-box { border-radius: 0; }
+  .taskbar { left: 8px; right: 8px; transform: none; width: auto; max-width: none; border-radius: 16px; bottom: 8px; padding: 6px 12px; }
+}
+</style>
+<style id="theme-css">/* Theme-specific CSS injected here by JS */</style>
+</head>
+<body>
+
+<!-- BOOT SCREEN -->
+<div id="boot-screen"></div>
+
+<!-- THEME TRANSITION OVERLAY -->
+<div class="theme-transition" id="themeTransition"></div>
+
+<!-- DESKTOP -->
+<div id="desktop">
+  <div class="desktop-bg"></div>
+  <div id="themeBackgroundLayers"></div>
+  <div class="floating-particles" id="particles"></div>
+  <div class="gc-wallpaper" id="gcWallpaper"></div>
+  <canvas class="watermark-canvas" id="watermarkCanvas"></canvas>
+  <div class="desktop-icons" id="desktopIcons"></div>
+  <div id="windowContainer"></div>
+
+  <!-- Taskbar -->
+  <div class="taskbar" id="taskbar">
+    <button class="tb-start" id="startBtn" title="Start">R</button>
+    <div class="tb-divider"></div>
+    <div class="tb-apps" id="tbApps"></div>
+    <div class="tb-tray">
+      <button class="tb-tray-btn" id="nightToggle" onclick="toggleNightMode()" title="Toggle night mode"></button>
+      <div class="lang-toggle-seg" id="langToggle">
+        <button class="lang-seg active" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-seg" data-lang="jp" onclick="setLang('jp')">JP</button>
+      </div>
+      <span id="clock"></span>
+    </div>
+  </div>
+</div>
+
+<!-- Command Palette -->
+<div class="cmd-overlay" id="cmdOverlay" onclick="if(event.target===this)closeCmdPalette()">
+  <div class="cmd-box">
+    <input class="cmd-input" id="cmdInput" placeholder="Search apps, commands, anything..." oninput="filterCommands()" onkeydown="handleCmdKey(event)">
+    <div class="cmd-results" id="cmdResults"></div>
+  </div>
+</div>
+
+<!-- Context Menu -->
+<div class="ctx-menu" id="ctxMenu"></div>
+
+<!-- Screensaver -->
+<div class="screensaver" id="screensaver" onclick="hideScreensaver()">
+  <div id="screensaverContent"></div>
+</div>
+
+<!-- Cheese Rain -->
+<div class="cheese-rain" id="cheeseRain"></div>
+
+<!-- Extra overlays for specific themes -->
+<div id="themeOverlays"></div>
+
+<script>
+// ============================================================================
+// THEMES — the heart of the unified system
+// ============================================================================
+const THEMES = {
+  kawaii: {
+    id: 'kawaii', name: 'Kawaii',
+    vars: {
+      '--bg':'#fdf6f3','--surface':'#ffffff','--surface-2':'#fef1ed',
+      '--border':'#f0ddd8','--text':'#3d2c3e','--text-muted':'#9a8a9c',
+      '--accent':'#f4a0b5','--accent-glow':'rgba(244,160,181,0.25)',
+      '--pink':'#e88fc0','--green':'#7ecba3','--amber':'#f5c97e',
+      '--red':'#f07070','--blue':'#97b8f0','--teal':'#7ec9c0',
+      '--lavender':'#c4b0e8','--peach':'#f8c4a4','--gold':'#f5c97e',
+      '--brown':'#8a6a3a',
+      '--taskbar-h':'88px','--radius':'16px','--win-header':'40px',
+      '--font':"'Inter','Noto Sans JP',sans-serif",
+      '--mono':"'JetBrains Mono',monospace",
+      '--display':"'Space Grotesk','Noto Sans JP',sans-serif",
+    },
+    nightVars: {
+      '--bg':'#1e1525','--surface':'#2a1f30','--surface-2':'#322838',
+      '--border':'#443a4c','--text':'#f5eff8','--text-muted':'#a89ab0',
+    },
+    nightMode: { prop: 'nightMode', class: 'night-mode', label: () => nightMode ? '\u{1F319}' : '\u{2600}\u{FE0F}' },
+    bootBg: '#3d2c3e',
+    bootContent: () => `
+      <div class="boot-logo" style="font-family:var(--display);font-size:48px;font-weight:800;background:linear-gradient(135deg,#f4a0b5,#f8c4a4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:32px;letter-spacing:-0.03em;">RikaOS</div>
+      <div class="boot-lines" id="bootLines"></div>
+      <div class="boot-bar" style="background:#222;"><div class="boot-bar-fill" style="background:linear-gradient(90deg,#f4a0b5,#f8c4a4);"></div></div>
+    `,
+    bootMessages: [
+      { text: 'RikaOS v2.1 \u2014 loading kernel...', delay: 0 },
+      { text: 'mounting /dev/portfolio...                    [OK]', cls: 'ok', delay: 200 },
+      { text: 'loading bilingual engine: en_US + ja_JP...    [OK]', cls: 'ok', delay: 400 },
+      { text: 'initializing creative subsystems...           [OK]', cls: 'ok', delay: 600 },
+      { text: 'calibrating vibes...                          [OK]', cls: 'ok', delay: 900 },
+      { text: "pilates.service \u2014 skipped (it's not 7am)     [WARN]", cls: 'warn', delay: 1100 },
+      { text: 'bridgerton-binge-tracker: 94% complete        [OK]', cls: 'ok', delay: 1300 },
+      { text: 'all systems nominal. welcome home, rika.', cls: 'ok', delay: 1600 },
+    ],
+    bootDuration: 2400,
+    bootLineColors: { ok: '#7ecba3', warn: '#f5c97e', default: '#555' },
+    termPrompt: 'rika@portfolio ~ % ',
+    termBg: 'color: var(--green); background: #0a0a0f;',
+    termWelcome: 'RikaOS Terminal v2.1 \u2014 type "help" for commands\n\n',
+    startButton: 'R',
+    startButtonStyle: 'background:linear-gradient(135deg,#f4a0b5,#f8c4a4);color:white;font-size:18px;',
+    taskbarStyle: 'background:rgba(255,255,255,0.75);border:1px solid rgba(244,160,181,0.2);box-shadow:0 8px 32px rgba(0,0,0,0.08),0 2px 8px rgba(244,160,181,0.1);',
+    nightTaskbarStyle: 'background:rgba(30,21,37,0.85);border-color:rgba(244,160,181,0.15);',
+    screensaverBg: '#000',
+    screensaverContent: () => {
+      let h = '';
+      for (let i = 0; i < 3; i++) h += `<div style="position:absolute;inset:0;opacity:0.6;background:linear-gradient(180deg,transparent ${30+i*5}%,rgba(244,160,181,${0.15-i*0.04}) ${50+i*5}%,rgba(248,196,164,${0.1-i*0.03}) ${65+i*5}%,transparent ${80+i*5}%);animation:aurora${i+1} ${8+i*4}s ease-in-out infinite alternate;"></div>`;
+      for (let i = 0; i < 60; i++) h += `<div style="position:absolute;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;background:white;border-radius:50%;left:${Math.random()*100}%;top:${Math.random()*60}%;animation:twinkle ${2+Math.random()*3}s ease-in-out infinite;animation-delay:${Math.random()*3}s;"></div>`;
+      h += `<div style="position:absolute;bottom:15%;width:100%;text-align:center;font-family:var(--display);font-size:14px;color:rgba(255,255,255,0.2);letter-spacing:0.1em;">click anywhere to wake \u2014 RikaOS</div>`;
+      return h;
+    },
+    musicalScale: {
+      welcome:{freq:523.25},projects:{freq:587.33},terminal:{freq:659.25},gallery:{freq:783.99},
+      currently:{freq:880},gc:{freq:1046.5},japan:{freq:1174.66},trash:{freq:1318.51},
+    },
+    scaleNoteType: 'sine',
+    ambientFreq: 110, ambientVol: 0.006, ambientType: 'sine',
+    iconSVGs: {
+      welcome: '<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="14" r="10" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/><circle cx="12.5" cy="12" r="1.8" fill="rgba(255,255,255,0.8)"/><circle cx="19.5" cy="12" r="1.8" fill="rgba(255,255,255,0.8)"/><path d="M13 17Q16 20 19 17" stroke="rgba(255,255,255,0.7)" stroke-width="1.3" fill="none" stroke-linecap="round"/><circle cx="9" cy="15" r="2.8" fill="rgba(255,180,200,0.35)"/><circle cx="23" cy="15" r="2.8" fill="rgba(255,180,200,0.35)"/></svg>',
+      projects: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.3" stroke-linecap="round"><rect x="5" y="8" width="22" height="15" rx="2" fill="rgba(255,255,255,0.1)"/><path d="M3 25h26" stroke-width="1.5"/><line x1="9" y1="13" x2="18" y2="13"/><line x1="9" y1="16.5" x2="23" y2="16.5" opacity="0.5"/></svg>',
+      terminal: '<svg viewBox="0 0 32 32" fill="none"><rect x="4" y="6" width="24" height="20" rx="3" fill="rgba(0,0,0,0.3)" stroke="rgba(126,203,163,0.5)" stroke-width="1"/><text x="10" y="20" font-family="monospace" font-size="12" font-weight="bold" fill="rgba(126,203,163,0.9)">\u203A_</text></svg>',
+      gallery: '<svg viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="17" rx="12" ry="10" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/><circle cx="11" cy="14" r="2.5" fill="#ff9bb5"/><circle cx="18" cy="11" r="2" fill="#c4b0e8"/><circle cx="23" cy="16" r="2" fill="#7ecba3"/></svg>',
+      currently: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"><path d="M8 19C8 11 24 11 24 19"/><rect x="5.5" y="18" width="5" height="7" rx="2.5" fill="rgba(255,255,255,0.2)"/><rect x="21.5" y="18" width="5" height="7" rx="2.5" fill="rgba(255,255,255,0.2)"/></svg>',
+      gc: '<svg viewBox="0 0 32 32" fill="none"><rect x="7" y="8" width="18" height="4.5" rx="2" fill="rgba(255,255,255,0.35)" stroke="rgba(255,255,255,0.5)" stroke-width="0.8"/><path d="M7 12.5Q11.5 17 16 12.5Q20.5 17 25 12.5" fill="rgba(255,210,120,0.45)"/><rect x="7" y="15" width="18" height="4.5" rx="2" fill="rgba(255,255,255,0.3)"/></svg>',
+      japan: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round"><line x1="10" y1="12" x2="10" y2="28"/><line x1="22" y1="12" x2="22" y2="28"/><path d="M6 12Q16 8 26 12" stroke-width="2.2"/></svg>',
+      trash: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(150,138,156,0.7)" stroke-width="1.2" stroke-linecap="round"><rect x="9" y="11" width="14" height="16" rx="2" fill="rgba(150,138,156,0.15)"/><path d="M7 9h18"/><path d="M13 7h6" stroke-width="1.5"/></svg>',
+    },
+    iconStyles: {
+      welcome: 'background:linear-gradient(135deg,#f4a0b5,#f8c4a4);',
+      projects: 'background:linear-gradient(135deg,#c4b0e8,#97b8f0);',
+      terminal: 'background:#2a2035;border:1px solid #443a4c;',
+      gallery: 'background:linear-gradient(135deg,#e88fc0,#c4b0e8);',
+      gc: 'background:linear-gradient(135deg,#f5c97e,#f8c4a4);',
+      trash: 'background:var(--surface-2);border:1px solid var(--border);',
+      currently: 'background:linear-gradient(135deg,#7ec9c0,#7ecba3);',
+      japan: 'background:linear-gradient(135deg,#f4a0b5,#f07070);',
+    },
+    finderPath: '/Users/rika/Desktop/definitely-not-important/',
+    trashLabel: () => t('trash'),
+    cursorDotStyle: 'width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:0.5;',
+    cursorThrottle: 50, cursorMax: 8,
+    css: `
+      .desktop-bg::before { content:''; position:absolute; width:150%; height:150%; top:-25%; left:-25%; background: radial-gradient(ellipse 600px 400px at 25% 35%,rgba(244,160,181,0.07) 0%,transparent 70%), radial-gradient(ellipse 500px 500px at 75% 25%,rgba(196,176,232,0.06) 0%,transparent 70%), radial-gradient(ellipse 400px 600px at 60% 75%,rgba(126,203,163,0.05) 0%,transparent 70%); animation:meshDrift 20s ease-in-out infinite alternate; }
+      @keyframes meshDrift { 0%{transform:translate(0,0) rotate(0deg);} 33%{transform:translate(30px,-20px) rotate(1deg);} 66%{transform:translate(-20px,15px) rotate(-0.5deg);} 100%{transform:translate(10px,-10px) rotate(0.5deg);} }
+      .desktop-bg::after { content:''; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(244,160,181,0.08) 1.5px,transparent 1.5px); background-size:28px 28px; }
+      body.night-mode .desktop-bg::after { background-image:radial-gradient(circle,rgba(255,255,255,0.04) 1.5px,transparent 1.5px); }
+      .particle { position:absolute; border-radius:50%; opacity:0; animation:particleFloat linear infinite; }
+      @keyframes particleFloat { 0%{opacity:0;transform:translateY(100vh) scale(0);} 10%{opacity:0.6;} 90%{opacity:0.6;} 100%{opacity:0;transform:translateY(-10vh) scale(1);} }
+      .window { animation:winOpen 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
+      @keyframes winOpen { from{transform:scale(0.8) translateY(20px);opacity:0;} 60%{transform:scale(1.03) translateY(-3px);opacity:1;} to{transform:scale(1) translateY(0);opacity:1;} }
+      .window.minimized { animation:winMin 0.2s forwards; }
+      @keyframes winMin { to{transform:scale(0.5) translateY(100vh);opacity:0;} }
+      .window.focused { box-shadow:0 16px 48px rgba(0,0,0,0.1),0 0 0 1px rgba(244,160,181,0.2),0 0 24px var(--accent-glow); }
+      .desktop-icon:hover { background:rgba(244,160,181,0.08); }
+      .desktop-icon:hover .icon-img { animation:iconWobble 0.5s ease-in-out; transform:scale(1.1); }
+      @keyframes iconWobble { 0%{transform:scale(1) rotate(0deg);} 20%{transform:scale(1.12) rotate(-6deg);} 40%{transform:scale(1.08) rotate(5deg);} 60%{transform:scale(1.11) rotate(-3deg);} 80%{transform:scale(1.09) rotate(2deg);} 100%{transform:scale(1.1) rotate(0deg);} }
+      .tb-app:hover { background:rgba(244,160,181,0.12); color:var(--text); transform:translateY(-2px); }
+      .tb-app.active { background:rgba(244,160,181,0.18); color:var(--text); }
+      .cmd-item:hover,.cmd-item.selected { background:rgba(244,160,181,0.1); }
+      .ctx-item:hover { background:rgba(244,160,181,0.12); }
+      .finder-item:hover { background:rgba(244,160,181,0.06); }
+      .notepad-content h2 { background:linear-gradient(135deg,#f4a0b5,#f8c4a4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+      .terminal { color:var(--green); background:#0a0a0f; }
+      .desktop-toy { background:radial-gradient(circle at 35% 35%,var(--accent),var(--pink)); box-shadow:0 2px 8px rgba(0,0,0,0.15),inset 0 -2px 4px rgba(0,0,0,0.1); }
+      @keyframes aurora1 { 0%{transform:translateX(-10%) scaleY(1);} 100%{transform:translateX(10%) scaleY(1.3);} }
+      @keyframes aurora2 { 0%{transform:translateX(15%) scaleY(1.2);} 100%{transform:translateX(-15%) scaleY(0.8);} }
+      @keyframes aurora3 { 0%{transform:translateX(-5%) scaleY(0.9);} 100%{transform:translateX(5%) scaleY(1.1);} }
+      @keyframes twinkle { 0%,100%{opacity:0.2;} 50%{opacity:0.8;} }
+    `,
+    initParticles: (container) => {
+      const colors = ['var(--accent)','var(--lavender)','var(--peach)','var(--green)','var(--teal)','var(--pink)'];
+      for (let i = 0; i < 15; i++) {
+        const p = document.createElement('div'); p.className = 'particle';
+        const s = 4+Math.random()*6;
+        p.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;background-color:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${15+Math.random()*15}s;animation-delay:${Math.random()*20}s;`;
+        container.appendChild(p);
+      }
+    },
+    initBackground: () => {},
+    initScreensaver: () => {},
+    playWindowOpen: () => { playBoop(523,0.1,0.1); setTimeout(()=>playBoop(659,0.12,0.08),80); },
+    playWindowClose: () => { playBoop(440,0.06,0.08); setTimeout(()=>playBoop(330,0.1,0.06),50); },
+    playTypeBoop: () => { if(!audioCtx)return; const f=600+Math.random()*200; playBoop(f,0.03,0.04,'sine'); },
+    playHoverSound: (appId) => { const n=currentTheme.musicalScale[appId]; if(n) playBoop(n.freq,0.15,0.08,'sine'); },
+    frameLoops: [],
+    easterEggs: {
+      init: () => {
+        // Triple-click wallpaper
+        let cc=0,ct=null;
+        document.getElementById('desktop').addEventListener('click',(e)=>{
+          if(e.target.closest('.desktop-icon,.window,.taskbar'))return;
+          cc++; clearTimeout(ct); ct=setTimeout(()=>{cc=0;},500);
+          if(cc>=3){cc=0;const wp=document.getElementById('gcWallpaper');wp.classList.add('show');setTimeout(()=>wp.classList.remove('show'),3000);}
+        });
+      }
+    },
+    cleanup: () => {},
+  },
+
+  ghibli: {
+    id: 'ghibli', name: 'Ghibli',
+    vars: {
+      '--bg':'#f5ede0','--surface':'#faf7f0','--surface-2':'#ede4d3',
+      '--border':'#d4c5a9','--text':'#3a2e1e','--text-muted':'#8a7e6a',
+      '--accent':'#c75c3a','--green':'#5a7a4a','--blue':'#4a6a8a',
+      '--pink':'#d4858a','--amber':'#c4943a','--red':'#c75c3a',
+      '--gold':'#c4943a','--lavender':'#8a7e6a','--peach':'#d4c5a9',
+      '--teal':'#5a7a4a','--brown':'#8a6a3a',
+      '--taskbar-h':'72px','--radius':'4px','--win-header':'38px',
+      '--font':"'Inter','Noto Sans JP',sans-serif",
+      '--mono':"'JetBrains Mono',monospace",
+      '--display':"'Playfair Display','Klee One',serif",
+    },
+    nightVars: {
+      '--bg':'#0f1020','--surface':'#1a1830','--surface-2':'#141228',
+      '--border':'#2a2840','--text':'#e8dfd0','--text-muted':'#8a7e9a',
+      '--accent':'#e8a050',
+    },
+    nightMode: { prop: 'nightMode', class: 'night-mode', label: () => nightMode ? '\u{6708}' : '\u{706F}' },
+    bootBg: '#1a1510',
+    bootContent: () => `
+      <div class="boot-ink-splatter" id="bootInk" style="position:absolute;width:100%;height:100%;background:radial-gradient(circle at 50% 50%,#1a1510 0%,transparent 70%);transition:opacity 1s;"></div>
+      <div id="bootLogo" style="font-family:'Klee One',serif;font-size:72px;font-weight:600;color:#c75c3a;opacity:0;filter:blur(2px);transition:opacity 0.6s,filter 0.6s;">RikaOS</div>
+      <div class="boot-lines" id="bootLines" style="font-family:'Klee One',serif;color:#7a6e5a;margin-top:24px;"></div>
+    `,
+    bootMessages: [
+      { text: 'RikaOS v2.1 (ghibli) \u2014 awakening...', delay: 0 },
+      { text: 'unrolling scroll of /dev/portfolio...       [OK]', cls: 'ok', delay: 300 },
+      { text: 'brewing tea for bilingual engine...         [OK]', cls: 'ok', delay: 600 },
+      { text: 'summoning soot sprites...                   [OK]', cls: 'ok', delay: 900 },
+      { text: 'painting clouds by hand...                  [OK]', cls: 'ok', delay: 1100 },
+      { text: 'onsen.service \u2014 too relaxed to start        [WARN]', cls: 'warn', delay: 1300 },
+      { text: 'all spirits accounted for. welcome home.', cls: 'ok', delay: 1600 },
+    ],
+    bootDuration: 3200,
+    bootLineColors: { ok: '#5a7a4a', warn: '#c4943a', default: '#7a6e5a' },
+    bootExtra: () => { setTimeout(()=>{ const l=document.getElementById('bootLogo'); if(l){l.style.opacity='1';l.style.filter='blur(0)';} },300); },
+    termPrompt: '\u{58A8} rika ~ % ',
+    termBg: 'color:var(--text);background:#f0e8d0;border-left:4px solid var(--accent);',
+    termWelcome: 'RikaOS \u{66F8}\u{9053} Terminal \u2014 type "help" for commands\n\n',
+    startButton: '\u{5370}',
+    startButtonStyle: 'border-radius:50%;border:2px solid var(--accent);background:var(--accent);color:#faf7f0;font-size:14px;font-family:var(--display);width:36px;height:36px;',
+    taskbarStyle: 'background:linear-gradient(180deg,#c4a878,#a88a60);border:1px solid rgba(138,106,58,0.4);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.12),inset 0 1px 0 rgba(255,255,255,0.15);',
+    nightTaskbarStyle: 'background:rgba(15,16,32,0.85);border-color:rgba(232,160,80,0.2);',
+    screensaverBg: '#0a0820',
+    screensaverContent: () => {
+      let h = `<div style="position:absolute;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#f0e8d0,#c4a43a);right:15%;bottom:60%;opacity:0;animation:moonRise 8s ease-out forwards;box-shadow:0 0 40px rgba(232,200,120,0.3);"></div>`;
+      for (let i = 0; i < 50; i++) h += `<div style="position:absolute;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;background:#e8dfd0;border-radius:50%;left:${Math.random()*100}%;top:${Math.random()*60}%;animation:twinkle ${2+Math.random()*3}s ease-in-out infinite;animation-delay:${Math.random()*3}s;"></div>`;
+      h += `<div style="position:absolute;bottom:18%;right:12%;opacity:0.08;animation:totoroBreathe 4s ease-in-out infinite;"><svg width="60" height="80" viewBox="0 0 60 80" fill="white"><ellipse cx="30" cy="50" rx="24" ry="30"/><ellipse cx="14" cy="20" rx="6" ry="10"/><ellipse cx="46" cy="20" rx="6" ry="10"/><circle cx="20" cy="42" r="3"/><circle cx="40" cy="42" r="3"/><path d="M24 52 Q30 58 36 52" stroke="white" stroke-width="2" fill="none"/></svg></div>`;
+      h += `<div style="position:absolute;bottom:12%;width:100%;text-align:center;font-family:var(--display);font-size:14px;color:rgba(232,223,208,0.25);letter-spacing:0.08em;">the artist is dreaming \u2014 click to wake</div>`;
+      return h;
+    },
+    musicalScale: {
+      welcome:{freq:293.66},projects:{freq:311.13},terminal:{freq:392},gallery:{freq:440},
+      currently:{freq:466.16},gc:{freq:587.33},japan:{freq:622.25},trash:{freq:783.99},
+    },
+    scaleNoteType: 'sine',
+    ambientFreq: 80, ambientVol: 0.004, ambientType: 'sine',
+    iconSVGs: {
+      welcome: '<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="11" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" fill="none" opacity="0.8"/><circle cx="16" cy="16" r="3" fill="rgba(255,255,255,0.5)"/></svg>',
+      projects: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"><rect x="6" y="10" width="20" height="14" rx="1.5" fill="rgba(255,255,255,0.1)"/><path d="M6 26h20M10 15h8M10 18h12"/></svg>',
+      terminal: '<svg viewBox="0 0 32 32" fill="none"><rect x="5" y="7" width="22" height="18" rx="2" fill="rgba(90,122,74,0.15)" stroke="rgba(90,122,74,0.6)" stroke-width="1.2"/><text x="10" y="20" font-family="monospace" font-size="11" fill="rgba(90,122,74,0.9)">\u203A_</text></svg>',
+      gallery: '<svg viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="17" rx="11" ry="9" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.6)" stroke-width="1.3"/><circle cx="11" cy="14" r="2.2" fill="#d4858a"/><circle cx="17" cy="11" r="1.8" fill="#c4943a"/></svg>',
+      currently: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"><ellipse cx="16" cy="20" rx="6" ry="4" fill="rgba(255,255,255,0.1)"/><path d="M12 16v4M20 16v4"/></svg>',
+      gc: '<svg viewBox="0 0 32 32" fill="none"><rect x="8" y="9" width="16" height="4" rx="2" fill="rgba(255,255,255,0.35)"/><path d="M8 13Q12 17 16 13Q20 17 24 13" fill="rgba(255,210,120,0.4)"/><rect x="8" y="15" width="16" height="4" rx="2" fill="rgba(255,255,255,0.3)"/></svg>',
+      japan: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round"><line x1="10" y1="12" x2="10" y2="27"/><line x1="22" y1="12" x2="22" y2="27"/><path d="M7 12Q16 8 25 12" stroke-width="2.5"/></svg>',
+      trash: '<svg viewBox="0 0 32 32" fill="none"><path d="M10 14 C10 14,8 26,16 26 C24 26,22 14,22 14" fill="rgba(138,126,106,0.2)" stroke="rgba(138,126,106,0.5)" stroke-width="1.2"/></svg>',
+    },
+    iconStyles: {
+      welcome: 'background:linear-gradient(135deg,#c75c3a,#d4858a);',
+      projects: 'background:linear-gradient(135deg,#4a6a8a,#5a7a4a);',
+      terminal: 'background:#2a2218;border:1px solid #3a3228;',
+      gallery: 'background:linear-gradient(135deg,#d4858a,#c4943a);',
+      gc: 'background:linear-gradient(135deg,#c4943a,#d4a040);',
+      trash: 'background:var(--surface-2);border:1px solid var(--border);',
+      currently: 'background:linear-gradient(135deg,#5a7a4a,#4a6a8a);',
+      japan: 'background:linear-gradient(135deg,#c75c3a,#c4943a);',
+    },
+    finderPath: '/Users/rika/Desktop/\u{7D75}\u{5DFB}\u{7269}/',
+    trashLabel: () => t('trash'),
+    cursorDotStyle: 'width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:0.3;',
+    cursorThrottle: 60, cursorMax: 6,
+    css: `
+      @keyframes moonRise { from{bottom:20%;opacity:0;} to{bottom:60%;opacity:1;} }
+      @keyframes twinkle { 0%,100%{opacity:0.2;} 50%{opacity:0.9;} }
+      .desktop-bg { background:linear-gradient(180deg,#c8d8e8 0%,#e0d8c8 35%,#f0e8d8 60%,#f5ede0 100%); transition:background 1s; }
+      .desktop-bg::after { content:''; position:absolute; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); background-size:256px 256px; pointer-events:none; }
+      body.night-mode .desktop-bg { background:linear-gradient(180deg,#0a0820 0%,#0f1020 40%,#141230 100%); }
+      .window { animation:winOpenG 0.5s cubic-bezier(0.175,0.885,0.32,1.1); box-shadow:0 8px 32px rgba(0,0,0,0.06); }
+      @keyframes winOpenG { from{transform:scaleY(0.1) scaleX(0.8);opacity:0;} 50%{transform:scaleY(1.02) scaleX(1.01);opacity:1;} to{transform:scaleY(1) scaleX(1);opacity:1;} }
+      .window.minimized { animation:winMin 0.3s forwards; }
+      @keyframes winMin { to{transform:scale(0.5) translateY(100vh);opacity:0;} }
+      .win-title { font-family:var(--display); }
+      .desktop-icon .icon-label { font-family:var(--display); }
+      .desktop-icon:hover { background:rgba(199,92,58,0.06); }
+      .desktop-icon:hover .icon-img { transform:scale(1.08); }
+      .tb-app:hover { background:rgba(255,255,255,0.2); color:var(--text); }
+      .tb-app.active { background:rgba(255,255,255,0.25); }
+      .cmd-item:hover,.cmd-item.selected { background:rgba(199,92,58,0.08); }
+      .ctx-item:hover { background:rgba(199,92,58,0.08); }
+      .finder-item:hover { background:rgba(199,92,58,0.04); }
+      .notepad-content h2 { color:var(--accent); -webkit-text-fill-color:unset; }
+      .terminal { color:var(--text);background:#f0e8d0;border-left:4px solid var(--accent); }
+      .petal { position:absolute; width:8px; height:5px; background:var(--pink); border-radius:50% 0 50% 0; opacity:0.5; }
+      @keyframes petalFall { 0%{transform:translateY(-5vh) rotate(0deg) translateX(0);opacity:0;} 10%{opacity:0.5;} 90%{opacity:0.5;} 100%{transform:translateY(105vh) rotate(540deg) translateX(80px);opacity:0;} }
+      .soot-sprite { position:absolute; width:5px; height:5px; background:#3a2e1e; border-radius:50%; opacity:0.4; }
+      @keyframes sootWander { 0%{transform:translate(0,0);} 25%{transform:translate(15px,-10px);} 50%{transform:translate(-8px,-20px);} 75%{transform:translate(20px,-5px);} 100%{transform:translate(0,0);} }
+      .cloud { position:absolute; background:var(--surface-2); border-radius:50%; filter:blur(20px); opacity:0.4; }
+      @keyframes cloudDrift { 0%{transform:translateX(0);} 100%{transform:translateX(100vw);} }
+    `,
+    initParticles: (container) => {
+      for(let i=0;i<8;i++){const s=document.createElement('div');s.className='soot-sprite';s.style.cssText=`left:${Math.random()*100}%;top:${30+Math.random()*50}%;animation:sootWander ${8+Math.random()*8}s ease-in-out infinite;animation-delay:${Math.random()*5}s;`;container.appendChild(s);}
+      for(let i=0;i<12;i++){const p=document.createElement('div');p.className='petal';p.style.cssText=`left:${Math.random()*100}%;animation:petalFall ${18+Math.random()*12}s linear infinite;animation-delay:${Math.random()*20}s;`;container.appendChild(p);}
+    },
+    initBackground: () => {
+      const bg=document.getElementById('themeBackgroundLayers');
+      // Clouds
+      let ch='<div class="clouds" style="position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;">';
+      for(let i=0;i<6;i++){const s=100+Math.random()*200;ch+=`<div class="cloud" style="width:${s}px;height:${s*0.5}px;top:${5+Math.random()*20}%;left:${Math.random()*100}%;animation:cloudDrift ${40+Math.random()*40}s linear infinite;"></div>`;}
+      ch+='</div>';
+      // Mountains
+      const mc=['#8a9a7a','#7a8a6a','#6a7a5a'];
+      ch+='<div style="position:fixed;bottom:0;left:0;right:0;height:15vh;z-index:0;pointer-events:none;">';
+      for(let i=0;i<5;i++){const h=60+Math.random()*80;ch+=`<div style="position:absolute;bottom:0;left:${-5+i*22}%;border-left:${80+Math.random()*60}px solid transparent;border-right:${80+Math.random()*60}px solid transparent;border-bottom:${h}px solid ${mc[i%3]};opacity:0.15;"></div>`;}
+      ch+='</div>';
+      bg.innerHTML=ch;
+    },
+    initScreensaver: () => {},
+    playWindowOpen: () => { if(!audioCtx)return; const n=audioCtx.createOscillator(),g=audioCtx.createGain();n.type='sawtooth';n.frequency.setValueAtTime(150,audioCtx.currentTime);n.frequency.exponentialRampToValueAtTime(80,audioCtx.currentTime+0.15);g.gain.setValueAtTime(0.03,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.15);n.connect(g).connect(audioCtx.destination);n.start();n.stop(audioCtx.currentTime+0.15);setTimeout(()=>{const c=audioCtx.createOscillator(),g2=audioCtx.createGain();c.type='sine';c.frequency.setValueAtTime(1200,audioCtx.currentTime);g2.gain.setValueAtTime(0.05,audioCtx.currentTime);g2.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.3);c.connect(g2).connect(audioCtx.destination);c.start();c.stop(audioCtx.currentTime+0.3);},100); },
+    playWindowClose: () => { playBoop(300,0.08,0.05,'triangle');setTimeout(()=>playBoop(200,0.1,0.03,'sine'),40); },
+    playTypeBoop: () => { if(!audioCtx)return; const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sawtooth';o.frequency.setValueAtTime(300+Math.random()*200,audioCtx.currentTime);g.gain.setValueAtTime(0.02,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.03);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.03); },
+    playHoverSound: (appId) => {
+      // Wood block tok
+      if(!audioCtx)return;
+      const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='triangle';o.frequency.setValueAtTime(800,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(200,audioCtx.currentTime+0.04);g.gain.setValueAtTime(0.08,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.06);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.06);
+      const n=currentTheme.musicalScale[appId]; if(n) playBoop(n.freq,0.2,0.06,'sine');
+    },
+    frameLoops: [],
+    easterEggs: { init: () => {
+      // Tanuki (click shelf 5x)
+      let sc=0;
+      document.querySelector('.taskbar')?.addEventListener('click',(e)=>{
+        if(e.target.closest('.tb-start,.tb-app,.tb-tray-btn,.lang-seg'))return;
+        sc++;if(sc>=5){sc=0;const t=document.createElement('div');t.style.cssText='position:fixed;z-index:9500;pointer-events:none;bottom:70px;left:50%;font-size:48px;animation:tanukiPeek 2s ease-in-out forwards;';t.textContent='\u{1F3A8}';document.body.appendChild(t);setTimeout(()=>t.remove(),2100);}
+        setTimeout(()=>{sc=0;},2000);
+      });
+    }},
+    cleanup: () => { document.getElementById('themeBackgroundLayers').innerHTML=''; },
+  },
+
+  holographic: {
+    id: 'holographic', name: 'Holographic',
+    vars: {
+      '--bg':'#08080f','--surface':'#12121f','--surface-2':'#1a1a2e',
+      '--border':'#2a2a44','--text':'#e0e0f0','--text-muted':'#6a6a8a',
+      '--accent':'#00ffcc','--accent-glow':'rgba(0,255,204,0.2)',
+      '--pink':'#ff3399','--blue':'#3366ff','--gold':'#ffcc00',
+      '--red':'#ff4444','--green':'#33ff99','--amber':'#ffcc00',
+      '--lavender':'#6a6a8a','--peach':'#2a2a44','--teal':'#00ffcc',
+      '--brown':'#2a2a44',
+      '--taskbar-h':'88px','--radius':'12px','--win-header':'40px',
+      '--font':"'Inter','Noto Sans JP',sans-serif",
+      '--mono':"'JetBrains Mono',monospace",
+      '--display':"'Space Grotesk','Noto Sans JP',sans-serif",
+    },
+    nightVars: { // Day mode is the "special" mode
+      '--bg':'#f0f0f8','--surface':'#ffffff','--surface-2':'#e8e8f0',
+      '--border':'#d0d0e0','--text':'#1a1a2e','--text-muted':'#6a6a8a',
+      '--accent':'#0088aa',
+    },
+    nightMode: { prop: 'nightMode', class: 'day-mode', inverted: true, label: () => nightMode ? 'GLITCH' : 'DEFRAG' },
+    bootBg: '#000',
+    bootContent: () => `
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,0.03) 0px,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 2px);animation:bootStatic 0.1s steps(4) infinite;pointer-events:none;"></div>
+      <div style="position:absolute;left:0;right:0;height:30px;background:linear-gradient(180deg,transparent,rgba(255,255,255,0.08),transparent);animation:trackingBars 2s ease-in-out infinite;pointer-events:none;"></div>
+      <div style="font-family:var(--mono);font-size:16px;color:#33ff99;text-shadow:0 0 10px #33ff99,0 0 30px rgba(51,255,153,0.3);opacity:0;letter-spacing:0.15em;text-transform:uppercase;animation:signalFlicker 0.5s ease-out 0.8s forwards;">SIGNAL ACQUIRED</div>
+      <div class="boot-lines" id="bootLines" style="color:#4a4a6a;margin-top:24px;"></div>
+      <div class="boot-bar" style="width:440px;background:#1a1a2e;"><div class="boot-bar-fill" style="background:linear-gradient(90deg,#00ffcc,#ff3399,#3366ff);box-shadow:0 0 12px #00ffcc;"></div></div>
+    `,
+    bootMessages: [
+      { text: 'HOLO_OS v3.0 \u2014 scanning frequencies...', delay: 0 },
+      { text: 'decoding /dev/portfolio stream...              [OK]', cls: 'ok', delay: 250 },
+      { text: 'calibrating holographic matrix...              [OK]', cls: 'ok', delay: 500 },
+      { text: 'loading bilingual codex: en_US + ja_JP...      [OK]', cls: 'ok', delay: 750 },
+      { text: 'SIGNAL NOISE detected in vibe.module            [WARN]', cls: 'warn', delay: 1000 },
+      { text: 'rendering phosphor grid...                     [OK]', cls: 'ok', delay: 1250 },
+      { text: 'all channels locked. transmission active.', cls: 'ok', delay: 1500 },
+    ],
+    bootDuration: 2600,
+    bootLineColors: { ok: '#33ff99', warn: '#ffcc00', default: '#4a4a6a' },
+    termPrompt: 'rika@holo ~ % ',
+    termBg: 'color:#33ff99;background:#060610;text-shadow:0 0 3px rgba(51,255,153,0.3);',
+    termWelcome: 'HOLO_OS Terminal \u2014 type "help" for commands\n\n',
+    startButton: 'R',
+    startButtonStyle: 'border-radius:12px;border:1px solid rgba(0,255,204,0.3);background:linear-gradient(135deg,rgba(0,255,204,0.15),rgba(255,51,153,0.1));color:var(--accent);font-size:18px;text-shadow:0 0 8px var(--accent);',
+    taskbarStyle: 'background:rgba(18,18,31,0.8);border:1px solid rgba(0,255,204,0.15);border-radius:18px;box-shadow:0 8px 32px rgba(0,0,0,0.3),0 0 20px rgba(0,255,204,0.05);',
+    nightTaskbarStyle: 'background:rgba(255,255,255,0.85);border-color:rgba(0,136,170,0.2);',
+    screensaverBg: '#000',
+    screensaverContent: () => {
+      return `<div style="position:absolute;inset:0;background:url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E&quot;);animation:staticNoise 0.15s steps(5) infinite;"></div>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:18px;color:rgba(255,255,255,0.3);letter-spacing:0.15em;text-transform:uppercase;text-shadow:0 0 20px rgba(255,255,255,0.1);animation:signalPulse 2s ease-in-out infinite;">SIGNAL LOST \u2014 CLICK TO RECONNECT</div>`;
+    },
+    musicalScale: {
+      welcome:{freq:220},projects:{freq:261.63},terminal:{freq:293.66},gallery:{freq:349.23},
+      currently:{freq:392},gc:{freq:440},japan:{freq:523.25},trash:{freq:587.33},
+    },
+    scaleNoteType: 'triangle',
+    ambientFreq: 60, ambientVol: 0.003, ambientType: 'sawtooth',
+    iconSVGs: {
+      welcome: '<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="14" r="10" stroke="rgba(0,255,204,0.5)" stroke-width="1" fill="rgba(0,255,204,0.05)"/><circle cx="12.5" cy="12" r="1.5" fill="rgba(0,255,204,0.6)"/><circle cx="19.5" cy="12" r="1.5" fill="rgba(0,255,204,0.6)"/><path d="M13 17Q16 19 19 17" stroke="rgba(0,255,204,0.5)" stroke-width="1" fill="none"/></svg>',
+      projects: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(0,255,204,0.5)" stroke-width="1" stroke-linecap="round"><rect x="5" y="8" width="22" height="15" rx="2" fill="rgba(0,255,204,0.05)"/><line x1="9" y1="13" x2="18" y2="13"/><line x1="9" y1="17" x2="23" y2="17" opacity="0.4"/></svg>',
+      terminal: '<svg viewBox="0 0 32 32" fill="none"><rect x="4" y="6" width="24" height="20" rx="3" fill="rgba(0,255,204,0.05)" stroke="rgba(0,255,204,0.4)" stroke-width="1"/><text x="10" y="20" font-family="monospace" font-size="12" fill="rgba(0,255,204,0.7)">\u203A_</text></svg>',
+      gallery: '<svg viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="17" rx="12" ry="10" fill="rgba(0,255,204,0.05)" stroke="rgba(0,255,204,0.4)" stroke-width="1"/><circle cx="11" cy="14" r="2" fill="rgba(255,51,153,0.4)"/><circle cx="18" cy="11" r="1.8" fill="rgba(51,102,255,0.4)"/></svg>',
+      currently: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(0,255,204,0.5)" stroke-width="1.2" stroke-linecap="round"><path d="M8 19C8 11 24 11 24 19"/><rect x="6" y="18" width="4" height="6" rx="2" fill="rgba(0,255,204,0.1)"/><rect x="22" y="18" width="4" height="6" rx="2" fill="rgba(0,255,204,0.1)"/></svg>',
+      gc: '<svg viewBox="0 0 32 32" fill="none"><rect x="7" y="8" width="18" height="4" rx="2" fill="rgba(0,255,204,0.15)" stroke="rgba(0,255,204,0.3)" stroke-width="0.8"/><path d="M7 12Q11.5 16 16 12Q20.5 16 25 12" fill="rgba(255,204,0,0.2)"/><rect x="7" y="14" width="18" height="4" rx="2" fill="rgba(0,255,204,0.1)"/></svg>',
+      japan: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(0,255,204,0.5)" stroke-width="1.5" stroke-linecap="round"><line x1="10" y1="12" x2="10" y2="28"/><line x1="22" y1="12" x2="22" y2="28"/><path d="M6 12Q16 8 26 12" stroke-width="2"/></svg>',
+      trash: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(106,106,138,0.6)" stroke-width="1" stroke-linecap="round"><rect x="9" y="11" width="14" height="16" rx="2" fill="rgba(106,106,138,0.1)"/><path d="M7 9h18M13 7h6"/></svg>',
+    },
+    iconStyles: {
+      welcome: 'background:var(--surface-2);border:1px solid var(--border);background-image:linear-gradient(135deg,rgba(0,255,204,0.08),rgba(255,51,153,0.06),rgba(51,102,255,0.08));',
+      projects: 'background:var(--surface-2);border:1px solid var(--border);background-image:linear-gradient(135deg,rgba(0,255,204,0.08),rgba(255,51,153,0.06));',
+      terminal: 'background:var(--surface-2);border:1px solid var(--border);',
+      gallery: 'background:var(--surface-2);border:1px solid var(--border);background-image:linear-gradient(135deg,rgba(255,51,153,0.06),rgba(51,102,255,0.08));',
+      gc: 'background:var(--surface-2);border:1px solid var(--border);background-image:linear-gradient(135deg,rgba(255,204,0,0.08),rgba(0,255,204,0.06));',
+      trash: 'background:var(--surface-2);border:1px solid var(--border);',
+      currently: 'background:var(--surface-2);border:1px solid var(--border);',
+      japan: 'background:var(--surface-2);border:1px solid var(--border);',
+    },
+    finderPath: '/holo/signal/trash/',
+    trashLabel: () => t('trash'),
+    cursorDotStyle: 'width:6px;height:6px;background:var(--accent);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);opacity:0.6;',
+    cursorThrottle: 40, cursorMax: 10,
+    css: `
+      @keyframes bootStatic { 0%{transform:translateY(0);} 25%{transform:translateY(-2px);} 50%{transform:translateY(1px);} 75%{transform:translateY(-1px);} 100%{transform:translateY(0);} }
+      @keyframes trackingBars { 0%{top:-30px;} 100%{top:110%;} }
+      @keyframes signalFlicker { 0%{opacity:0;} 20%{opacity:1;} 30%{opacity:0.3;} 50%{opacity:1;} 60%{opacity:0.6;} 100%{opacity:1;} }
+      @keyframes staticNoise { 0%{transform:translate(0,0);} 20%{transform:translate(-5%,5%);} 40%{transform:translate(5%,-5%);} 60%{transform:translate(-5%,-5%);} 80%{transform:translate(5%,5%);} 100%{transform:translate(0,0);} }
+      @keyframes signalPulse { 0%,100%{opacity:0.3;} 50%{opacity:0.7;} }
+      .desktop-bg::before { content:''; position:absolute; width:200%; height:200%; top:-50%; left:-50%; background: radial-gradient(ellipse 600px 500px at 20% 30%,rgba(0,255,204,0.06) 0%,transparent 60%), radial-gradient(ellipse 500px 600px at 80% 25%,rgba(255,51,153,0.05) 0%,transparent 60%), radial-gradient(ellipse 500px 400px at 55% 75%,rgba(51,102,255,0.05) 0%,transparent 60%); animation:holoDrift 25s ease-in-out infinite alternate; }
+      @keyframes holoDrift { 0%{transform:translate(0,0) rotate(0deg) scale(1);} 25%{transform:translate(40px,-30px) rotate(1.5deg) scale(1.02);} 50%{transform:translate(-30px,20px) rotate(-1deg) scale(0.98);} 75%{transform:translate(20px,10px) rotate(0.5deg) scale(1.01);} 100%{transform:translate(-10px,-15px) rotate(-0.5deg) scale(1);} }
+      .holo-scanlines { position:fixed; inset:0; z-index:0; pointer-events:none; background:repeating-linear-gradient(0deg,transparent 0px,transparent 1px,rgba(255,255,255,0.015) 1px,rgba(255,255,255,0.015) 2px); animation:scanScroll 8s linear infinite; }
+      @keyframes scanScroll { 0%{transform:translateY(0);} 100%{transform:translateY(40px);} }
+      .holo-vignette { position:fixed; inset:0; z-index:0; pointer-events:none; background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.4) 100%); }
+      .window { background:rgba(18,18,31,0.85); backdrop-filter:blur(12px); animation:winMaterialize 0.45s cubic-bezier(0.16,1,0.3,1); box-shadow:2px 0 0 rgba(255,51,153,0.08),-2px 0 0 rgba(51,102,255,0.08),0 8px 32px rgba(0,0,0,0.4); }
+      @keyframes winMaterialize { 0%{transform:scaleY(0.02) scaleX(1);opacity:0;filter:brightness(3) hue-rotate(90deg);} 30%{transform:scaleY(0.02) scaleX(1);opacity:1;filter:brightness(2);} 50%{transform:scaleY(0.5) scaleX(1.02);filter:brightness(1.5) hue-rotate(45deg);} 75%{transform:scaleY(1.02) scaleX(0.99);filter:brightness(1.1);} 100%{transform:scaleY(1) scaleX(1);opacity:1;filter:none;} }
+      .window.minimized { animation:winMinH 0.25s forwards; }
+      @keyframes winMinH { to{transform:scaleY(0.02) scaleX(0.5);opacity:0;filter:brightness(2);} }
+      .window.focused { box-shadow:2px 0 0 rgba(255,51,153,0.12),-2px 0 0 rgba(51,102,255,0.12),0 12px 48px rgba(0,0,0,0.5),0 0 30px var(--accent-glow); }
+      .win-header { background:rgba(26,26,46,0.9); }
+      .win-dot.close { box-shadow:0 0 6px rgba(255,68,68,0.4); }
+      .win-dot.minimize { box-shadow:0 0 6px rgba(255,204,0,0.3); }
+      .win-dot.maximize { box-shadow:0 0 6px rgba(51,255,153,0.3); }
+      .desktop-icon:hover { background:rgba(0,255,204,0.04); }
+      .desktop-icon:hover .icon-img { transform:scale(1.08) rotateY(8deg) rotateX(-4deg); border-color:var(--accent); box-shadow:0 0 16px rgba(0,255,204,0.2); }
+      .tb-app:hover { background:rgba(0,255,204,0.08); color:var(--text); transform:translateY(-2px); }
+      .tb-app.active { background:rgba(0,255,204,0.12); color:var(--accent); }
+      .cmd-item:hover,.cmd-item.selected { background:rgba(0,255,204,0.08); }
+      .ctx-item:hover { background:rgba(0,255,204,0.1); }
+      .finder-item:hover { background:rgba(0,255,204,0.04); }
+      .notepad-content h2 { background:linear-gradient(135deg,var(--accent),var(--pink),var(--blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+      .terminal { color:var(--green); background:#060610; text-shadow:0 0 3px rgba(51,255,153,0.3); }
+      body.day-mode .holo-scanlines { opacity:0; }
+      body.day-mode .holo-vignette { opacity:0; }
+      body.day-mode .desktop-bg::before { opacity:0; }
+      .holo-shard { position:absolute; width:0; height:0; border-left:4px solid transparent; border-right:4px solid transparent; border-bottom:8px solid var(--accent); filter:blur(0.5px); opacity:0; animation:holoFloat linear infinite; }
+      .holo-line { position:absolute; width:30px; height:1px; background:linear-gradient(90deg,transparent,var(--accent),transparent); opacity:0; animation:holoFloat linear infinite; }
+      @keyframes holoFloat { 0%{opacity:0;transform:translateY(100vh) rotate(0deg);} 10%{opacity:0.4;} 90%{opacity:0.4;} 100%{opacity:0;transform:translateY(-10vh) rotate(180deg);} }
+      .desktop-toy { background:transparent; clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%); box-shadow:0 0 8px var(--accent); width:12px; height:12px; }
+      .cursor-dot:nth-child(odd) { background:var(--pink) !important; }
+      .cursor-dot:nth-child(3n) { background:var(--blue) !important; }
+    `,
+    initParticles: (container) => {
+      const colors=['var(--accent)','var(--pink)','var(--blue)','var(--gold)'];
+      for(let i=0;i<10;i++){const s=document.createElement('div');s.className='holo-shard';s.style.cssText=`left:${Math.random()*100}%;border-bottom-color:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${12+Math.random()*15}s;animation-delay:${Math.random()*15}s;`;container.appendChild(s);}
+      for(let i=0;i<6;i++){const l=document.createElement('div');l.className='holo-line';l.style.cssText=`left:${Math.random()*100}%;animation-duration:${20+Math.random()*15}s;animation-delay:${Math.random()*20}s;`;container.appendChild(l);}
+    },
+    initBackground: () => {
+      const bg=document.getElementById('themeBackgroundLayers');
+      bg.innerHTML='<div class="holo-scanlines"></div><div class="holo-vignette"></div>';
+    },
+    initScreensaver: () => {},
+    playWindowOpen: () => { if(!audioCtx)return; const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sawtooth';o.frequency.setValueAtTime(100,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(2000,audioCtx.currentTime+0.15);g.gain.setValueAtTime(0.05,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.15);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.15); },
+    playWindowClose: () => { if(!audioCtx)return; const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sawtooth';o.frequency.setValueAtTime(1200,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(60,audioCtx.currentTime+0.2);g.gain.setValueAtTime(0.04,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.2);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.2); },
+    playTypeBoop: () => { if(!audioCtx)return; const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='square';o.frequency.setValueAtTime(1800+Math.random()*600,audioCtx.currentTime);g.gain.setValueAtTime(0.02,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.02);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.02); },
+    playHoverSound: (appId) => { if(!audioCtx)return; const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='square';o.frequency.setValueAtTime(800,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(400,audioCtx.currentTime+0.04);g.gain.setValueAtTime(0.03,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.04);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.04);const n=currentTheme.musicalScale[appId];if(n)playBoop(n.freq,0.15,0.06,'triangle'); },
+    frameLoops: [],
+    _holoAngle: 0,
+    _glitchTimer: null,
+    easterEggs: { init: () => {
+      // Periodic glitch tear
+      function scheduleGlitch(){
+        currentTheme._glitchTimer = setTimeout(()=>{
+          const d=document.getElementById('desktop');if(d){d.classList.add('glitch-active');setTimeout(()=>d.classList.remove('glitch-active'),150);}
+          if(currentTheme.id==='holographic')scheduleGlitch();
+        },15000+Math.random()*15000);
+      }
+      scheduleGlitch();
+      // Holo border angle RAF
+      function animHolo(){
+        if(currentTheme.id!=='holographic')return;
+        currentTheme._holoAngle=(currentTheme._holoAngle+0.5)%360;
+        document.querySelectorAll('.window').forEach(w=>{w.style.setProperty('--holo-angle',currentTheme._holoAngle+'deg');});
+        requestAnimationFrame(animHolo);
+      }
+      requestAnimationFrame(animHolo);
+      // Hidden frequency: hold start button 5s
+      let holdTimer=null;
+      const startBtn=document.getElementById('startBtn');
+      startBtn.addEventListener('mousedown',()=>{
+        holdTimer=setTimeout(()=>{
+          if(currentTheme.id!=='holographic')return;
+          if(!audioCtx)initAudio();
+          const freqs=[220,277.18,329.63,415.3,523.25];
+          freqs.forEach((f,i)=>{setTimeout(()=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.setValueAtTime(f,audioCtx.currentTime);g.gain.setValueAtTime(0.08,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+1.5);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+1.5);},i*200);});
+          const toast=document.createElement('div');toast.className='melody-toast';toast.textContent='HIDDEN FREQUENCY UNLOCKED';toast.style.borderColor='var(--accent)';toast.style.color='var(--accent)';document.body.appendChild(toast);setTimeout(()=>toast.remove(),3000);
+        },5000);
+      });
+      startBtn.addEventListener('mouseup',()=>{clearTimeout(holdTimer);});
+      startBtn.addEventListener('mouseleave',()=>{clearTimeout(holdTimer);});
+      // Shake mouse to intensify glitch
+      let lastGX=0,gShakes=0,gShakeTimer=null;
+      document.addEventListener('mousemove',(e)=>{
+        if(currentTheme.id!=='holographic')return;
+        const dx=Math.abs(e.clientX-lastGX);lastGX=e.clientX;
+        if(dx>60){gShakes++;clearTimeout(gShakeTimer);gShakeTimer=setTimeout(()=>{gShakes=0;},800);
+          if(gShakes>=8){gShakes=0;const d=document.getElementById('desktop');if(d){d.classList.add('glitch-active');setTimeout(()=>d.classList.remove('glitch-active'),400);}}
+        }
+      });
+    }},
+    cleanup: () => {
+      if(THEMES.holographic._glitchTimer)clearTimeout(THEMES.holographic._glitchTimer);
+      document.getElementById('themeBackgroundLayers').innerHTML='';
+      document.getElementById('desktop').classList.remove('glitch-active');
+    },
+  },
+
+  terrarium: {
+    id: 'terrarium', name: 'Terrarium',
+    vars: {
+      '--bg':'#1a2e1a','--surface':'rgba(255,255,255,0.08)','--surface-2':'#1e3420',
+      '--border':'rgba(255,255,255,0.12)','--text':'#e0ead8','--text-muted':'#8aaa80',
+      '--accent':'#4ec97a','--accent-glow':'rgba(78,201,122,0.2)',
+      '--brown':'#8a6a3a','--amber':'#c4a43a','--pink':'#d48a8a',
+      '--blue':'#5a8aaa','--teal':'#3aaa8a','--red':'#c45a5a',
+      '--green':'#4ec97a','--gold':'#c4a43a','--lavender':'#8aaa80','--peach':'#d48a8a',
+      '--taskbar-h':'88px','--radius':'16px','--win-header':'40px',
+      '--font':"'Inter','Noto Sans JP',sans-serif",
+      '--mono':"'JetBrains Mono',monospace",
+      '--display':"'Space Grotesk','Noto Sans JP',sans-serif",
+    },
+    nightVars: {
+      '--bg':'#0a0f1a','--surface':'rgba(96,255,160,0.04)','--surface-2':'#0e1520',
+      '--border':'rgba(96,255,160,0.1)','--text':'#c0d8e8','--text-muted':'#5a8a9a',
+      '--accent':'#60ffa0','--accent-glow':'rgba(96,255,160,0.15)',
+    },
+    nightMode: { prop: 'nightMode', class: 'night-mode', label: () => '<div style="width:24px;height:28px;border:1.5px solid rgba(255,255,255,0.15);border-radius:4px 4px 6px 6px;display:flex;align-items:center;justify-content:center;cursor:pointer;"><div style="width:6px;height:6px;border-radius:50%;background:'+(nightMode?'#60ffa0':'#c4a43a')+';box-shadow:0 0 '+(nightMode?'8px #60ffa0':'6px #c4a43a')+';"></div></div>' },
+    bootBg: '#0a1a0a',
+    bootContent: () => `
+      <div class="boot-dome" style="width:300px;height:300px;border:2px solid rgba(255,255,255,0.1);border-radius:50%;position:relative;margin-bottom:32px;overflow:hidden;opacity:0;animation:domeAppear 0.4s 0.1s forwards;">
+        <div style="position:absolute;bottom:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5a3a1a,#3a2a10,#2a1a08);animation:soilFill 0.8s 0.3s ease-out forwards;border-radius:0 0 150px 150px;"></div>
+        <div style="position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse 120px 60px at 35% 30%,rgba(255,255,255,0.08),transparent);opacity:0;animation:reflectionAppear 0.5s 1.8s forwards;"></div>
+      </div>
+      <div style="font-family:var(--display);font-size:42px;font-weight:800;background:linear-gradient(135deg,#4ec97a,#3aaa8a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:24px;letter-spacing:-0.03em;">Terrarium OS</div>
+      <div class="boot-lines" id="bootLines" style="color:#3a5a3a;"></div>
+      <div class="boot-bar" style="background:#1a2a1a;"><div class="boot-bar-fill" style="background:linear-gradient(90deg,#4ec97a,#3aaa8a);"></div></div>
+    `,
+    bootMessages: [
+      { text: 'Terrarium OS v1.0 \u2014 germinating...', delay: 0 },
+      { text: 'propagating /dev/portfolio seedlings...       [OK]', cls: 'ok', delay: 250 },
+      { text: 'watering bilingual root system...             [OK]', cls: 'ok', delay: 500 },
+      { text: 'growing creative mycelium network...          [OK]', cls: 'ok', delay: 750 },
+      { text: 'composting old code...                        [OK]', cls: 'ok', delay: 1000 },
+      { text: 'photosynthesis.service \u2014 needs more light     [WARN]', cls: 'warn', delay: 1200 },
+      { text: 'all spores accounted for. ecosystem ready.', cls: 'ok', delay: 1500 },
+    ],
+    bootDuration: 2800,
+    bootLineColors: { ok: '#4ec97a', warn: '#c4a43a', default: '#3a5a3a' },
+    termPrompt: '[field-log] rika ~ \u{276F} ',
+    termBg: 'color:var(--accent);background:linear-gradient(180deg,#1a1408,#12100a);',
+    termWelcome: 'Terrarium Field Log \u2014 type "help" for commands\n\n',
+    startButton: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="12" rx="4" ry="2" fill="rgba(78,201,122,0.3)"/><circle cx="8" cy="10" r="3" fill="rgba(138,106,58,0.6)" stroke="rgba(138,106,58,0.8)" stroke-width="0.5"/></svg>',
+    startButtonStyle: 'border-radius:50%;border:2px solid rgba(78,201,122,0.3);background:radial-gradient(circle at 45% 40%,rgba(78,201,122,0.4),rgba(26,46,26,0.6));color:var(--accent);font-size:14px;',
+    taskbarStyle: 'background:linear-gradient(180deg,rgba(138,106,58,0.5),rgba(90,60,30,0.6));border:1px solid rgba(138,106,58,0.3);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.06);',
+    nightTaskbarStyle: 'background:rgba(10,15,26,0.9);border-color:rgba(96,255,160,0.15);',
+    screensaverBg: '#050a15',
+    screensaverContent: () => {
+      let h = '';
+      // Mushrooms
+      for(let i=0;i<8;i++){
+        h+=`<div style="position:absolute;bottom:${10+Math.random()*30}%;left:${5+Math.random()*90}%;"><div style="width:20px;height:12px;border-radius:50% 50% 0 0;background:radial-gradient(ellipse at center,rgba(96,255,160,0.6),rgba(96,255,160,0.1));box-shadow:0 0 20px rgba(96,255,160,0.3);animation:mushroomGlow ${2+Math.random()*2}s ease-in-out infinite;animation-delay:${Math.random()*2}s;"></div><div style="width:4px;height:12px;background:rgba(96,255,160,0.15);margin:0 auto;border-radius:0 0 2px 2px;"></div></div>`;
+      }
+      // Fireflies
+      for(let i=0;i<20;i++){
+        h+=`<div style="position:absolute;width:4px;height:4px;border-radius:50%;background:#ffd54f;box-shadow:0 0 8px #ffd54f;left:${Math.random()*100}%;top:${Math.random()*80}%;animation:fireflyFloat ${8+Math.random()*10}s linear infinite;animation-delay:${Math.random()*8}s;"></div>`;
+      }
+      h+=`<div style="position:absolute;bottom:15%;width:100%;text-align:center;font-family:var(--display);font-size:14px;color:rgba(96,255,160,0.25);letter-spacing:0.1em;">the garden sleeps \u2014 click to wake</div>`;
+      return h;
+    },
+    musicalScale: {
+      welcome:{freq:261.63},projects:{freq:293.66},terminal:{freq:329.63},gallery:{freq:392},
+      currently:{freq:440},gc:{freq:523.25},japan:{freq:587.33},trash:{freq:659.25},
+    },
+    scaleNoteType: 'sine',
+    ambientFreq: 80, ambientVol: 0.004, ambientType: 'sine',
+    ambientFilter: { type: 'lowpass', freq: 200 },
+    iconSVGs: {
+      welcome: '<svg viewBox="0 0 32 32" fill="none"><path d="M8 24 Q8 12 16 8 Q24 12 24 24 Z" fill="rgba(78,201,122,0.2)" stroke="rgba(78,201,122,0.4)" stroke-width="1"/><circle cx="16" cy="16" r="3" fill="rgba(78,201,122,0.3)" stroke="rgba(78,201,122,0.5)" stroke-width="0.8"/></svg>',
+      projects: '<svg viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="22" rx="12" ry="4" fill="rgba(138,106,58,0.2)" stroke="rgba(138,106,58,0.4)" stroke-width="1"/><rect x="10" y="8" width="12" height="14" rx="6" fill="rgba(78,201,122,0.15)" stroke="rgba(78,201,122,0.3)" stroke-width="1"/><line x1="16" y1="12" x2="16" y2="18" stroke="rgba(78,201,122,0.4)" stroke-width="1"/></svg>',
+      terminal: '<svg viewBox="0 0 32 32" fill="none"><rect x="4" y="6" width="24" height="20" rx="3" fill="rgba(15,26,15,0.5)" stroke="rgba(78,201,122,0.3)" stroke-width="1"/><text x="10" y="20" font-family="monospace" font-size="12" fill="rgba(78,201,122,0.7)">\u203A_</text></svg>',
+      gallery: '<svg viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="17" rx="12" ry="10" fill="rgba(212,138,138,0.1)" stroke="rgba(212,138,138,0.3)" stroke-width="1"/><circle cx="11" cy="15" r="2" fill="rgba(212,138,138,0.3)"/><circle cx="18" cy="12" r="1.8" fill="rgba(196,164,58,0.3)"/></svg>',
+      currently: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(58,170,138,0.5)" stroke-width="1.2" stroke-linecap="round"><path d="M8 19C8 11 24 11 24 19"/><rect x="6" y="18" width="4" height="6" rx="2" fill="rgba(58,170,138,0.15)"/><rect x="22" y="18" width="4" height="6" rx="2" fill="rgba(58,170,138,0.15)"/></svg>',
+      gc: '<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="10" fill="rgba(196,164,58,0.15)" stroke="rgba(196,164,58,0.3)" stroke-width="1"/><path d="M10 16Q13 20 16 16Q19 20 22 16" fill="rgba(196,164,58,0.2)"/></svg>',
+      japan: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(212,138,138,0.5)" stroke-width="1.5" stroke-linecap="round"><line x1="10" y1="12" x2="10" y2="28"/><line x1="22" y1="12" x2="22" y2="28"/><path d="M6 12Q16 8 26 12" stroke-width="2"/></svg>',
+      trash: '<svg viewBox="0 0 32 32" fill="none"><path d="M8 14Q8 14 8 26Q8 28 16 28Q24 28 24 26L24 14" fill="rgba(138,106,58,0.15)" stroke="rgba(138,106,58,0.4)" stroke-width="1"/><path d="M8 14Q16 12 24 14" stroke="rgba(138,106,58,0.4)" stroke-width="1" fill="none"/></svg>',
+    },
+    iconStyles: {
+      welcome: 'background:linear-gradient(135deg,rgba(78,201,122,0.3),rgba(58,170,138,0.2));border:1px solid rgba(78,201,122,0.3);',
+      projects: 'background:linear-gradient(135deg,rgba(138,106,58,0.4),rgba(90,70,30,0.3));border:1px solid rgba(138,106,58,0.3);',
+      terminal: 'background:#0f1a0f;border:1px solid rgba(78,201,122,0.2);',
+      gallery: 'background:linear-gradient(135deg,rgba(212,138,138,0.25),rgba(196,164,58,0.2));border:1px solid rgba(212,138,138,0.2);',
+      gc: 'background:linear-gradient(135deg,rgba(196,164,58,0.35),rgba(138,106,58,0.25));border:1px solid rgba(196,164,58,0.3);',
+      trash: 'background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);',
+      currently: 'background:linear-gradient(135deg,rgba(58,170,138,0.3),rgba(90,138,170,0.2));border:1px solid rgba(58,170,138,0.2);',
+      japan: 'background:linear-gradient(135deg,rgba(212,138,138,0.2),rgba(255,255,255,0.08));border:1px solid rgba(212,138,138,0.2);',
+    },
+    finderPath: '/terrarium/compost/',
+    trashLabel: () => lang === 'jp' ? '\u{30B3}\u{30F3}\u{30DD}\u{30B9}\u{30C8}' : 'Compost',
+    cursorDotStyle: 'width:8px;height:5px;border-radius:50% 50% 50% 0;background:var(--accent);opacity:0.4;',
+    cursorThrottle: 50, cursorMax: 8,
+    css: `
+      @keyframes domeAppear { to{opacity:1;} }
+      @keyframes soilFill { to{height:35%;} }
+      @keyframes reflectionAppear { to{opacity:1;} }
+      @keyframes mushroomGlow { 0%,100%{opacity:0.5;} 50%{opacity:1;} }
+      @keyframes fireflyFloat { 0%{transform:translate(0,0);opacity:0;} 10%{opacity:0.8;} 50%{transform:translate(40px,-60px);opacity:1;} 90%{opacity:0.4;} 100%{transform:translate(-20px,-120px);opacity:0;} }
+      .desktop-bg::before { content:''; position:absolute; width:150%; height:150%; top:-25%; left:-25%; background: radial-gradient(ellipse 500px 400px at 20% 30%,rgba(78,201,122,0.06) 0%,transparent 70%), radial-gradient(ellipse 600px 500px at 70% 20%,rgba(58,170,138,0.04) 0%,transparent 70%), radial-gradient(ellipse 400px 500px at 55% 70%,rgba(138,106,58,0.05) 0%,transparent 70%); animation:meshDriftT 25s ease-in-out infinite alternate; }
+      @keyframes meshDriftT { 0%{transform:translate(0,0) rotate(0deg);} 33%{transform:translate(20px,-15px) rotate(0.5deg);} 66%{transform:translate(-15px,10px) rotate(-0.3deg);} 100%{transform:translate(8px,-8px) rotate(0.2deg);} }
+      .desktop-bg::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at center,transparent 40%,rgba(255,255,255,0.03) 65%,rgba(255,255,255,0.06) 80%,rgba(255,255,255,0.03) 100%); }
+      .terr-mist { position:fixed; inset:0; z-index:1; pointer-events:none; background:linear-gradient(180deg,transparent 50%,rgba(255,255,255,0.015) 70%,rgba(255,255,255,0.025) 85%,transparent 100%); animation:mistShift 15s ease-in-out infinite alternate; }
+      @keyframes mistShift { 0%{transform:translateX(-3%);} 100%{transform:translateX(3%);} }
+      .terr-butterfly { position:fixed; pointer-events:none; z-index:2; width:14px; height:10px; animation:butterflyPath 20s ease-in-out infinite; }
+      .terr-butterfly::before,.terr-butterfly::after { content:''; position:absolute; width:7px; height:10px; border-radius:50% 50% 50% 0; background:rgba(212,138,138,0.5); }
+      .terr-butterfly::before { left:0; transform-origin:right center; animation:wingFlap 0.3s ease-in-out infinite; }
+      .terr-butterfly::after { right:0; transform:scaleX(-1); transform-origin:left center; animation:wingFlap 0.3s ease-in-out infinite reverse; }
+      @keyframes wingFlap { 0%,100%{transform:rotateY(0);} 50%{transform:rotateY(70deg);} }
+      @keyframes butterflyPath { 0%{top:60%;left:10%;} 15%{top:30%;left:30%;} 30%{top:45%;left:55%;} 45%{top:20%;left:70%;} 60%{top:50%;left:80%;} 75%{top:35%;left:45%;} 90%{top:55%;left:20%;} 100%{top:60%;left:10%;} }
+      .window { background:rgba(26,46,26,0.92); backdrop-filter:blur(12px); border-top-color:rgba(255,255,255,0.18); animation:winOpenT 0.5s cubic-bezier(0.175,0.885,0.32,1.275); }
+      @keyframes winOpenT { from{transform:scale(0.3);opacity:0;border-radius:50%;} 50%{border-radius:var(--radius);} 70%{transform:scale(1.03);opacity:1;} to{transform:scale(1);opacity:1;} }
+      .window.minimized { animation:winMinT 0.3s forwards; }
+      @keyframes winMinT { to{transform:scale(0.3) translateY(100vh);opacity:0;border-radius:50%;} }
+      .window.focused { box-shadow:0 16px 48px rgba(0,0,0,0.35),0 0 0 1px rgba(78,201,122,0.15),0 0 30px var(--accent-glow); }
+      .win-header { background:rgba(255,255,255,0.04); backdrop-filter:blur(8px); }
+      .win-dot.close { background:radial-gradient(circle at 40% 35%,rgba(255,255,255,0.3),var(--red)); }
+      .win-dot.minimize { background:radial-gradient(circle at 40% 35%,rgba(255,255,255,0.3),var(--amber)); }
+      .win-dot.maximize { background:radial-gradient(circle at 40% 35%,rgba(255,255,255,0.3),var(--green)); }
+      .desktop-icon:hover { background:rgba(78,201,122,0.08); }
+      .desktop-icon:hover .icon-img { animation:iconCondense 0.5s ease-in-out; transform:scale(1.1); }
+      @keyframes iconCondense { 0%{transform:scale(1);filter:brightness(1);} 30%{transform:scale(1.12);filter:brightness(1.15);} 60%{transform:scale(1.08);filter:brightness(1.08);} 100%{transform:scale(1.1);filter:brightness(1);} }
+      .tb-app:hover { background:rgba(78,201,122,0.1); color:var(--text); transform:translateY(-2px); }
+      .tb-app.active { background:rgba(78,201,122,0.15); color:var(--text); }
+      .cmd-item:hover,.cmd-item.selected { background:rgba(78,201,122,0.1); }
+      .ctx-item:hover { background:rgba(78,201,122,0.12); }
+      .finder-item:hover { background:rgba(78,201,122,0.06); }
+      .notepad-content h2 { background:linear-gradient(135deg,#4ec97a,#3aaa8a); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+      .terminal { color:var(--accent); background:linear-gradient(180deg,#1a1408,#12100a); }
+      .terr-particle { position:absolute; border-radius:50%; opacity:0; animation:pollenFloat linear infinite; }
+      @keyframes pollenFloat { 0%{opacity:0;transform:translate(0,0) scale(0);} 10%{opacity:0.5;} 50%{transform:translate(30px,-40vh) scale(1);opacity:0.4;} 90%{opacity:0.3;} 100%{opacity:0;transform:translate(-20px,-80vh) scale(0.5);} }
+      .desktop-toy { background:radial-gradient(circle at 35% 35%,var(--brown),#5a3a1a); border-radius:50% 50% 45% 55%; width:14px; height:12px; box-shadow:0 2px 6px rgba(0,0,0,0.3); }
+    `,
+    initParticles: (container) => {
+      const colors=['rgba(196,164,58,0.6)','rgba(78,201,122,0.5)','rgba(255,215,0,0.4)','rgba(58,170,138,0.4)'];
+      for(let i=0;i<18;i++){const p=document.createElement('div');p.className='terr-particle';const s=3+Math.random()*4;p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;top:${50+Math.random()*50}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${12+Math.random()*15}s;animation-delay:${Math.random()*15}s;`;container.appendChild(p);}
+    },
+    initBackground: () => {
+      const bg=document.getElementById('themeBackgroundLayers');
+      let h='<div class="terr-mist"></div><div class="terr-butterfly"></div>';
+      // Pebbles
+      h+='<div style="position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;">';
+      const pColors=['rgba(138,106,58,0.15)','rgba(120,100,70,0.12)','rgba(160,130,80,0.1)'];
+      for(let i=0;i<25;i++){const s=4+Math.random()*12;h+=`<div style="position:absolute;width:${s}px;height:${s*0.8}px;border-radius:50% 45% 55% 50%;background:${pColors[Math.floor(Math.random()*3)]};left:${Math.random()*100}%;top:${Math.random()*100}%;"></div>`;}
+      h+='</div>';
+      // Condensation
+      h+='<div style="position:fixed;inset:0;z-index:1;pointer-events:none;">';
+      for(let i=0;i<12;i++){const s=4+Math.random()*8;h+=`<div style="position:absolute;width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,0.15),rgba(255,255,255,0.03));left:${Math.random()*100}%;top:${Math.random()*40}%;animation:condensationGrow ${8+Math.random()*8}s linear infinite;animation-delay:${Math.random()*10}s;"></div>`;}
+      h+='</div>';
+      bg.innerHTML=h;
+    },
+    initScreensaver: () => {},
+    playWindowOpen: () => { if(!audioCtx)return; const b=audioCtx.createBufferSource(),buf=audioCtx.createBuffer(1,audioCtx.sampleRate*0.08,audioCtx.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/(d.length*0.3));b.buffer=buf;const f=audioCtx.createBiquadFilter(),g=audioCtx.createGain();f.type='bandpass';f.frequency.value=2000;g.gain.setValueAtTime(0.06,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.08);b.connect(f).connect(g).connect(audioCtx.destination);b.start(); },
+    playWindowClose: () => { playBoop(250,0.1,0.05,'sine');setTimeout(()=>playBoop(180,0.12,0.03,'sine'),50); },
+    playTypeBoop: () => { if(!audioCtx)return;const b=audioCtx.createBufferSource(),buf=audioCtx.createBuffer(1,audioCtx.sampleRate*0.03,audioCtx.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*0.5;b.buffer=buf;const f=audioCtx.createBiquadFilter(),g=audioCtx.createGain();f.type='highpass';f.frequency.value=3000;g.gain.setValueAtTime(0.03,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.03);b.connect(f).connect(g).connect(audioCtx.destination);b.start(); },
+    playHoverSound: (appId) => { if(!audioCtx)return;const b=audioCtx.createBufferSource(),buf=audioCtx.createBuffer(1,audioCtx.sampleRate*0.05,audioCtx.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/(d.length*0.4));b.buffer=buf;const f=audioCtx.createBiquadFilter(),g=audioCtx.createGain();f.type='bandpass';f.frequency.value=4000;g.gain.setValueAtTime(0.04,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.05);b.connect(f).connect(g).connect(audioCtx.destination);b.start();const n=currentTheme.musicalScale[appId];if(n)playBoop(n.freq,0.15,0.06,'sine'); },
+    frameLoops: [],
+    easterEggs: { init: () => {
+      // Shake for rain
+      let lastMX=0,shakes=0,shakeTimer=null;
+      document.addEventListener('mousemove',(e)=>{
+        if(currentTheme.id!=='terrarium')return;
+        const dx=Math.abs(e.clientX-lastMX);lastMX=e.clientX;
+        if(dx>50){shakes++;clearTimeout(shakeTimer);shakeTimer=setTimeout(()=>{shakes=0;},1000);
+          if(shakes>=6){shakes=0;triggerRain();}
+        }
+      });
+    }},
+    cleanup: () => { document.getElementById('themeBackgroundLayers').innerHTML=''; },
+  },
+};
+
+function triggerRain(){
+  for(let i=0;i<60;i++){
+    setTimeout(()=>{
+      const d=document.createElement('div');
+      d.style.cssText=`position:fixed;pointer-events:none;z-index:99998;width:1px;height:${15+Math.random()*15}px;background:linear-gradient(180deg,transparent,rgba(90,138,170,0.4));left:${Math.random()*100}%;top:-20px;animation:rainFallT ${0.5+Math.random()*0.5}s linear forwards;`;
+      document.body.appendChild(d);setTimeout(()=>d.remove(),1000);
+    },i*30);
+  }
+}
+
+function triggerMatrix(){
+  const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\u{30A2}\u{30A4}\u{30A6}\u{30A8}\u{30AA}\u{30AB}\u{30AD}\u{30AF}\u{30B1}\u{30B3}\u{30B5}\u{30B7}\u{30B9}\u{30BB}\u{30BD}\u{30BF}\u{30C1}\u{30C4}\u{30C6}\u{30C8}\u{30CA}\u{30CB}\u{30CC}\u{30CD}\u{30CE}\u{30CF}\u{30D2}\u{30D5}\u{30D8}\u{30DB}\u{30DE}\u{30DF}\u{30E0}\u{30E1}\u{30E2}\u{30E4}\u{30E6}\u{30E8}\u{30E9}\u{30EA}\u{30EB}\u{30EC}\u{30ED}\u{30EF}\u{30F2}\u{30F3}';
+  for(let col=0;col<30;col++){
+    setTimeout(()=>{
+      const x=Math.random()*100;
+      for(let row=0;row<20;row++){
+        setTimeout(()=>{
+          const d=document.createElement('div');
+          d.textContent=chars[Math.floor(Math.random()*chars.length)];
+          d.style.cssText=`position:fixed;pointer-events:none;z-index:99998;left:${x}%;top:${-20+row*5}%;font-family:var(--mono);font-size:14px;color:#33ff99;text-shadow:0 0 8px #33ff99;opacity:${1-row*0.04};`;
+          document.body.appendChild(d);
+          setTimeout(()=>{d.style.transition='opacity 0.5s';d.style.opacity='0';setTimeout(()=>d.remove(),500);},800+Math.random()*400);
+        },row*60);
+      }
+    },col*100);
+  }
+}
+
+function triggerGrow(){
+  const container=document.getElementById('particles');
+  const stages=[
+    {delay:0,h:'<div style="position:absolute;bottom:20%;left:50%;width:4px;height:8px;background:#5a3a1a;border-radius:1px;transform:translateX(-50%);transition:height 0.5s;"></div>'},
+    {delay:400,h:'<div style="position:absolute;bottom:20%;left:50%;transform:translateX(-50%);"><div style="width:4px;height:20px;background:#5a3a1a;border-radius:1px;margin:0 auto;"></div><div style="width:12px;height:8px;background:#4ec97a;border-radius:50% 50% 0 0;margin:-2px auto 0;"></div></div>'},
+    {delay:900,h:'<div style="position:absolute;bottom:20%;left:50%;transform:translateX(-50%);"><div style="width:4px;height:30px;background:#5a3a1a;border-radius:1px;margin:0 auto;"></div><div style="width:16px;height:10px;background:#4ec97a;border-radius:50%;margin:-4px auto 0;"></div><div style="width:8px;height:6px;background:#3aaa8a;border-radius:50%;position:absolute;top:0;left:-6px;transform:rotate(-30deg);"></div><div style="width:8px;height:6px;background:#3aaa8a;border-radius:50%;position:absolute;top:4px;right:-6px;transform:rotate(20deg);"></div></div>'},
+  ];
+  const growEl=document.createElement('div');growEl.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:99998;';
+  document.body.appendChild(growEl);
+  stages.forEach(s=>{setTimeout(()=>{growEl.innerHTML=s.h;},s.delay);});
+  setTimeout(()=>{growEl.style.transition='opacity 1s';growEl.style.opacity='0';setTimeout(()=>growEl.remove(),1000);},3000);
+}
+
+// ============================================================================
+// STATE
+// ============================================================================
+let lang = 'en';
+let windows = [];
+let nextZ = 100;
+let nextWinId = 1;
+let focusedWinId = null;
+let idleTimer = null;
+const IDLE_TIMEOUT = 120000;
+let nightMode = false;
+let currentTheme = THEMES.kawaii;
+let audioCtx = null;
+let ambientNode = null;
+
+// ============================================================================
+// THEME ENGINE
+// ============================================================================
+function applyThemeVars(theme, isNight) {
+  const root = document.documentElement;
+  // Apply base vars
+  Object.entries(theme.vars).forEach(([k,v]) => root.style.setProperty(k, v));
+  // Apply night vars if night mode
+  if (isNight && theme.nightVars) {
+    Object.entries(theme.nightVars).forEach(([k,v]) => root.style.setProperty(k, v));
+  }
+}
+
+function injectThemeCSS(theme) {
+  const styleEl = document.getElementById('theme-css');
+  let css = theme.css || '';
+  // Add @keyframes rainFallT for terrarium rain
+  css += '\n@keyframes rainFallT { from{transform:translateY(-20px);opacity:0.6;} to{transform:translateY(100vh);opacity:0;} }';
+  // Add condensationGrow for terrarium
+  css += '\n@keyframes condensationGrow { 0%{transform:scale(0.5);opacity:0.3;} 70%{transform:scale(1);opacity:0.6;} 80%{transform:scale(1) translateY(2px);opacity:0.5;} 100%{transform:scale(0.3) translateY(8px);opacity:0;} }';
+  // Glitch for holographic
+  css += '\n.glitch-active { animation:glitchTear 0.15s steps(2) forwards; }';
+  css += '\n@keyframes glitchTear { 0%{clip-path:inset(0 0 0 0);transform:translateX(0);} 25%{clip-path:inset(30% 0 40% 0);transform:translateX(8px);filter:hue-rotate(90deg);} 50%{clip-path:inset(60% 0 10% 0);transform:translateX(-5px);filter:hue-rotate(180deg);} 75%{clip-path:inset(10% 0 70% 0);transform:translateX(3px);filter:hue-rotate(270deg);} 100%{clip-path:inset(0 0 0 0);transform:translateX(0);filter:none;} }';
+  // tanuki peek for ghibli
+  css += '\n@keyframes tanukiPeek { 0%{transform:translateX(-50%) translateY(30px);opacity:0;} 20%{transform:translateX(-50%) translateY(0);opacity:1;} 80%{transform:translateX(-50%) translateY(0);opacity:1;} 100%{transform:translateX(-50%) translateY(30px);opacity:0;} }';
+  // totoro breathe for ghibli screensaver
+  css += '\n@keyframes totoroBreathe { 0%,100%{transform:scaleY(1);} 50%{transform:scaleY(1.03);} }';
+  styleEl.textContent = css;
+}
+
+function cleanupCurrentTheme() {
+  if (currentTheme.cleanup) currentTheme.cleanup();
+  // Remove night/day mode classes
+  document.body.classList.remove('night-mode','day-mode');
+  // Clear particles
+  document.getElementById('particles').innerHTML = '';
+  // Clear screensaver content
+  document.getElementById('screensaverContent').innerHTML = '';
+  // Clear extra overlays
+  document.getElementById('themeOverlays').innerHTML = '';
+  // Stop ambient
+  if (ambientNode) { try { ambientNode.stop(); } catch(e){} ambientNode = null; }
+}
+
+function applyNewTheme(theme) {
+  currentTheme = theme;
+  // Apply CSS vars
+  applyThemeVars(theme, nightMode);
+  // Inject theme CSS
+  injectThemeCSS(theme);
+  // Apply night mode class if needed
+  if (nightMode && theme.nightMode.class) {
+    document.body.classList.add(theme.nightMode.class);
+  }
+  // Taskbar styling
+  const tb = document.getElementById('taskbar');
+  tb.style.cssText = (nightMode ? (theme.nightTaskbarStyle || theme.taskbarStyle) : theme.taskbarStyle);
+  // Start button
+  const sb = document.getElementById('startBtn');
+  sb.innerHTML = theme.startButton;
+  sb.style.cssText = theme.startButtonStyle;
+  // Night toggle
+  updateNightToggleUI();
+  // Background layers
+  if (theme.initBackground) theme.initBackground();
+  // Particles
+  if (theme.initParticles) theme.initParticles(document.getElementById('particles'));
+  // Screensaver
+  document.getElementById('screensaver').style.background = theme.screensaverBg;
+  document.getElementById('screensaverContent').innerHTML = theme.screensaverContent();
+  // Restart ambient
+  startAmbientHum();
+  // Easter eggs
+  if (theme.easterEggs && theme.easterEggs.init) theme.easterEggs.init();
+  // Re-render desktop icons with new theme icons
+  renderDesktopIcons();
+  updateTaskbar();
+  updateWatermark();
+  // Update open terminal prompts and styling
+  windows.forEach(w => {
+    if (w.appId === 'terminal') {
+      const term = document.getElementById(`term-${w.id}`);
+      if (term) term.style.cssText = theme.termBg;
+      const prompt = term?.querySelector('.term-input-line .prompt');
+      if (prompt) prompt.textContent = theme.termPrompt;
+    }
+  });
+}
+
+function switchTheme(themeId) {
+  if (currentTheme.id === themeId) return;
+  const newTheme = THEMES[themeId];
+  if (!newTheme) return;
+  // Transition overlay
+  const overlay = document.getElementById('themeTransition');
+  overlay.classList.add('active');
+  setTimeout(() => {
+    cleanupCurrentTheme();
+    // Reset night mode when switching themes
+    nightMode = false;
+    applyNewTheme(newTheme);
+    // Persist
+    try { localStorage.setItem('rikaos-theme', themeId); } catch(e) {}
+    setTimeout(() => { overlay.classList.remove('active'); }, 300);
+  }, 500);
+}
+
+// ============================================================================
+// SOUND SYSTEM
+// ============================================================================
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+document.addEventListener('click', () => { initAudio(); startAmbientHum(); }, { once: true });
+
+function startAmbientHum() {
+  if (!audioCtx || ambientNode) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = currentTheme.ambientType || 'sine';
+  osc.frequency.setValueAtTime(currentTheme.ambientFreq || 110, audioCtx.currentTime);
+  gain.gain.setValueAtTime(currentTheme.ambientVol || 0.006, audioCtx.currentTime);
+  if (currentTheme.ambientFilter) {
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = currentTheme.ambientFilter.type;
+    filter.frequency.setValueAtTime(currentTheme.ambientFilter.freq, audioCtx.currentTime);
+    osc.connect(filter).connect(gain).connect(audioCtx.destination);
+  } else {
+    osc.connect(gain).connect(audioCtx.destination);
+  }
+  osc.start();
+  ambientNode = osc;
+}
+
+function playBoop(freq=520, duration=0.08, vol=0.12, type='sine') {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(freq * 0.6, audioCtx.currentTime + duration);
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+// Musical scale
+const scaleOrder = ['welcome','projects','terminal','gallery','currently','gc','japan','trash'];
+let scaleProgress = 0;
+let melodyUnlocked = false;
+
+function playScaleNote(appId) {
+  if (currentTheme.playHoverSound) { currentTheme.playHoverSound(appId); }
+  const scale = currentTheme.musicalScale;
+  if (!scale) return;
+  if (scaleOrder[scaleProgress] === appId) {
+    scaleProgress++;
+    if (scaleProgress >= scaleOrder.length && !melodyUnlocked) { melodyUnlocked = true; triggerMelodyUnlocked(); }
+  } else if (scaleOrder[0] === appId) { scaleProgress = 1; } else { scaleProgress = 0; }
+}
+
+function triggerMelodyUnlocked() {
+  const scale = currentTheme.musicalScale;
+  scaleOrder.forEach((id, i) => { setTimeout(() => { const n = scale[id]; if(n) playBoop(n.freq, 0.2, 0.1, currentTheme.scaleNoteType||'sine'); }, i * 80); });
+  document.querySelectorAll('.desktop-icon').forEach(icon => {
+    const rect = icon.getBoundingClientRect();
+    for (let i = 0; i < 4; i++) { setTimeout(() => { const sp = document.createElement('div'); sp.className = 'sparkle'; sp.style.left = (rect.left+Math.random()*rect.width)+'px'; sp.style.top = (rect.top+Math.random()*rect.height)+'px'; document.body.appendChild(sp); setTimeout(()=>sp.remove(),600); }, i*100); }
+  });
+  const toast = document.createElement('div'); toast.className = 'melody-toast'; toast.textContent = '\u{266A} melody unlocked \u{266A}'; document.body.appendChild(toast); setTimeout(()=>toast.remove(),3000);
+}
+
+// ============================================================================
+// I18N
+// ============================================================================
+const i18n = {
+  en: {
+    welcome_title: 'Welcome to RikaOS!',
+    welcome_body: `<p>Hey! I'm <strong>Rika Ciminieri</strong> \u2014 half-Japanese full-stack engineer at Eventbrite.</p><p>Former microbiology student turned tech advocate. I pivoted from petri dishes to pixels because I realized I liked debugging code more than debugging cell cultures.</p><p>I paint, build tiny book nooks, do pilates, have deeply researched One Piece theories, and rank grilled cheeses competitively. I go to Japan almost every year.</p><p class="aside">Currently into: Bridgerton, The Traitors, Heated Rivalry, learning AI, Monopoly Deal, and learning how to sing.</p><p class="aside">Pro tip: Press \u{2318}K to open the command palette. Right-click anywhere for more options.</p>`,
+    about: 'About', projects: 'Projects', terminal: 'Terminal', gallery: 'Gallery',
+    gc: 'Grilled Cheese', trash: 'Trash', currently: 'Currently', japan: 'Japan',
+  },
+  jp: {
+    welcome_title: 'RikaOS\u{3078}\u{3088}\u{3046}\u{3053}\u{305D}\u{FF01}',
+    welcome_body: `<p>\u{3053}\u{3093}\u{306B}\u{3061}\u{306F}\u{FF01}<strong>Rika Ciminieri</strong>\u{3067}\u{3059}\u{3002}\u{65E5}\u{7C73}\u{30CF}\u{30FC}\u{30D5}\u{306E}\u{30D5}\u{30EB}\u{30B9}\u{30BF}\u{30C3}\u{30AF}\u{30A8}\u{30F3}\u{30B8}\u{30CB}\u{30A2}\u{3067}\u{3001}Eventbrite\u{3067}\u{50CD}\u{3044}\u{3066}\u{3044}\u{307E}\u{3059}\u{3002}</p><p>\u{5143}\u{5FAE}\u{751F}\u{7269}\u{5B66}\u{306E}\u{5B66}\u{751F}\u{304B}\u{3089}\u{30C6}\u{30C3}\u{30AF}\u{696D}\u{754C}\u{3078}\u{8EE2}\u{8EAB}\u{3002}\u{30B7}\u{30E3}\u{30FC}\u{30EC}\u{306E}\u{57F9}\u{990A}\u{3088}\u{308A}\u{30B3}\u{30FC}\u{30C9}\u{306E}\u{30C7}\u{30D0}\u{30C3}\u{30B0}\u{306E}\u{65B9}\u{304C}\u{597D}\u{304D}\u{3060}\u{3068}\u{6C17}\u{3065}\u{304D}\u{307E}\u{3057}\u{305F}\u{3002}</p><p>\u{7D75}\u{3092}\u{63CF}\u{3044}\u{305F}\u{308A}\u{3001}\u{5C0F}\u{3055}\u{306A}\u{30D6}\u{30C3}\u{30AF}\u{30CC}\u{30C3}\u{30AF}\u{3092}\u{4F5C}\u{3063}\u{305F}\u{308A}\u{3001}\u{30D4}\u{30E9}\u{30C6}\u{30A3}\u{30B9}\u{3092}\u{3057}\u{305F}\u{308A}\u{3001}\u{30EF}\u{30F3}\u{30D4}\u{30FC}\u{30B9}\u{306E}\u{8003}\u{5BDF}\u{3092}\u{6DF1}\u{304F}\u{7814}\u{7A76}\u{3057}\u{305F}\u{308A}\u{3001}\u{30B0}\u{30EA}\u{30EB}\u{30C9}\u{30C1}\u{30FC}\u{30BA}\u{306E}\u{30E9}\u{30F3}\u{30AD}\u{30F3}\u{30B0}\u{3082}\u{672C}\u{6C17}\u{3067}\u{3084}\u{3063}\u{3066}\u{3044}\u{307E}\u{3059}\u{3002}</p><p class="aside">\u{30D2}\u{30F3}\u{30C8}: \u{2318}K\u{3067}\u{30B3}\u{30DE}\u{30F3}\u{30C9}\u{30D1}\u{30EC}\u{30C3}\u{30C8}\u{3092}\u{958B}\u{3051}\u{307E}\u{3059}\u{3002}\u{53F3}\u{30AF}\u{30EA}\u{30C3}\u{30AF}\u{3067}\u{30E1}\u{30CB}\u{30E5}\u{30FC}\u{3082}\u{3002}</p>`,
+    about: '\u{30D7}\u{30ED}\u{30D5}\u{30A3}\u{30FC}\u{30EB}', projects: '\u{30D7}\u{30ED}\u{30B8}\u{30A7}\u{30AF}\u{30C8}', terminal: '\u{30BF}\u{30FC}\u{30DF}\u{30CA}\u{30EB}', gallery: '\u{30AE}\u{30E3}\u{30E9}\u{30EA}\u{30FC}',
+    gc: '\u{30B0}\u{30EA}\u{30EB}\u{30C9}\u{30C1}\u{30FC}\u{30BA}', trash: '\u{30B4}\u{30DF}\u{7BB1}', currently: '\u{4ECA}\u{30CF}\u{30DE}\u{3063}\u{3066}\u{308B}', japan: '\u{65E5}\u{672C}',
+  }
+};
+function t(key) { return i18n[lang]?.[key] || i18n.en[key] || key; }
+
+// ============================================================================
+// APPS
+// ============================================================================
+const apps = [
+  { id:'welcome', iconCls:'icon-welcome', label:()=>t('about'), w:520, h:420 },
+  { id:'projects', iconCls:'icon-projects', label:()=>t('projects'), w:700, h:500 },
+  { id:'terminal', iconCls:'icon-terminal', label:()=>t('terminal'), w:640, h:420 },
+  { id:'gallery', iconCls:'icon-gallery', label:()=>t('gallery'), w:680, h:460 },
+  { id:'currently', iconCls:'icon-currently', label:()=>t('currently'), w:480, h:400 },
+  { id:'gc', iconCls:'icon-gc', label:()=>t('gc'), w:720, h:520 },
+  { id:'japan', iconCls:'icon-japan', label:()=>t('japan'), w:520, h:440 },
+  { id:'trash', iconCls:'icon-trash', label:()=>currentTheme.trashLabel ? currentTheme.trashLabel() : t('trash'), w:560, h:420 },
+];
+
+// ============================================================================
+// BOOT
+// ============================================================================
+function runBoot() {
+  const bootEl = document.getElementById('boot-screen');
+  bootEl.style.background = currentTheme.bootBg;
+  bootEl.innerHTML = currentTheme.bootContent();
+  if (currentTheme.bootExtra) currentTheme.bootExtra();
+  const container = document.getElementById('bootLines');
+  if (container) {
+    const msgs = currentTheme.bootMessages;
+    const colors = currentTheme.bootLineColors;
+    msgs.forEach(msg => {
+      setTimeout(() => {
+        const div = document.createElement('div');
+        div.textContent = msg.text;
+        if (msg.cls) { div.classList.add(msg.cls); div.style.color = colors[msg.cls] || colors.default; }
+        else { div.style.color = colors.default; }
+        container.appendChild(div);
+      }, msg.delay + (currentTheme.id === 'ghibli' ? 800 : 0));
+    });
+  }
+  setTimeout(() => {
+    bootEl.classList.add('done');
+    document.getElementById('desktop').classList.add('visible');
+    setTimeout(() => {
+      bootEl.style.display = 'none';
+      openApp('welcome');
+    }, 600);
+  }, currentTheme.bootDuration);
+}
+
+// ============================================================================
+// DESKTOP ICONS
+// ============================================================================
+function renderDesktopIcons() {
+  const container = document.getElementById('desktopIcons');
+  container.innerHTML = '';
+  apps.forEach(app => {
+    const el = document.createElement('div');
+    el.className = 'desktop-icon';
+    el.ondblclick = () => openApp(app.id);
+    el.onmouseenter = () => playScaleNote(app.id);
+    const iconStyle = currentTheme.iconStyles?.[app.id] || '';
+    const iconSVG = currentTheme.iconSVGs?.[app.id] || '';
+    el.innerHTML = `<div class="icon-img ${app.iconCls}" style="${iconStyle}">${iconSVG}</div><div class="icon-label">${app.label()}</div>`;
+    container.appendChild(el);
+  });
+}
+
+// ============================================================================
+// WINDOW MANAGER
+// ============================================================================
+function openApp(appId) {
+  const existing = windows.find(w => w.appId === appId && !w.minimized);
+  if (existing) { focusWindow(existing.id); return; }
+  const existingMin = windows.find(w => w.appId === appId && w.minimized);
+  if (existingMin) { existingMin.minimized = false; const el = document.getElementById(`win-${existingMin.id}`); if(el){el.classList.remove('minimized');el.style.display='';} focusWindow(existingMin.id); updateTaskbar(); return; }
+  const app = apps.find(a => a.id === appId); if (!app) return;
+  const id = nextWinId++;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const winW = Math.min(app.w, vw-40), winH = Math.min(app.h, vh-100);
+  const openCount = windows.filter(w => !w.minimized).length;
+  const offsetX = Math.min(220 + openCount*30, vw-winW-20);
+  const offsetY = Math.min(30 + openCount*25, vh-winH-80);
+  const win = { id, appId, x:offsetX, y:offsetY, w:winW, h:winH, z:nextZ++, minimized:false };
+  windows.push(win);
+  renderWindow(win, app);
+  focusWindow(id);
+  updateTaskbar();
+  if (currentTheme.playWindowOpen) currentTheme.playWindowOpen();
+  setTimeout(() => {
+    const tbApp = document.querySelector(`.tb-app[data-app="${appId}"]`);
+    if (tbApp) { tbApp.classList.add('bouncing'); tbApp.addEventListener('animationend',()=>tbApp.classList.remove('bouncing'),{once:true}); }
+  }, 350);
+}
+
+function renderWindow(win, app) {
+  const el = document.createElement('div');
+  el.className = 'window'; el.id = `win-${win.id}`;
+  el.style.cssText = `left:${win.x}px;top:${win.y}px;width:${win.w}px;height:${win.h}px;z-index:${win.z};`;
+  el.onmousedown = () => focusWindow(win.id);
+  el.innerHTML = `<div class="win-header" onmousedown="startDrag(event,${win.id})"><div class="win-dots"><button class="win-dot close" onclick="closeWindow(${win.id})"></button><button class="win-dot minimize" onclick="minimizeWindow(${win.id})"></button><button class="win-dot maximize" onclick="maximizeWindow(${win.id})"></button></div><div class="win-title">${app.label()}</div></div><div class="win-body" id="win-body-${win.id}"></div><div class="win-resize" onmousedown="startResize(event,${win.id})"></div>`;
+  document.getElementById('windowContainer').appendChild(el);
+  renderAppContent(win.id, app.id);
+}
+
+function renderAppContent(winId, appId) {
+  const body = document.getElementById(`win-body-${winId}`); if (!body) return;
+  switch (appId) {
+    case 'welcome': body.innerHTML = `<div class="notepad-content"><h2>${t('welcome_title')}</h2>${t('welcome_body')}</div>`; break;
+    case 'projects': body.innerHTML = `<div class="projects-grid"><div class="project-card"><h3>This Portfolio</h3><p>A custom OS-style portfolio built from scratch. The site itself is the proof of competence.</p><div class="tags"><span class="tag">React</span><span class="tag">Vite</span><span class="tag">Tailwind</span><span class="tag">TypeScript</span></div></div><div class="project-card"><h3>Bilingual CMS</h3><p>Content management system with first-class EN/JP support.</p><div class="tags"><span class="tag">Next.js</span><span class="tag">i18n</span><span class="tag">MDX</span></div></div><div class="project-card"><h3>Event Platform</h3><p>Contributed to Eventbrite's core event discovery and ticketing.</p><div class="tags"><span class="tag">React</span><span class="tag">Python</span><span class="tag">GraphQL</span></div></div><div class="project-card"><h3>Lab Dashboard</h3><p>Real-time microbiology lab monitoring dashboard.</p><div class="tags"><span class="tag">D3.js</span><span class="tag">Flask</span><span class="tag">WebSockets</span></div></div><div class="project-card"><h3>Grilled Cheese API</h3><p>A RESTful API for ranking grilled cheese sandwiches.</p><div class="tags"><span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">PostgreSQL</span></div></div><div class="project-card"><h3>AI Experiments</h3><p>Currently exploring AI-assisted development tools and agents.</p><div class="tags"><span class="tag">Claude API</span><span class="tag">Python</span><span class="tag">LLMs</span></div></div></div>`; break;
+    case 'terminal': body.style.padding='0'; body.innerHTML = `<div class="terminal" id="term-${winId}" style="${currentTheme.termBg}"><div id="term-output-${winId}"><span class="output">${currentTheme.termWelcome}</span></div><div class="term-input-line"><span class="prompt">${currentTheme.termPrompt}</span><input class="term-input" id="term-input-${winId}" autofocus onkeydown="if(event.key==='Enter')execTermCmd(${winId});else if(currentTheme.playTypeBoop)currentTheme.playTypeBoop();"></div></div>`; setTimeout(()=>{const inp=document.getElementById(`term-input-${winId}`);if(inp)inp.focus();},100); break;
+    case 'gallery': body.innerHTML = `<h3 style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:16px;">The Gallery</h3><div class="gallery-scroll"><div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#ff9a56,#ff6b3d);">\u{1F3A8}</div><h4>Sunset Over Shibuya</h4><p>Paint-by-numbers, acrylic on canvas.</p></div><div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#8b5e3c,#c4956a);">\u{1F3E0}</div><h4>Hobbit Hole Book Nook</h4><p>My first book nook! Balsa wood, LED lights.</p></div><div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#1a73e8,#4ecdc4);">\u{1F30A}</div><h4>The Great Wave (Remix)</h4><p>Paint-by-numbers reinterpretation of Hokusai.</p></div><div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">\u{1F4DA}</div><h4>Diagon Alley Nook</h4><p>Harry Potter-themed book nook with tiny shop windows.</p></div><div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#ff8fa3,#ffb7c5);">\u{1F338}</div><h4>Cherry Blossom Garden</h4><p>After my last Kyoto trip.</p></div></div>`; break;
+    case 'currently': body.innerHTML = `<h3 style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:16px;">What I'm Into Right Now</h3><div class="currently-grid"><div class="currently-card"><h4>Watching</h4><div class="item"><span class="item-dot" style="background:var(--pink);"></span> Bridgerton (rewatching... again)</div><div class="item"><span class="item-dot" style="background:var(--red);"></span> The Traitors</div><div class="item"><span class="item-dot" style="background:var(--amber);"></span> Terrace House</div></div><div class="currently-card"><h4>Reading</h4><div class="item"><span class="item-dot" style="background:var(--accent);"></span> Heated Rivalry</div><div class="item"><span class="item-dot" style="background:var(--teal);"></span> One Piece (always)</div></div><div class="currently-card"><h4>Playing</h4><div class="item"><span class="item-dot" style="background:var(--green);"></span> Monopoly Deal</div><div class="item"><span class="item-dot" style="background:var(--blue);"></span> Learning to sing</div></div><div class="currently-card"><h4>Learning</h4><div class="item"><span class="item-dot" style="background:var(--amber);"></span> AI & LLMs</div><div class="item"><span class="item-dot" style="background:var(--pink);"></span> Building agents</div></div><div class="currently-card"><h4>Listening</h4><div class="item"><span class="item-dot" style="background:var(--pink);"></span> Yoasobi \u2014 Idol</div><div class="item"><span class="item-dot" style="background:var(--accent);"></span> Dodo</div></div><div class="currently-card"><h4>Hills I'll Die On</h4><div class="item"><span class="item-dot" style="background:var(--red);"></span> MJ is the king of pop</div><div class="item"><span class="item-dot" style="background:var(--amber);"></span> The Rock's Jumanji is good</div><div class="item"><span class="item-dot" style="background:var(--green);"></span> Health > everything</div></div></div>`; break;
+    case 'japan': body.innerHTML = `<h3 style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:4px;">\u{65E5}\u{672C} \u2014 Japan</h3><p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Heritage, not decoration. I go almost every year.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;"><h4 style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;font-family:var(--mono);">\u{2668}\u{FE0F} Onsen Rankings</h4><div style="font-size:13px;line-height:2;">\u{1F947} Kurokawa, Kumamoto<br>\u{1F948} Hakone open-air<br>\u{1F949} Kinosaki, Hyogo</div></div><div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;"><h4 style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;font-family:var(--mono);">\u{1F3EA} Konbini Tier List</h4><div style="font-size:13px;line-height:2;">S tier: 7-Eleven<br>A tier: FamilyMart<br>B tier: Lawson</div></div><div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;"><h4 style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;font-family:var(--mono);">\u{1F4FA} Drama Corner</h4><div style="font-size:13px;line-height:1.8;">Hana Yori Dango \u2014 GOAT<br>Terrace House \u2014 deeply formative</div></div><div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;"><h4 style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;font-family:var(--mono);">\u{1F3B5} Now Playing</h4><div style="font-size:13px;line-height:1.8;">Yoasobi \u2014 Idol (on repeat)<br>Dodo<br>City Pop playlists at 2am</div></div></div>`; break;
+    case 'gc': body.innerHTML = `<h3 style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:20px;">The Grilled Cheese Olympics</h3><div class="gc-podium"><div class="gc-podium-item silver"><div class="gc-medal">\u{1F948}</div><div class="gc-name">Truffle Melt</div><div class="gc-score">38/40</div></div><div class="gc-podium-item gold"><div class="gc-medal">\u{1F947}</div><div class="gc-name">The Classic</div><div class="gc-score">39/40</div></div><div class="gc-podium-item bronze"><div class="gc-medal">\u{1F949}</div><div class="gc-name">Brie & Fig</div><div class="gc-score">36/40</div></div></div><h4 style="font-size:14px;font-weight:600;margin-bottom:12px;">Tournament Bracket</h4><div class="gc-bracket"><div class="gc-round"><div class="gc-match"><div class="gc-matchup winner">The Classic</div><div class="gc-matchup">Caprese</div></div><div class="gc-match"><div class="gc-matchup winner">Truffle Melt</div><div class="gc-matchup">French Onion</div></div><div class="gc-match"><div class="gc-matchup winner">Brie & Fig</div><div class="gc-matchup">Jalape\u{F1}o Popper</div></div><div class="gc-match"><div class="gc-matchup">Starbucks One</div><div class="gc-matchup winner">Kimchi GC</div></div></div><div class="gc-round"><div class="gc-match"><div class="gc-matchup winner">The Classic</div><div class="gc-matchup">Truffle Melt</div></div><div class="gc-match"><div class="gc-matchup winner">Brie & Fig</div><div class="gc-matchup">Kimchi GC</div></div></div><div class="gc-round"><div class="gc-match"><div class="gc-matchup winner">The Classic \u{1F3C6}</div><div class="gc-matchup">Brie & Fig</div></div></div></div>`; break;
+    case 'trash': body.style.padding='0'; body.innerHTML = `<div class="finder" id="finder-${winId}"><div class="finder-toolbar"><span class="finder-path">${currentTheme.finderPath}</span><span style="font-family:var(--mono);font-size:10px;">12 items</span></div><div class="finder-list" id="finder-list-${winId}"></div></div>`; renderFinderList(winId); break;
+  }
+}
+
+// ============================================================================
+// FINDER
+// ============================================================================
+const finderFiles = [
+  { icon:'\u{1F4C4}', name:'resume_final_FINAL_v3.docx', size:'847 KB', meta:'Modified: way too many times', clickable:true, content:{title:'resume_final_FINAL_v3.docx',body:'<p>Wait, you actually opened this?</p><p>The real resume is the portfolio you\'re currently standing inside of.</p>'}},
+  { icon:'\u{1F4CA}', name:'grilled-cheese-spreadsheet-v47.xlsx', size:'2.1 MB', meta:'The sacred texts', clickable:true, content:{title:'The Sacred Spreadsheet',body:'<p>47 versions because grilled cheese ranking is an iterative science.</p><p>Columns: Cheese Pull (x/10), Crunch Factor (x/10), Flavor (x/10), Vibes (x/10).</p>'}},
+  { icon:'\u{1F4C1}', name:'photos-from-kyoto-2024/', size:'\u2014', meta:'Folder', disabled:true },
+  { icon:'\u{1F3B5}', name:'yoasobi-idol-loop-3hr.mp3', size:'312 MB', meta:'No regrets', clickable:true, content:{title:'yoasobi-idol-loop-3hr.mp3',body:'<p>Three hours of Idol by Yoasobi on loop.</p><p>This is what peak productivity sounds like.</p>'}},
+  { icon:'\u{1F4DD}', name:'one-piece-theories-too-unhinged.txt', size:'94 KB', meta:'Classified', disabled:true },
+  { icon:'\u{1F5BC}\u{FE0F}', name:'book-nook-progress-shots/', size:'\u2014', meta:'Folder', disabled:true },
+  { icon:'\u{1F4C4}', name:'cover-letter-that-goes-too-hard.pdf', size:'156 KB', meta:'They said "be authentic"', clickable:true, content:{title:'Cover Letter That Goes Too Hard',body:'<p>"Dear Hiring Manager, I once spent 3 months building a grilled cheese ranking API. I bring this same energy to everything I build."</p>'}},
+  { icon:'\u{1F4C1}', name:'screenshots-of-bugs-i-fixed/', size:'\u2014', meta:'The trophy case', disabled:true },
+  { icon:'\u{1F4C4}', name:'things-i-will-learn-next.md', size:'12 KB', meta:'Always growing', clickable:true, content:{title:'Things I Want to Learn Next',body:'<p>\u{2022} Rust \u{2022} WebGL/Three.js \u{2022} How to sing \u{2022} Better Japanese kanji \u{2022} Perfect croissant \u{2022} Prompt engineering</p>'}},
+  { icon:'\u{1F3AE}', name:'monopoly-deal-win-streak.log', size:'4 KB', meta:'Undefeated (almost)', disabled:true },
+  { icon:'\u{1F4C4}', name:'bridgerton-hot-takes.txt', size:'28 KB', meta:'Spoilers inside', clickable:true, content:{title:'Bridgerton Hot Takes',body:'<p>Season 2 > Season 1. The enemies-to-lovers tension was *chef\'s kiss*. I have rewatched the rain scene 14 times.</p>'}},
+  { icon:'\u{1F4C1}', name:'env-files-definitely-not-secrets/', size:'\u2014', meta:'Nice try, hacker', disabled:true },
+];
+
+function renderFinderList(winId) {
+  const list = document.getElementById(`finder-list-${winId}`); if(!list) return;
+  list.innerHTML = finderFiles.map((f,i) => `<div class="finder-item ${f.disabled?'disabled':''}" ${f.clickable?`onclick="openFinderFile(${winId},${i})"`:''}>
+    <span class="fi-icon">${f.icon}</span><span class="fi-name">${f.name}</span><span class="fi-meta">${f.meta}</span><span class="fi-size">${f.size}</span></div>`).join('');
+}
+
+function openFinderFile(winId, fileIdx) {
+  const file = finderFiles[fileIdx]; if(!file?.content)return;
+  const list = document.getElementById(`finder-list-${winId}`);
+  list.innerHTML = `<div class="finder-preview"><div class="finder-preview-back" onclick="renderFinderList(${winId})">\u{2190} Back</div><h3>${file.content.title}</h3>${file.content.body}</div>`;
+}
+
+// ============================================================================
+// WINDOW MANAGEMENT
+// ============================================================================
+function focusWindow(id) { focusedWinId=id; const win=windows.find(w=>w.id===id); if(win)win.z=nextZ++; document.querySelectorAll('.window').forEach(el=>{el.classList.remove('focused');const wid=parseInt(el.id.replace('win-',''));const w=windows.find(x=>x.id===wid);if(w)el.style.zIndex=w.z;}); const el=document.getElementById(`win-${id}`);if(el)el.classList.add('focused');updateTaskbar(); }
+function closeWindow(id) { if(currentTheme.playWindowClose)currentTheme.playWindowClose(); const el=document.getElementById(`win-${id}`);if(el){el.style.transition='transform 0.2s,opacity 0.2s';el.style.transform='scale(0.9)';el.style.opacity='0';setTimeout(()=>el.remove(),200);} windows=windows.filter(w=>w.id!==id);if(focusedWinId===id)focusedWinId=null;updateTaskbar(); }
+function minimizeWindow(id) { playBoop(350,0.08,0.06); const win=windows.find(w=>w.id===id);if(win)win.minimized=true;const el=document.getElementById(`win-${id}`);if(el)el.classList.add('minimized');if(focusedWinId===id)focusedWinId=null;updateTaskbar(); }
+function maximizeWindow(id) { const el=document.getElementById(`win-${id}`);if(!el)return;const win=windows.find(w=>w.id===id);if(!win)return; if(win._maximized){el.style.left=win._prevX+'px';el.style.top=win._prevY+'px';el.style.width=win._prevW+'px';el.style.height=win._prevH+'px';win._maximized=false;}else{win._prevX=win.x;win._prevY=win.y;win._prevW=win.w;win._prevH=win.h;el.style.left='0';el.style.top='0';el.style.width='100vw';el.style.height='calc(100vh - var(--taskbar-h))';win._maximized=true;}focusWindow(id); }
+
+// Drag & resize
+let dragState = null;
+function startDrag(e,winId){if(e.target.classList.contains('win-dot'))return;e.preventDefault();const el=document.getElementById(`win-${winId}`);const rect=el.getBoundingClientRect();dragState={type:'drag',winId,startX:e.clientX,startY:e.clientY,origX:rect.left,origY:rect.top};focusWindow(winId);}
+function startResize(e,winId){e.preventDefault();e.stopPropagation();const el=document.getElementById(`win-${winId}`);const rect=el.getBoundingClientRect();dragState={type:'resize',winId,startX:e.clientX,startY:e.clientY,origW:rect.width,origH:rect.height};focusWindow(winId);}
+
+let snapIndicator=null,currentSnapSide=null;const SNAP_THRESHOLD=20;
+function updateSnapIndicator(mx,my){const vw=window.innerWidth,vh=window.innerHeight;let side=null;if(mx<SNAP_THRESHOLD)side='left';else if(mx>vw-SNAP_THRESHOLD)side='right';if(side){if(!snapIndicator){snapIndicator=document.createElement('div');snapIndicator.className='snap-indicator';document.body.appendChild(snapIndicator);}if(side==='left')snapIndicator.style.cssText=`left:4px;top:4px;width:${vw/2-8}px;height:${vh-100}px;`;else snapIndicator.style.cssText=`left:${vw/2+4}px;top:4px;width:${vw/2-8}px;height:${vh-100}px;`;}else{removeSnapIndicator();}return side;}
+function removeSnapIndicator(){if(snapIndicator){snapIndicator.remove();snapIndicator=null;}}
+function snapWindow(winId,side){const el=document.getElementById(`win-${winId}`);const win=windows.find(w=>w.id===winId);if(!el||!win)return;const vw=window.innerWidth,vh=window.innerHeight;if(side==='left'){el.style.left='4px';el.style.top='4px';el.style.width=(vw/2-8)+'px';el.style.height=(vh-100)+'px';}else{el.style.left=(vw/2+4)+'px';el.style.top='4px';el.style.width=(vw/2-8)+'px';el.style.height=(vh-100)+'px';}win.x=parseInt(el.style.left);win.y=parseInt(el.style.top);win.w=parseInt(el.style.width);win.h=parseInt(el.style.height);removeSnapIndicator();}
+
+document.addEventListener('mousemove',e=>{if(!dragState)return;const el=document.getElementById(`win-${dragState.winId}`);if(!el)return;const win=windows.find(w=>w.id===dragState.winId);if(dragState.type==='drag'){const nx=dragState.origX+(e.clientX-dragState.startX),ny=dragState.origY+(e.clientY-dragState.startY);el.style.left=nx+'px';el.style.top=ny+'px';if(win){win.x=nx;win.y=ny;win._maximized=false;}currentSnapSide=updateSnapIndicator(e.clientX,e.clientY);}else if(dragState.type==='resize'){const nw=Math.max(320,dragState.origW+(e.clientX-dragState.startX)),nh=Math.max(200,dragState.origH+(e.clientY-dragState.startY));el.style.width=nw+'px';el.style.height=nh+'px';if(win){win.w=nw;win.h=nh;}}});
+document.addEventListener('mouseup',()=>{if(dragState&&currentSnapSide){snapWindow(dragState.winId,currentSnapSide);currentSnapSide=null;}removeSnapIndicator();dragState=null;});
+
+// ============================================================================
+// TASKBAR
+// ============================================================================
+function updateTaskbar(){const container=document.getElementById('tbApps');container.innerHTML='';windows.forEach(win=>{const app=apps.find(a=>a.id===win.appId);if(!app)return;const btn=document.createElement('button');btn.className='tb-app'+(win.id===focusedWinId&&!win.minimized?' active':'');btn.dataset.app=win.appId;btn.innerHTML=`<span class="tb-app-dot"></span>${app.label()}`;btn.onclick=()=>{if(win.minimized){win.minimized=false;const el=document.getElementById(`win-${win.id}`);if(el){el.classList.remove('minimized');el.style.display='';}}focusWindow(win.id);};container.appendChild(btn);});}
+
+// Clock
+function updateClock(){const now=new Date();document.getElementById('clock').textContent=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');}
+setInterval(updateClock,1000);updateClock();
+
+// ============================================================================
+// TERMINAL
+// ============================================================================
+function execTermCmd(winId){const input=document.getElementById(`term-input-${winId}`);const output=document.getElementById(`term-output-${winId}`);if(!input||!output)return;const cmd=input.value.trim();input.value='';output.innerHTML+=`<span class="prompt">${currentTheme.termPrompt}</span><span class="cmd-text">${escHtml(cmd)}</span>\n`;const result=processCmd(cmd);if(result)output.innerHTML+=`<span class="output">${result}</span>\n`;output.innerHTML+='\n';const term=document.getElementById(`term-${winId}`);if(term)term.scrollTop=term.scrollHeight;}
+
+function processCmd(cmd){const parts=cmd.split(/\s+/);const c=parts[0]?.toLowerCase();switch(c){
+  case '':return '';
+  case 'help':{let h=`Available commands:\n  <span class="highlight">help</span>        \u2014 show this help\n  <span class="highlight">whoami</span>      \u2014 who is rika?\n  <span class="highlight">ls</span>          \u2014 list apps\n  <span class="highlight">open</span> [app]  \u2014 open an app\n  <span class="highlight">clear</span>       \u2014 clear terminal\n  <span class="highlight">neofetch</span>    \u2014 system info\n  <span class="highlight">theme</span> [name] \u2014 switch theme (kawaii/ghibli/holographic/terrarium)\n  <span class="highlight">fortune</span>     \u2014 random fortune\n  <span class="highlight">cowsay</span> [msg] \u2014 moo`;if(currentTheme.id==='ghibli')h+='\n  <span class="highlight">rain</span>        \u2014 summon rain';if(currentTheme.id==='holographic')h+='\n  <span class="highlight">matrix</span>      \u2014 enter the matrix';if(currentTheme.id==='terrarium')h+='\n  <span class="highlight">rain</span>        \u2014 summon rain\n  <span class="highlight">grow</span>        \u2014 grow a plant';return h;}
+  case 'whoami':return 'Rika Ciminieri\nHalf-Japanese full-stack engineer @ Eventbrite\nFormer microbiology student \u{00B7} Pilates enthusiast \u{00B7} Book nook builder';
+  case 'ls':return apps.map(a=>`  ${a.label()}`).join('\n');
+  case 'open':const appName=parts[1]?.replace('.app','');if(appName&&apps.find(a=>a.id===appName)){setTimeout(()=>openApp(appName),100);return `Opening ${appName}...`;}return `<span class="error">open: unknown app</span>\nAvailable: ${apps.map(a=>a.id).join(', ')}`;
+  case 'clear':setTimeout(()=>{const w=windows.find(w=>w.appId==='terminal');if(w){const o=document.getElementById(`term-output-${w.id}`);if(o)o.innerHTML='';}},10);return '';
+  case 'neofetch':return `\n  <span class="highlight">     \u{2588}\u{2588}\u{2588}\u{2588}\u{2588}\u{2588}\u{2557}  </span>   rika@portfolio\n  <span class="highlight">    \u{2588}\u{2588}\u{2554}\u{2550}\u{2550}\u{2588}\u{2588}\u{2557} </span>   \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\n  <span class="highlight">    \u{2588}\u{2588}\u{2588}\u{2588}\u{2588}\u{2588}\u{2554}\u{255D} </span>   OS: RikaOS v2.1\n  <span class="highlight">    \u{2588}\u{2588}\u{2554}\u{2550}\u{2550}\u{2588}\u{2588}\u{2557} </span>   Theme: ${currentTheme.name}\n  <span class="highlight">    \u{2588}\u{2588}\u{2551}  \u{2588}\u{2588}\u{2551} </span>   Languages: EN, JP\n  <span class="highlight">    \u{255A}\u{2550}\u{255D}  \u{255A}\u{2550}\u{255D} </span>   Uptime: since 2024`;
+  case 'theme':const tid=parts[1];if(tid&&THEMES[tid]){switchTheme(tid);return `Switching to ${THEMES[tid].name}...`;}return `<span class="error">theme: unknown</span>\nAvailable: ${Object.keys(THEMES).join(', ')}`;
+  case 'fortune':const f=['"A well-organized codebase is worth a thousand comments."','"The real treasure is the bugs we fixed along the way."','"Have you tried turning it off and making a grilled cheese?"'];return f[Math.floor(Math.random()*f.length)];
+  case 'cowsay':const msg=parts.slice(1).join(' ')||'moo';return ` \u{250C}${'\u{2500}'.repeat(msg.length+2)}\u{2510}\n \u{2502} ${escHtml(msg)} \u{2502}\n \u{2514}${'\u{2500}'.repeat(msg.length+2)}\u{2518}\n        \\   ^__^\n         \\  (oo)\\_______\n            (__)\       )\\/\\\n                ||----w |\n                ||     ||`;
+  case 'sudo':return cmd.toLowerCase().includes('make me a sandwich')||cmd.toLowerCase().includes('grilled cheese')?'Order up! \u{1F9C0} Rika-approved.':'<span class="error">Nice try. No sudo on RikaOS.</span>';
+  case 'rain':if(currentTheme.id==='ghibli'||currentTheme.id==='terrarium'){triggerRain();return 'Rain summoned...';}return `<span class="error">command not found: ${escHtml(c)}</span>`;
+  case 'matrix':{if(currentTheme.id!=='holographic')return `<span class="error">command not found: ${escHtml(c)}</span>`;triggerMatrix();return 'Entering the matrix...';}
+  case 'grow':{if(currentTheme.id!=='terrarium')return `<span class="error">command not found: ${escHtml(c)}</span>`;triggerGrow();return 'Growing...';}
+  default:return `<span class="error">command not found: ${escHtml(c)}</span>\nType <span class="highlight">help</span> for available commands.`;
+}}
+function escHtml(str){const d=document.createElement('div');d.textContent=str;return d.innerHTML;}
+
+// ============================================================================
+// COMMAND PALETTE
+// ============================================================================
+const cmdItems=[
+  {icon:'\u{2726}',label:'Open About',hint:'welcome',action:()=>openApp('welcome')},
+  {icon:'{ }',label:'Open Projects',hint:'engineering',action:()=>openApp('projects')},
+  {icon:'>_',label:'Open Terminal',hint:'commands',action:()=>openApp('terminal')},
+  {icon:'\u{25C6}',label:'Open Gallery',hint:'art + nooks',action:()=>openApp('gallery')},
+  {icon:'\u{25B6}',label:'Open Currently',hint:'watching/reading',action:()=>openApp('currently')},
+  {icon:'GC',label:'Open Grilled Cheese',hint:'rankings',action:()=>openApp('gc')},
+  {icon:'\u{65E5}',label:'Open Japan',hint:'heritage',action:()=>openApp('japan')},
+  {icon:'\u{1F4C1}',label:'Open Trash',hint:'files',action:()=>openApp('trash')},
+  {icon:'\u{1F310}',label:'Toggle Language',hint:'EN \u{2194} JP',action:()=>toggleLang()},
+  {icon:'\u{2715}',label:'Close All Windows',hint:'',action:()=>closeAllWindows()},
+  {icon:'\u{1F3A8}',label:'Theme: Kawaii',hint:'pink & warm',action:()=>switchTheme('kawaii')},
+  {icon:'\u{1F343}',label:'Theme: Ghibli',hint:'ink & nature',action:()=>switchTheme('ghibli')},
+  {icon:'\u{1F4A0}',label:'Theme: Holographic',hint:'neon & glitch',action:()=>switchTheme('holographic')},
+  {icon:'\u{1F331}',label:'Theme: Terrarium',hint:'moss & glass',action:()=>switchTheme('terrarium')},
+];
+let cmdSelectedIdx=0;
+let cmdFiltered=[];
+function openCmdPalette(){document.getElementById('cmdOverlay').classList.add('open');const inp=document.getElementById('cmdInput');inp.value='';inp.focus();cmdSelectedIdx=0;filterCommands();}
+function closeCmdPalette(){document.getElementById('cmdOverlay').classList.remove('open');}
+function filterCommands(){const q=document.getElementById('cmdInput').value.toLowerCase();cmdFiltered=cmdItems.filter(item=>item.label.toLowerCase().includes(q)||item.hint.toLowerCase().includes(q));const container=document.getElementById('cmdResults');cmdSelectedIdx=Math.min(cmdSelectedIdx,cmdFiltered.length-1);container.innerHTML=cmdFiltered.map((item,i)=>`<div class="cmd-item ${i===cmdSelectedIdx?'selected':''}" data-cmd-idx="${i}"><span class="cmd-icon" style="font-family:var(--mono);font-size:13px;">${item.icon}</span><span class="cmd-label">${item.label}</span><span class="cmd-hint">${item.hint}</span></div>`).join('');}
+document.getElementById('cmdResults').addEventListener('click',(e)=>{const item=e.target.closest('.cmd-item');if(!item)return;const idx=parseInt(item.dataset.cmdIdx);if(cmdFiltered[idx]){cmdFiltered[idx].action();closeCmdPalette();}});
+document.getElementById('cmdResults').addEventListener('mouseenter',(e)=>{const item=e.target.closest('.cmd-item');if(!item)return;const idx=parseInt(item.dataset.cmdIdx);if(!isNaN(idx)){cmdSelectedIdx=idx;document.querySelectorAll('.cmd-item').forEach((el,i)=>el.classList.toggle('selected',i===cmdSelectedIdx));}},{capture:true});
+function handleCmdKey(e){if(e.key==='ArrowDown'){e.preventDefault();cmdSelectedIdx=Math.min(cmdSelectedIdx+1,cmdFiltered.length-1);document.querySelectorAll('.cmd-item').forEach((el,i)=>el.classList.toggle('selected',i===cmdSelectedIdx));}if(e.key==='ArrowUp'){e.preventDefault();cmdSelectedIdx=Math.max(cmdSelectedIdx-1,0);document.querySelectorAll('.cmd-item').forEach((el,i)=>el.classList.toggle('selected',i===cmdSelectedIdx));}if(e.key==='Enter'){const items=document.getElementById('cmdResults').querySelectorAll('.cmd-item');items[cmdSelectedIdx]?.click();}if(e.key==='Escape'){closeCmdPalette();}}
+
+// ============================================================================
+// CONTEXT MENU (with theme submenu)
+// ============================================================================
+document.addEventListener('contextmenu',e=>{e.preventDefault();const menu=document.getElementById('ctxMenu');
+  const themeList=Object.values(THEMES).map(th=>`<div class="ctx-item" data-theme="${th.id}"><span class="ctx-icon">${th.id===currentTheme.id?'\u{2713}':''}</span>${th.name}</div>`).join('');
+  menu.innerHTML=`<div class="ctx-item" data-action="about"><span class="ctx-icon">\u{2726}</span>Open About</div><div class="ctx-item" data-action="projects"><span class="ctx-icon">{ }</span>Open Projects</div><div class="ctx-item" data-action="terminal"><span class="ctx-icon">>_</span>Open Terminal</div><div class="ctx-sep"></div><div class="ctx-item" data-action="lang"><span class="ctx-icon">\u{1F310}</span>${lang==='en'?'Switch to \u{65E5}\u{672C}\u{8A9E}':'Switch to English'}</div><div class="ctx-item" data-action="cmd"><span class="ctx-icon">\u{2318}K</span>Command Palette</div><div class="ctx-sep"></div><div class="ctx-submenu"><div class="ctx-item"><span class="ctx-icon">\u{1F3A8}</span>Theme \u{25B8}</div><div class="ctx-submenu-list">${themeList}</div></div>`;
+  menu.querySelectorAll('[data-action]').forEach(el=>el.onclick=()=>{const a=el.dataset.action;if(a==='about')openApp('welcome');else if(a==='projects')openApp('projects');else if(a==='terminal')openApp('terminal');else if(a==='lang')toggleLang();else if(a==='cmd')openCmdPalette();menu.classList.remove('open');});
+  menu.querySelectorAll('[data-theme]').forEach(el=>el.onclick=()=>{switchTheme(el.dataset.theme);menu.classList.remove('open');});
+  menu.style.left=Math.min(e.clientX,window.innerWidth-220)+'px';menu.style.top=Math.min(e.clientY,window.innerHeight-350)+'px';menu.classList.add('open');
+});
+document.addEventListener('click',()=>document.getElementById('ctxMenu').classList.remove('open'));
+
+// ============================================================================
+// LANGUAGE
+// ============================================================================
+function setLang(newLang){lang=newLang;document.querySelectorAll('.lang-seg').forEach(btn=>{btn.classList.toggle('active',btn.dataset.lang===lang);});renderDesktopIcons();windows.forEach(win=>{const app=apps.find(a=>a.id===win.appId);if(app&&win.appId!=='terminal'){const titleEl=document.querySelector(`#win-${win.id} .win-title`);if(titleEl)titleEl.textContent=app.label();renderAppContent(win.id,win.appId);}});updateTaskbar();updateWatermark();}
+function toggleLang(){setLang(lang==='en'?'jp':'en');}
+
+// ============================================================================
+// NIGHT MODE
+// ============================================================================
+function toggleNightMode(){
+  nightMode=!nightMode;
+  const nm=currentTheme.nightMode;
+  if(nm.inverted){
+    document.body.classList.toggle(nm.class,nightMode);
+  } else {
+    document.body.classList.toggle(nm.class,nightMode);
+  }
+  applyThemeVars(currentTheme,nightMode);
+  const tb=document.getElementById('taskbar');
+  tb.style.cssText=(nightMode?(currentTheme.nightTaskbarStyle||currentTheme.taskbarStyle):currentTheme.taskbarStyle);
+  updateNightToggleUI();
+  updateWatermark();
+}
+
+function updateNightToggleUI(){
+  const btn=document.getElementById('nightToggle');
+  const label=currentTheme.nightMode.label();
+  btn.innerHTML=label;
+}
+
+// ============================================================================
+// KEYBOARD SHORTCUTS
+// ============================================================================
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();const o=document.getElementById('cmdOverlay');o.classList.contains('open')?closeCmdPalette():openCmdPalette();}if(e.key==='Escape')closeCmdPalette();resetIdleTimer();});
+document.addEventListener('mousemove',resetIdleTimer);
+
+// Konami code
+const konamiCode=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiIdx=0;
+document.addEventListener('keydown',e=>{if(e.key===konamiCode[konamiIdx]){konamiIdx++;if(konamiIdx===konamiCode.length){konamiIdx=0;cheeseRain();}}else{konamiIdx=0;}});
+function cheeseRain(){const c=document.getElementById('cheeseRain');for(let i=0;i<40;i++){const d=document.createElement('div');d.className='cheese-drop';d.textContent='\u{1F9C0}';d.style.left=Math.random()*100+'vw';d.style.animationDuration=(2+Math.random()*3)+'s';d.style.animationDelay=Math.random()*2+'s';d.style.fontSize=(20+Math.random()*30)+'px';c.appendChild(d);}setTimeout(()=>{c.innerHTML='';},6000);}
+
+// ============================================================================
+// SCREENSAVER
+// ============================================================================
+function resetIdleTimer(){clearTimeout(idleTimer);hideScreensaver();idleTimer=setTimeout(showScreensaver,IDLE_TIMEOUT);}
+function showScreensaver(){document.getElementById('screensaver').classList.add('active');}
+function hideScreensaver(){document.getElementById('screensaver').classList.remove('active');}
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+function closeAllWindows(){[...windows].forEach(w=>closeWindow(w.id));}
+
+// ============================================================================
+// CURSOR TRAIL
+// ============================================================================
+let trailDots=[],lastTrailTime=0;
+document.addEventListener('mousemove',(e)=>{const now=Date.now();if(now-lastTrailTime<(currentTheme.cursorThrottle||50))return;lastTrailTime=now;const dot=document.createElement('div');dot.className='cursor-dot';dot.style.cssText=`left:${e.clientX-3}px;top:${e.clientY-3}px;${currentTheme.cursorDotStyle||''}`;document.body.appendChild(dot);trailDots.push(dot);requestAnimationFrame(()=>dot.classList.add('fade'));setTimeout(()=>{dot.remove();trailDots=trailDots.filter(d=>d!==dot);},400);while(trailDots.length>(currentTheme.cursorMax||8)){const old=trailDots.shift();old.remove();}});
+
+// ============================================================================
+// CANVAS RIPPLE WATERMARK
+// ============================================================================
+const rippleCanvas=document.getElementById('watermarkCanvas');
+const rippleCtx2d=rippleCanvas.getContext('2d');
+let rippleW,rippleH,rippleGrid,ripplePrevGrid,rippleRefImage;
+const RIPPLE_RES=4;let rippleGridW,rippleGridH;const RIPPLE_DAMPING=0.97;
+function initRippleCanvas(){rippleW=window.innerWidth;rippleH=window.innerHeight;rippleCanvas.width=rippleW;rippleCanvas.height=rippleH;rippleGridW=Math.ceil(rippleW/RIPPLE_RES);rippleGridH=Math.ceil(rippleH/RIPPLE_RES);rippleGrid=new Float32Array(rippleGridW*rippleGridH);ripplePrevGrid=new Float32Array(rippleGridW*rippleGridH);renderWatermarkText();}
+function renderWatermarkText(){rippleCtx2d.clearRect(0,0,rippleW,rippleH);const text=lang==='jp'?'\u{8389}\u{9999}\u{30C1}\u{30DF}\u{30CB}\u{30A8}\u{30EA}':'RIKA CIMINIERI';const fontSize=lang==='jp'?160:120;const fontFamily=lang==='jp'?"'Noto Sans JP',sans-serif":"'Space Grotesk',sans-serif";rippleCtx2d.font=`800 ${fontSize}px ${fontFamily}`;rippleCtx2d.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#f4a0b5';rippleCtx2d.globalAlpha=0.06;rippleCtx2d.textAlign='right';rippleCtx2d.textBaseline='bottom';rippleCtx2d.fillText(text,rippleW-60,rippleH-80);rippleCtx2d.globalAlpha=1.0;rippleRefImage=rippleCtx2d.getImageData(0,0,rippleW,rippleH);rippleGrid.fill(0);ripplePrevGrid.fill(0);}
+function updateWatermark(){renderWatermarkText();}
+let mouseRippleX=-1,mouseRippleY=-1;
+document.addEventListener('mousemove',e=>{mouseRippleX=Math.floor(e.clientX/RIPPLE_RES);mouseRippleY=Math.floor(e.clientY/RIPPLE_RES);});
+function rippleFrame(){if(mouseRippleX>=1&&mouseRippleX<rippleGridW-1&&mouseRippleY>=1&&mouseRippleY<rippleGridH-1){const idx=mouseRippleY*rippleGridW+mouseRippleX;rippleGrid[idx]=512;}const newGrid=new Float32Array(rippleGridW*rippleGridH);for(let y=1;y<rippleGridH-1;y++){for(let x=1;x<rippleGridW-1;x++){const idx=y*rippleGridW+x;newGrid[idx]=(rippleGrid[idx-1]+rippleGrid[idx+1]+rippleGrid[idx-rippleGridW]+rippleGrid[idx+rippleGridW])/2-ripplePrevGrid[idx];newGrid[idx]*=RIPPLE_DAMPING;}}ripplePrevGrid=rippleGrid;rippleGrid=newGrid;if(!rippleRefImage)return requestAnimationFrame(rippleFrame);const imgData=new ImageData(new Uint8ClampedArray(rippleRefImage.data),rippleW,rippleH);const pixels=imgData.data;for(let y=1;y<rippleGridH-1;y++){for(let x=1;x<rippleGridW-1;x++){const idx=y*rippleGridW+x;const displacement=rippleGrid[idx];if(Math.abs(displacement)<0.5)continue;const offsetX=Math.round((rippleGrid[idx-1]-rippleGrid[idx+1])*0.5);const offsetY=Math.round((rippleGrid[idx-rippleGridW]-rippleGrid[idx+rippleGridW])*0.5);for(let py=0;py<RIPPLE_RES;py++){for(let px=0;px<RIPPLE_RES;px++){const destX=x*RIPPLE_RES+px,destY=y*RIPPLE_RES+py;const srcX=Math.min(Math.max(destX+offsetX,0),rippleW-1),srcY=Math.min(Math.max(destY+offsetY,0),rippleH-1);const destIdx=(destY*rippleW+destX)*4,srcIdx=(srcY*rippleW+srcX)*4;pixels[destIdx]=rippleRefImage.data[srcIdx];pixels[destIdx+1]=rippleRefImage.data[srcIdx+1];pixels[destIdx+2]=rippleRefImage.data[srcIdx+2];pixels[destIdx+3]=rippleRefImage.data[srcIdx+3];const absDisp=Math.abs(displacement);if(absDisp>3){const bloom=Math.min(absDisp/25,1);pixels[destIdx]=Math.min(255,pixels[destIdx]+bloom*80);pixels[destIdx+1]=Math.min(255,pixels[destIdx+1]+bloom*20);pixels[destIdx+2]=Math.min(255,pixels[destIdx+2]+bloom*50);pixels[destIdx+3]=Math.min(255,pixels[destIdx+3]+bloom*100);}}}}}rippleCtx2d.putImageData(imgData,0,0);requestAnimationFrame(rippleFrame);}
+window.addEventListener('resize',()=>{initRippleCanvas();});
+
+// ============================================================================
+// EASTER EGGS: CLOCK TOOLTIP
+// ============================================================================
+let clockHoverTimer=null,clockTooltip=null;
+const clockFacts=["Currently thinking about grilled cheese","Wondering if Luffy is Joy Boy","Practicing singing (neighbors sorry)","Debugging something... always","Ranking sandwiches in my head","Missing Japan right now","Building something cool with AI","Rewatching Bridgerton... again"];
+document.getElementById('clock').addEventListener('mouseenter',()=>{clockHoverTimer=setTimeout(()=>{if(clockTooltip)clockTooltip.remove();clockTooltip=document.createElement('div');clockTooltip.className='clock-tooltip';clockTooltip.textContent=clockFacts[Math.floor(Math.random()*clockFacts.length)];document.body.appendChild(clockTooltip);},3000);});
+document.getElementById('clock').addEventListener('mouseleave',()=>{clearTimeout(clockHoverTimer);if(clockTooltip){clockTooltip.remove();clockTooltip=null;}});
+
+// ============================================================================
+// DESKTOP TOY
+// ============================================================================
+document.getElementById('desktop').addEventListener('dblclick',(e)=>{if(e.target.closest('.desktop-icon,.window,.taskbar'))return;spawnDesktopToy(e.clientX,e.clientY);});
+function spawnDesktopToy(x,y){const toy=document.createElement('div');toy.className='desktop-toy';toy.style.left=x+'px';toy.style.top=y+'px';document.body.appendChild(toy);playBoop(600,0.05,0.06,'sine');let vx=(Math.random()-0.5)*8,vy=-8-Math.random()*4;const gravity=0.3,bounce=0.6,friction=0.99;let px=x,py=y,life=0;function animate(){vy+=gravity;vx*=friction;px+=vx;py+=vy;const floor=window.innerHeight-100;if(py>floor){py=floor;vy=-vy*bounce;if(Math.abs(vy)<1)vy=0;}if(px<0||px>window.innerWidth-18){vx=-vx;px=Math.max(0,Math.min(px,window.innerWidth-18));}toy.style.left=px+'px';toy.style.top=py+'px';life++;if(life<200&&(Math.abs(vx)>0.1||Math.abs(vy)>0.5||py<floor)){requestAnimationFrame(animate);}else{toy.style.transition='opacity 0.5s';toy.style.opacity='0';setTimeout(()=>toy.remove(),500);}}requestAnimationFrame(animate);}
+
+// ============================================================================
+// INIT
+// ============================================================================
+// Load saved theme
+const savedTheme = localStorage.getItem('rikaos-theme');
+if (savedTheme && THEMES[savedTheme]) { currentTheme = THEMES[savedTheme]; }
+
+// Apply initial theme
+applyThemeVars(currentTheme, false);
+injectThemeCSS(currentTheme);
+
+// Taskbar
+const tb = document.getElementById('taskbar');
+tb.style.cssText = currentTheme.taskbarStyle;
+const sb = document.getElementById('startBtn');
+sb.innerHTML = currentTheme.startButton;
+sb.style.cssText = currentTheme.startButtonStyle;
+sb.onclick = () => openCmdPalette();
+updateNightToggleUI();
+
+// Background + particles
+if (currentTheme.initBackground) currentTheme.initBackground();
+if (currentTheme.initParticles) currentTheme.initParticles(document.getElementById('particles'));
+
+// Screensaver
+document.getElementById('screensaver').style.background = currentTheme.screensaverBg;
+document.getElementById('screensaverContent').innerHTML = currentTheme.screensaverContent();
+
+// Easter eggs
+if (currentTheme.easterEggs && currentTheme.easterEggs.init) currentTheme.easterEggs.init();
+
+// Desktop icons + watermark
+renderDesktopIcons();
+resetIdleTimer();
+initRippleCanvas();
+requestAnimationFrame(rippleFrame);
+
+// Boot or skip
+const skipBoot = window.location.hash === '#skipboot';
+if (skipBoot) {
+  document.getElementById('boot-screen').style.display = 'none';
+  document.getElementById('desktop').classList.add('visible');
+  openApp('welcome');
+} else {
+  runBoot();
+}
+</script>
+</body>
+</html>

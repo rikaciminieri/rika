@@ -250,17 +250,20 @@ html, body {
   <button class="tab active" data-dir="1" onclick="switchTab(1)">
     <span class="num">01</span><span class="label">RikaOS</span>
   </button>
-  <button class="tab" data-dir="2" onclick="switchTab(2)">
-    <span class="num">02</span><span class="label">Scrapbook</span>
+  <button class="tab" data-dir="1b" onclick="switchTab('1b')">
+    <span class="num">01b</span><span class="label">Ghibli OS</span>
+  </button>
+  <button class="tab" data-dir="1c" onclick="switchTab('1c')">
+    <span class="num">01c</span><span class="label">Holographic OS</span>
+  </button>
+  <button class="tab" data-dir="1d" onclick="switchTab('1d')">
+    <span class="num">01d</span><span class="label">Terrarium OS</span>
   </button>
   <button class="tab" data-dir="3" onclick="switchTab(3)">
     <span class="num">03</span><span class="label">Petri Dish</span>
   </button>
   <button class="tab" data-dir="4" onclick="switchTab(4)">
     <span class="num">04</span><span class="label">rika tv</span>
-  </button>
-  <button class="tab" data-dir="5" onclick="switchTab(5)">
-    <span class="num">05</span><span class="label">Neighborhood</span>
   </button>
   <div class="tab-spacer"></div>
   <button class="sidebar-toggle" onclick="toggleSidebar()">
@@ -279,48 +282,92 @@ html, body {
 <script>
 const protoFiles = {
   1: 'prototypes/d1-rikaos.html',
-  2: 'prototypes/d2-scrapbook.html',
+  '1b': 'prototypes/d1v2-ghibli.html',
+  '1c': 'prototypes/d1v3-holographic.html',
+  '1d': 'prototypes/d1v4-terrarium.html',
   3: 'prototypes/d3-petridish.html',
   4: 'prototypes/d4-rikatv.html',
-  5: 'prototypes/d5-neighborhood.html'
 };
 
 const sidebarData = {
   1: {
-    title: 'RikaOS',
-    subtitle: 'Tech-playful. "You just booted up someone\'s personal computer and found a whole world inside."',
+    title: 'RikaOS — Kawaii Pastel',
+    subtitle: 'Tech-playful. "You just booted up someone\'s personal computer and found a whole world inside." Warm pastels, wobble animations, kawaii SVG icons.',
     strengths: [
       'Strongest metaphor for a developer — the site IS a computer she built',
-      'Infinite extensibility — every new project is a new app',
-      'Window manager, terminal, and command palette demonstrate real engineering',
-      'Recruiter-friendly: projects.app is immediately findable'
+      'Custom SVG kawaii icons (waving hand, dripping grilled cheese, torii gate)',
+      'Musical icon scale — hover all 8 icons in order to unlock a melody',
+      'Window snap to edges, dock bounce, physics desktop toys on double-click',
+      'Canvas ripple watermark with color bloom effect'
     ],
     tradeoffs: [
-      'Desktop OS metaphors have been done — needs enough personality to stand out',
-      'Window management complexity on mobile (mitigated by phone-OS transformation)',
-      'Boot sequence could feel slow on repeat visits (add skip option)'
+      'Desktop OS metaphors have been done — personality is what makes it stand out',
+      'Window management complexity on mobile',
+      'Boot sequence could feel slow on repeat visits (skip option included)'
     ],
-    complexity: 'High — custom window manager, drag/resize system, z-index management, command parser, boot sequence, taskbar state, multiple "apps" each with unique layouts.',
-    mobile: 'Transforms to phone-OS launcher with app grid. Tap opens fullscreen app view. Bottom status bar with back gesture.',
-    recruiter: 'High — projects.app front and center. Terminal impresses technical recruiters. Clear navigation through taskbar.'
+    complexity: 'High — custom window manager, drag/resize/snap, Web Audio musical scale, physics toys, canvas watermark, command palette, terminal.',
+    mobile: 'Transforms to phone-OS launcher with app grid.',
+    recruiter: 'High — projects.app front and center. Terminal impresses technical recruiters.'
   },
-  2: {
-    title: 'The Scrapbook',
-    subtitle: 'Cozy-intimate. "Found someone\'s personal journal on a rainy day and couldn\'t stop turning pages."',
+  '1b': {
+    title: 'RikaOS — Ghibli / Alive',
+    subtitle: 'Hand-painted & breathing. "The OS looks like a Studio Ghibli background that came to life." Warm parchment, ink brush art, wooden textures.',
     strengths: [
-      'Strongest emotional connection — feels personal and handmade',
-      'Natural storytelling flow through page-turning',
-      'Paper textures, washi tape, and craft aesthetic are unique in dev portfolios',
-      'Envelope metaphor (casual outside → rigorous inside) perfectly balances personality and skill'
+      'Unique aesthetic nobody has done — hand-painted OS with watercolor sky',
+      'Animated sky shifts dawn→day→dusk over 60s cycle',
+      'Soot sprites wander the desktop, cherry blossom petals fall',
+      'Japanese pentatonic (miyako-bushi) musical scale on icon hover',
+      'Ink brush SVG icons (ensō circle, calligraphy scroll, tea cup with steam)',
+      'Wooden shelf taskbar with red hanko stamp start button'
     ],
     tradeoffs: [
-      'Two-page spread requires careful responsive handling',
-      'Page-turn physics need to feel right or the whole metaphor breaks',
-      'Risk of feeling too crafty/not technical enough (mitigated by envelope reveal pattern)'
+      'Organic aesthetic may feel less "techy" at first glance',
+      'Paper unfurl window animations need to feel crisp',
+      'Heavily themed — some users may not connect with it'
     ],
-    complexity: 'Medium-High — page-turn CSS/JS animation, paper textures, interactive elements per spread (corkboard, envelopes, flipcards), ribbon navigation system.',
-    mobile: 'Single-page view with swipe navigation. Ribbons become bottom tab bar. Touch-optimized interactions.',
-    recruiter: 'Medium — engineering content exists but needs "opening the envelope" to reveal. Table of contents and ribbons help navigation.'
+    complexity: 'High — animated watercolor sky, paper grain texture, soot sprite AI, ink brush icons, calligraphy terminal, wood grain textures.',
+    mobile: 'Full-screen windows with simplified particles.',
+    recruiter: 'Medium-high — engineering is proven by the craft itself. Projects app is clearly accessible.'
+  },
+  '1c': {
+    title: 'RikaOS — Holographic Chaos',
+    subtitle: 'Beautiful digital destruction. "A malfunctioning holographic projector that\'s GORGEOUS." Iridescent rainbow, glitch artifacts, RGB separation.',
+    strengths: [
+      'Most visually striking — holographic mesh gradient with scan lines and CRT vignette',
+      'Periodic global glitch every 15-30s (horizontal tear + static crackle)',
+      'Holographic card icons with tilt-shimmer on hover',
+      'Day mode is the surprise — "defragmented" clean white aesthetic (inverted default)',
+      'Windows materialize from glitch lines, dissolve into pixel scatter on close',
+      'Synth minor pentatonic scale with bitcrushed blips'
+    ],
+    tradeoffs: [
+      'Dark-by-default may not suit all contexts',
+      'Heavy visual effects — performance sensitive',
+      'Glitch aesthetic can feel chaotic if overdone'
+    ],
+    complexity: 'Highest — animated holographic gradients, RGB chromatic aberration, scan lines, CRT vignette, glitch tear system, pixel dissolve animations, VHS boot sequence.',
+    mobile: 'Simplified effects, full-screen windows.',
+    recruiter: 'High — the sheer technical craft speaks for itself. Projects accessible via dock.'
+  },
+  '1d': {
+    title: 'RikaOS — Terrarium',
+    subtitle: 'Living glass ecosystems. "The desktop is a terrarium viewed from above. Content lives in glass domes. Everything grows and breathes."',
+    strengths: [
+      'Most original concept — nobody has done a terrarium OS',
+      'Miniature terrarium icons (zen garden in jar, compost with cute worms, bark radio)',
+      'Glass dome windows with condensation, frosted glass headers',
+      'Pollen particles, mist layer, CSS butterfly with figure-8 path',
+      'Wooden potting bench taskbar with sprouting seed start button',
+      'Night mode: bioluminescent mushrooms + fireflies'
+    ],
+    tradeoffs: [
+      'Organic metaphor is furthest from "tech" — engineering must be proven by craft',
+      'Many layered effects (pebbles, condensation, mist, butterflies) — performance risk',
+      'Glass dome window style may reduce readability'
+    ],
+    complexity: 'Highest — terrarium floor textures, glass dome refraction, condensation animation, butterfly physics, pollen/mist particles, bioluminescent night mode.',
+    mobile: 'Full-screen windows, hidden butterfly and condensation.',
+    recruiter: 'Medium — the wow factor is memorable. Projects accessible through icons.'
   },
   3: {
     title: 'The Petri Dish',
@@ -357,24 +404,6 @@ const sidebarData = {
     complexity: 'High — channel transition animations, CRT shader effects, 6 distinct channel layouts, draggable remote control, keyboard shortcuts, news ticker, chyron system.',
     mobile: 'Swipe between channels (like stories). Bottom channel indicator. Remote control becomes bottom bar. Fullscreen immersive experience.',
     recruiter: 'High — Channel 2 (Code Review) is a dedicated engineering showcase. Channel-surfing makes exploring natural.'
-  },
-  5: {
-    title: 'The Neighborhood',
-    subtitle: 'Warm-inviting. "Visiting a friend\'s neighborhood and every building has a story."',
-    strengths: [
-      'Most emotionally warm direction — feels like being invited somewhere',
-      'Isometric map creates instant spatial understanding',
-      'Each building interior is a full content page — no compromises on content depth',
-      'Day/night cycle and animated details make it feel alive'
-    ],
-    tradeoffs: [
-      'Isometric illustration requires significant art direction',
-      'Map navigation on small screens needs careful handling',
-      'Zoom transition between map and interior must be smooth or it feels jarring'
-    ],
-    complexity: 'High — isometric CSS/SVG map, zoom transitions, 6 unique interior layouts, day/night mode, ambient animations (cherry blossoms, cat, smoke), building hover/enter states.',
-    mobile: 'Pan/tap map at slightly-above-overhead angle. Tap building → fullscreen interior. Bottom bar for quick building access.',
-    recruiter: 'High — Workshop building is clearly labeled. Map overview shows breadth immediately. Building metaphor is intuitive.'
   }
 };
 
@@ -434,12 +463,13 @@ function renderSidebar() {
 }
 
 // Keyboard shortcuts
+const tabKeys = ['1', '2', '3', '4', '5', '6'];
+const tabOrder = [1, '1b', '1c', '1d', 3, 4];
 document.addEventListener('keydown', e => {
-  const num = parseInt(e.key);
-  if (num >= 1 && num <= 5 && !e.metaKey && !e.ctrlKey && !e.altKey) {
-    // Only if not focused in iframe
+  const idx = tabKeys.indexOf(e.key);
+  if (idx !== -1 && !e.metaKey && !e.ctrlKey && !e.altKey) {
     if (document.activeElement !== document.getElementById('protoFrame')) {
-      switchTab(num);
+      switchTab(tabOrder[idx]);
     }
   }
   if (e.key === 'Escape' && sidebarOpen) {

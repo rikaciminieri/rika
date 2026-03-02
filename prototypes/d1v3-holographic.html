@@ -1,0 +1,2398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RikaOS — Holographic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080f;
+  --surface: #12121f;
+  --surface-2: #1a1a2e;
+  --border: #2a2a44;
+  --text: #e0e0f0;
+  --text-muted: #6a6a8a;
+  --accent: #00ffcc;
+  --accent-glow: rgba(0, 255, 204, 0.2);
+  --pink: #ff3399;
+  --blue: #3366ff;
+  --gold: #ffcc00;
+  --red: #ff4444;
+  --green: #33ff99;
+  --taskbar-h: 88px;
+  --radius: 12px;
+  --win-header: 40px;
+  --font: 'Inter', 'Noto Sans JP', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+}
+
+/* Day mode = "defragmented" / repaired — the surprise */
+body.day-mode {
+  --bg: #f0f0f8;
+  --surface: #ffffff;
+  --surface-2: #e8e8f0;
+  --border: #d0d0e0;
+  --text: #1a1a2e;
+  --text-muted: #6a6a8a;
+  --accent: #0088aa;
+  --accent-glow: rgba(0, 136, 170, 0.15);
+  --pink: #cc2277;
+  --blue: #2255cc;
+  --gold: #cc9900;
+  --red: #cc3333;
+  --green: #22aa66;
+}
+
+body.day-mode .desktop-bg { background: var(--bg); }
+body.day-mode .desktop-bg::before { opacity: 0; }
+body.day-mode .scanlines { opacity: 0; }
+body.day-mode .taskbar { background: rgba(255,255,255,0.85); border-color: rgba(0,136,170,0.2); }
+body.day-mode .boot-screen-wrap { background: #f0f0f8; }
+body.day-mode .window { border-color: var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
+body.day-mode .window::before { opacity: 0; }
+body.day-mode .holo-particle { opacity: 0.15; }
+body.day-mode .terminal { background: #1a1a2e; }
+
+html, body { height: 100%; overflow: hidden; font-family: var(--font); background: var(--bg); color: var(--text); }
+
+/* =================== BOOT SEQUENCE =================== */
+#boot-screen {
+  position: fixed; inset: 0; z-index: 99999;
+  background: #000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  transition: opacity 0.8s;
+  overflow: hidden;
+}
+#boot-screen.done { opacity: 0; pointer-events: none; }
+
+/* Static noise overlay for boot */
+.boot-static {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255,255,255,0.03) 0px,
+    rgba(255,255,255,0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  animation: bootStatic 0.1s steps(4) infinite;
+  pointer-events: none;
+}
+@keyframes bootStatic {
+  0% { transform: translateY(0); }
+  25% { transform: translateY(-2px); }
+  50% { transform: translateY(1px); }
+  75% { transform: translateY(-1px); }
+  100% { transform: translateY(0); }
+}
+
+/* Tracking bars */
+.boot-tracking {
+  position: absolute; left: 0; right: 0;
+  height: 30px;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.08), transparent);
+  animation: trackingBars 2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes trackingBars {
+  0% { top: -30px; }
+  100% { top: 110%; }
+}
+
+.boot-signal {
+  font-family: var(--mono);
+  font-size: 16px;
+  color: var(--green);
+  text-shadow: 0 0 10px var(--green), 0 0 30px rgba(51,255,153,0.3);
+  opacity: 0;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  animation: signalFlicker 0.5s ease-out 0.8s forwards;
+}
+@keyframes signalFlicker {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  30% { opacity: 0.3; }
+  50% { opacity: 1; }
+  60% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+.boot-lines { font-size: 11px; color: #4a4a6a; text-align: left; width: 440px; max-width: 90vw; margin-top: 24px; }
+.boot-lines div { opacity: 0; animation: bootFade 0.3s forwards; }
+.boot-lines .ok { color: var(--green); text-shadow: 0 0 6px rgba(51,255,153,0.3); }
+.boot-lines .warn { color: var(--gold); text-shadow: 0 0 6px rgba(255,204,0,0.3); }
+@keyframes bootFade { to { opacity: 1; } }
+
+.boot-bar { width: 440px; max-width: 90vw; height: 2px; background: #1a1a2e; border-radius: 2px; margin-top: 20px; overflow: hidden; }
+.boot-bar-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--pink), var(--blue)); border-radius: 2px; animation: bootFill 2.2s ease-in-out forwards; box-shadow: 0 0 12px var(--accent); }
+@keyframes bootFill { to { width: 100%; } }
+
+/* =================== DESKTOP =================== */
+#desktop {
+  position: fixed; inset: 0;
+  opacity: 0;
+  transition: opacity 1s 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+#desktop.visible { opacity: 1; }
+
+/* Holographic mesh gradient backdrop */
+.desktop-bg {
+  position: fixed; inset: 0;
+  z-index: -1;
+  background: var(--bg);
+  overflow: hidden;
+}
+.desktop-bg::before {
+  content: '';
+  position: absolute;
+  width: 200%; height: 200%;
+  top: -50%; left: -50%;
+  background:
+    radial-gradient(ellipse 600px 500px at 20% 30%, rgba(0,255,204,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 500px 600px at 80% 25%, rgba(255,51,153,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 500px 400px at 55% 75%, rgba(51,102,255,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 400px 500px at 15% 80%, rgba(255,204,0,0.04) 0%, transparent 60%);
+  animation: holoDrift 25s ease-in-out infinite alternate;
+  transition: opacity 0.5s;
+}
+@keyframes holoDrift {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  25% { transform: translate(40px, -30px) rotate(1.5deg) scale(1.02); }
+  50% { transform: translate(-30px, 20px) rotate(-1deg) scale(0.98); }
+  75% { transform: translate(20px, 10px) rotate(0.5deg) scale(1.01); }
+  100% { transform: translate(-10px, -15px) rotate(-0.5deg) scale(1); }
+}
+
+/* Scan lines overlay */
+.scanlines {
+  position: fixed; inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(255,255,255,0.015) 1px,
+    rgba(255,255,255,0.015) 2px
+  );
+  animation: scanScroll 8s linear infinite;
+  transition: opacity 0.5s;
+}
+@keyframes scanScroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(40px); }
+}
+
+/* CRT vignette */
+.crt-vignette {
+  position: fixed; inset: 0;
+  z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+}
+
+/* Global glitch tear */
+.desktop-glitch {
+  animation: none;
+}
+.desktop-glitch.active {
+  animation: glitchTear 0.15s steps(2) forwards;
+}
+@keyframes glitchTear {
+  0% { clip-path: inset(0 0 0 0); transform: translateX(0); }
+  25% { clip-path: inset(30% 0 40% 0); transform: translateX(8px); filter: hue-rotate(90deg); }
+  50% { clip-path: inset(60% 0 10% 0); transform: translateX(-5px); filter: hue-rotate(180deg); }
+  75% { clip-path: inset(10% 0 70% 0); transform: translateX(3px); filter: hue-rotate(270deg); }
+  100% { clip-path: inset(0 0 0 0); transform: translateX(0); filter: none; }
+}
+
+/* Watermark canvas */
+.watermark-canvas {
+  position: fixed;
+  right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Holographic floating particles */
+.floating-particles {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+}
+.holo-particle {
+  position: absolute;
+  opacity: 0;
+  animation: holoFloat linear infinite;
+  transition: opacity 0.5s;
+}
+.holo-particle.shard {
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 8px solid var(--accent);
+  filter: blur(0.5px);
+}
+.holo-particle.line {
+  width: 30px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+@keyframes holoFloat {
+  0% { opacity: 0; transform: translateY(100vh) rotate(0deg); }
+  10% { opacity: 0.4; }
+  90% { opacity: 0.4; }
+  100% { opacity: 0; transform: translateY(-10vh) rotate(180deg); }
+}
+
+/* =================== DESKTOP ICONS =================== */
+.desktop-icons {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-content: start;
+  max-width: 200px;
+}
+
+.desktop-icon {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px;
+  width: 84px; height: 84px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+  perspective: 600px;
+}
+.desktop-icon:hover { background: rgba(0,255,204,0.04); }
+.desktop-icon:active { transform: scale(0.95); }
+
+.desktop-icon .icon-img {
+  width: 54px; height: 54px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  /* Holographic iridescent gradient */
+  background-image: linear-gradient(135deg, rgba(0,255,204,0.08), rgba(255,51,153,0.06), rgba(51,102,255,0.08));
+}
+
+.desktop-icon:hover .icon-img {
+  transform: scale(1.08) rotateY(8deg) rotateX(-4deg);
+  border-color: var(--accent);
+  box-shadow: 0 0 16px rgba(0,255,204,0.2), 2px 0 8px rgba(255,51,153,0.15), -2px 0 8px rgba(51,102,255,0.15);
+  background-image: linear-gradient(135deg, rgba(0,255,204,0.15), rgba(255,51,153,0.12), rgba(51,102,255,0.15), rgba(255,204,0,0.1));
+}
+
+.desktop-icon .icon-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =================== WINDOWS =================== */
+.window {
+  position: absolute;
+  background: rgba(18, 18, 31, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex; flex-direction: column;
+  min-width: 320px; min-height: 200px;
+  overflow: hidden;
+  animation: winMaterialize 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  /* RGB chromatic aberration */
+  box-shadow:
+    2px 0 0 rgba(255,51,153,0.08),
+    -2px 0 0 rgba(51,102,255,0.08),
+    0 8px 32px rgba(0,0,0,0.4);
+}
+/* Animated holographic border */
+.window::before {
+  content: '';
+  position: absolute; inset: -1px;
+  border-radius: var(--radius);
+  background: linear-gradient(var(--holo-angle, 0deg), var(--accent), var(--pink), var(--blue), var(--gold), var(--accent));
+  z-index: -1;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  padding: 1px;
+  opacity: 0.4;
+  transition: opacity 0.3s;
+}
+.window.focused::before { opacity: 0.8; }
+
+@keyframes winMaterialize {
+  0% { transform: scaleY(0.02) scaleX(1); opacity: 0; filter: brightness(3) hue-rotate(90deg); }
+  30% { transform: scaleY(0.02) scaleX(1); opacity: 1; filter: brightness(2); }
+  50% { transform: scaleY(0.5) scaleX(1.02); filter: brightness(1.5) hue-rotate(45deg); }
+  75% { transform: scaleY(1.02) scaleX(0.99); filter: brightness(1.1); }
+  100% { transform: scaleY(1) scaleX(1); opacity: 1; filter: none; }
+}
+
+.window.minimized { animation: winMin 0.25s forwards; pointer-events: none; }
+@keyframes winMin {
+  to { transform: scaleY(0.02) scaleX(0.5); opacity: 0; filter: brightness(2); }
+}
+
+.window.focused {
+  box-shadow:
+    2px 0 0 rgba(255,51,153,0.12),
+    -2px 0 0 rgba(51,102,255,0.12),
+    0 12px 48px rgba(0,0,0,0.5),
+    0 0 30px var(--accent-glow);
+}
+
+.win-header {
+  height: var(--win-header);
+  background: rgba(26, 26, 46, 0.9);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 12px;
+  cursor: grab;
+  user-select: none;
+  flex-shrink: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.win-header:active { cursor: grabbing; }
+
+.win-dots { display: flex; gap: 7px; }
+.win-dot {
+  width: 13px; height: 13px; border-radius: 50%; border: none;
+  cursor: pointer; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+}
+.win-dot:hover { transform: scale(1.3); }
+.win-dot.close { background: var(--red); box-shadow: 0 0 6px rgba(255,68,68,0.4); }
+.win-dot.minimize { background: var(--gold); box-shadow: 0 0 6px rgba(255,204,0,0.3); }
+.win-dot.maximize { background: var(--green); box-shadow: 0 0 6px rgba(51,255,153,0.3); }
+
+.win-title { flex: 1; text-align: center; font-size: 12px; font-weight: 500; color: var(--text-muted); pointer-events: none; font-family: var(--mono); letter-spacing: 0.03em; }
+
+.win-body { flex: 1; overflow: auto; padding: 20px; }
+.win-body::-webkit-scrollbar { width: 4px; }
+.win-body::-webkit-scrollbar-track { background: transparent; }
+.win-body::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; opacity: 0.5; }
+
+.win-resize { position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; cursor: nwse-resize; }
+
+/* =================== TASKBAR (FLOATING HOLOGRAPHIC BAR) =================== */
+.taskbar {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: auto;
+  width: auto;
+  max-width: 90vw;
+  background: rgba(18, 18, 31, 0.8);
+  backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid rgba(0,255,204,0.12);
+  border-top: 1px solid;
+  border-image: linear-gradient(90deg, var(--accent), var(--pink), var(--blue), var(--gold), var(--accent)) 1;
+  border-image-slice: 1;
+  border-radius: 18px;
+  display: flex; align-items: center;
+  padding: 8px 16px;
+  z-index: 9000;
+  gap: 4px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 20px rgba(0,255,204,0.05);
+  /* override border-image for border-radius */
+  border: 1px solid rgba(0,255,204,0.15);
+  overflow: hidden;
+}
+/* Top holographic edge */
+.taskbar::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--pink), var(--blue), var(--gold), var(--accent), transparent);
+  animation: holoShift 4s linear infinite;
+}
+@keyframes holoShift {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+
+.tb-start {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,255,204,0.3);
+  background: linear-gradient(135deg, rgba(0,255,204,0.15), rgba(255,51,153,0.1));
+  color: var(--accent);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-weight: 700;
+  font-family: var(--display);
+  text-shadow: 0 0 8px var(--accent);
+  position: relative;
+}
+.tb-start:hover {
+  transform: scale(1.15) rotate(-5deg);
+  box-shadow: 0 0 20px rgba(0,255,204,0.3);
+  border-color: var(--accent);
+}
+
+.tb-divider { width: 1px; height: 28px; background: var(--border); margin: 0 8px; }
+
+.tb-apps { display: flex; gap: 3px; flex: 1; overflow-x: auto; }
+
+.tb-app {
+  padding: 6px 14px; border-radius: 10px; border: none;
+  background: transparent; color: var(--text-muted);
+  font-family: var(--font); font-size: 12px;
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex; align-items: center; gap: 6px;
+}
+.tb-app:hover { background: rgba(0,255,204,0.08); color: var(--text); transform: translateY(-2px); }
+.tb-app.active { background: rgba(0,255,204,0.12); color: var(--accent); }
+.tb-app .tb-app-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 4px var(--accent); }
+
+.tb-tray { display: flex; align-items: center; gap: 12px; margin-left: auto; font-size: 12px; color: var(--text-muted); }
+.tb-tray-btn {
+  background: none; border: 1px solid transparent;
+  color: var(--text-muted); cursor: pointer; font-size: 11px;
+  font-family: var(--mono); transition: all 0.15s;
+  padding: 4px 8px; border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+.tb-tray-btn:hover { color: var(--accent); background: rgba(0,255,204,0.06); border-color: rgba(0,255,204,0.2); }
+#clock { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+
+/* Language binary switch */
+.lang-toggle-seg {
+  display: flex; border-radius: 6px; overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.lang-seg {
+  padding: 3px 10px; border: none; background: transparent;
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+}
+.lang-seg.active {
+  background: var(--accent); color: #08080f;
+  text-shadow: none;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+.lang-seg:hover:not(.active) { background: rgba(0,255,204,0.08); }
+
+/* =================== COMMAND PALETTE =================== */
+.cmd-overlay {
+  position: fixed; inset: 0; background: rgba(8,8,15,0.7); backdrop-filter: blur(10px);
+  z-index: 50000; display: none; align-items: flex-start; justify-content: center; padding-top: 20vh;
+}
+.cmd-overlay.open { display: flex; }
+.cmd-box {
+  width: 560px; max-width: 90vw; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 16px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 40px rgba(0,255,204,0.1);
+  overflow: hidden; animation: cmdOpen 0.15s ease-out;
+}
+@keyframes cmdOpen { from { transform: scale(0.94) translateY(-12px); opacity: 0; } }
+.cmd-input {
+  width: 100%; padding: 16px 20px; background: transparent;
+  border: none; outline: none; color: var(--text);
+  font-family: var(--font); font-size: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.cmd-input::placeholder { color: var(--text-muted); }
+.cmd-results { max-height: 320px; overflow-y: auto; }
+.cmd-item {
+  padding: 10px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px;
+  transition: background 0.1s; font-size: 14px;
+}
+.cmd-item:hover, .cmd-item.selected { background: rgba(0,255,204,0.08); }
+.cmd-item .cmd-icon { font-size: 14px; width: 28px; text-align: center; font-family: var(--mono); color: var(--accent); }
+.cmd-item .cmd-label { flex: 1; }
+.cmd-item .cmd-hint { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+
+/* =================== CONTEXT MENU =================== */
+.ctx-menu {
+  position: fixed; background: rgba(18,18,31,0.95); backdrop-filter: blur(12px);
+  border: 1px solid var(--border); border-radius: 12px; padding: 6px;
+  min-width: 200px; box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 16px rgba(0,255,204,0.05);
+  z-index: 60000; display: none; animation: ctxOpen 0.12s ease-out;
+}
+@keyframes ctxOpen { from { transform: scale(0.95); opacity: 0; } }
+.ctx-menu.open { display: block; }
+.ctx-item {
+  padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; gap: 10px; transition: background 0.1s; color: var(--text);
+}
+.ctx-item:hover { background: rgba(0,255,204,0.1); }
+.ctx-item .ctx-icon { width: 20px; text-align: center; font-family: var(--mono); font-size: 11px; color: var(--accent); }
+.ctx-sep { height: 1px; background: var(--border); margin: 4px 8px; }
+
+/* =================== APP: WELCOME =================== */
+.notepad-content { font-family: var(--font); font-size: 14px; line-height: 1.8; color: var(--text); }
+.notepad-content h2 {
+  font-family: var(--display); font-size: 22px; font-weight: 700; margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--pink), var(--blue));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.notepad-content p { margin-bottom: 12px; }
+.notepad-content .aside { color: var(--text-muted); font-style: italic; font-size: 13px; }
+
+/* =================== APP: TERMINAL =================== */
+.terminal {
+  font-family: var(--mono); font-size: 13px; line-height: 1.7;
+  color: var(--green); background: #060610; padding: 20px; height: 100%;
+  border-radius: 0 0 var(--radius) var(--radius);
+  /* CRT phosphor glow */
+  text-shadow: 0 0 3px rgba(51,255,153,0.3);
+  position: relative;
+}
+/* CRT flicker */
+.terminal::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(51,255,153,0.02) 1px,
+    rgba(51,255,153,0.02) 2px
+  );
+  pointer-events: none;
+  animation: termFlicker 0.08s steps(2) infinite;
+}
+@keyframes termFlicker {
+  0% { opacity: 1; }
+  50% { opacity: 0.98; }
+  100% { opacity: 1; }
+}
+.terminal .prompt { color: var(--accent); text-shadow: 0 0 6px rgba(0,255,204,0.4); }
+.terminal .cmd-text { color: var(--text); text-shadow: none; }
+.terminal .output { color: var(--text-muted); white-space: pre-wrap; text-shadow: none; }
+.terminal .error { color: var(--red); text-shadow: 0 0 4px rgba(255,68,68,0.3); }
+.terminal .highlight { color: var(--gold); text-shadow: 0 0 4px rgba(255,204,0,0.3); }
+.term-input-line { display: flex; align-items: center; gap: 0; }
+.term-input {
+  background: transparent; border: none; outline: none;
+  color: var(--text); font-family: var(--mono); font-size: 13px;
+  flex: 1; caret-color: var(--accent);
+}
+
+/* =================== APP: PROJECTS =================== */
+.projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.project-card {
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 20px; cursor: pointer; transition: all 0.2s;
+}
+.project-card:hover {
+  border-color: var(--accent); transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 12px rgba(0,255,204,0.08);
+}
+.project-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+.project-card p { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
+.project-card .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.project-card .tag {
+  font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 6px;
+  background: rgba(0,255,204,0.08); color: var(--accent);
+  border: 1px solid rgba(0,255,204,0.15);
+}
+
+/* =================== APP: GALLERY =================== */
+.gallery-scroll { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 16px; scroll-snap-type: x mandatory; }
+.gallery-scroll::-webkit-scrollbar { height: 4px; }
+.gallery-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.gallery-item { flex-shrink: 0; width: 260px; scroll-snap-align: start; }
+.gallery-thumb {
+  width: 100%; height: 200px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px; margin-bottom: 10px;
+  border: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+.gallery-thumb svg { width: 64px; height: 64px; }
+.gallery-item h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.gallery-item p { font-size: 12px; color: var(--text-muted); }
+
+/* =================== APP: GRILLED CHEESE =================== */
+.gc-podium { display: flex; align-items: flex-end; justify-content: center; gap: 16px; margin-bottom: 32px; }
+.gc-podium-item { text-align: center; padding: 16px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); }
+.gc-podium-item.gold { border-color: var(--gold); box-shadow: 0 0 12px rgba(255,204,0,0.15); order: 2; }
+.gc-podium-item.silver { border-color: #94a3b8; order: 1; }
+.gc-podium-item.bronze { border-color: #d97706; order: 3; }
+.gc-medal { font-size: 28px; font-family: var(--display); font-weight: 700; }
+.gc-medal.gold-medal { color: var(--gold); text-shadow: 0 0 8px rgba(255,204,0,0.4); }
+.gc-medal.silver-medal { color: #94a3b8; }
+.gc-medal.bronze-medal { color: #d97706; }
+.gc-name { font-size: 14px; font-weight: 600; margin-top: 8px; }
+.gc-score { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+.gc-bracket { display: flex; gap: 40px; align-items: center; overflow-x: auto; padding: 16px 0; }
+.gc-round { display: flex; flex-direction: column; gap: 20px; flex-shrink: 0; }
+.gc-match { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.gc-matchup { padding: 8px 14px; font-size: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+.gc-matchup:last-child { border-bottom: none; }
+.gc-matchup.winner { color: var(--accent); font-weight: 600; text-shadow: 0 0 4px rgba(0,255,204,0.2); }
+
+/* =================== APP: FINDER (TRASH) =================== */
+.finder { height: 100%; display: flex; flex-direction: column; }
+.finder-toolbar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--surface-2); font-size: 12px; color: var(--text-muted); }
+.finder-path { font-family: var(--mono); font-size: 11px; color: var(--text-muted); flex: 1; }
+.finder-list { flex: 1; overflow-y: auto; }
+.finder-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+  cursor: pointer;
+  transition: background 0.1s;
+  font-size: 13px;
+}
+.finder-item:hover { background: rgba(0,255,204,0.04); }
+.finder-item.disabled { opacity: 0.35; cursor: not-allowed; }
+.finder-item.disabled:hover { background: transparent; }
+.finder-item .fi-icon { width: 28px; text-align: center; flex-shrink: 0; }
+.finder-item .fi-icon svg { width: 20px; height: 20px; display: inline-block; vertical-align: middle; }
+.finder-item .fi-name { flex: 1; }
+.finder-item .fi-meta { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+.finder-item .fi-size { font-size: 11px; color: var(--text-muted); font-family: var(--mono); min-width: 60px; text-align: right; }
+
+.finder-preview { padding: 24px; animation: fadeIn 0.2s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.finder-preview h3 { font-size: 16px; margin-bottom: 12px; font-family: var(--display); color: var(--accent); }
+.finder-preview p { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 8px; }
+.finder-preview-back { font-size: 12px; color: var(--accent); cursor: pointer; margin-bottom: 16px; display: inline-block; }
+.finder-preview-back:hover { text-decoration: underline; }
+
+/* =================== APP: CURRENTLY INTO =================== */
+.currently-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.currently-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.currently-card h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 8px; font-family: var(--mono); }
+.currently-card .item { font-size: 13px; padding: 4px 0; display: flex; align-items: center; gap: 8px; }
+.currently-card .item-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 4px currentColor; }
+
+/* =================== CURSOR TRAIL =================== */
+.cursor-dot {
+  position: fixed;
+  width: 6px; height: 6px;
+  pointer-events: none;
+  z-index: 99998;
+  opacity: 0.6;
+  transition: opacity 0.3s, transform 0.3s;
+  /* Holographic diamond shape */
+  background: var(--accent);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+.cursor-dot:nth-child(odd) { background: var(--pink); }
+.cursor-dot:nth-child(3n) { background: var(--blue); }
+.cursor-dot.fade { opacity: 0; transform: scale(0) rotate(90deg); }
+
+/* =================== MOBILE =================== */
+@media (max-width: 768px) {
+  .desktop-icons { flex-direction: row; flex-wrap: wrap; max-width: 100%; justify-content: center; padding: 16px; }
+  .window { position: fixed !important; inset: 0 !important; width: 100vw !important; height: calc(100vh - var(--taskbar-h)) !important; border-radius: 0 !important; min-width: unset !important; min-height: unset !important; }
+  .watermark-canvas { display: none; }
+  .cmd-box { border-radius: 0; }
+  .taskbar { left: 8px; right: 8px; transform: none; width: auto; max-width: none; border-radius: 14px; bottom: 8px; padding: 6px 12px; }
+  .crt-vignette { display: none; }
+}
+
+/* =================== SCREENSAVER =================== */
+.screensaver {
+  position: fixed; inset: 0; background: #000; z-index: 80000;
+  display: none; cursor: pointer; overflow: hidden;
+}
+.screensaver.active { display: block; }
+
+/* Static noise for screensaver */
+.screensaver-noise {
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+  animation: staticNoise 0.15s steps(5) infinite;
+}
+@keyframes staticNoise {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-5%, 5%); }
+  40% { transform: translate(5%, -5%); }
+  60% { transform: translate(-5%, -5%); }
+  80% { transform: translate(5%, 5%); }
+  100% { transform: translate(0, 0); }
+}
+
+.screensaver-text {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--mono);
+  font-size: 18px;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(255,255,255,0.1);
+  animation: signalPulse 2s ease-in-out infinite;
+}
+@keyframes signalPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+/* =================== KONAMI =================== */
+.cheese-rain { position: fixed; inset: 0; pointer-events: none; z-index: 90000; }
+.cheese-drop { position: absolute; animation: cheeseFall linear forwards; }
+.cheese-drop svg { width: 32px; height: 32px; }
+@keyframes cheeseFall { from { transform: translateY(-50px) rotate(0deg); } to { transform: translateY(110vh) rotate(360deg); } }
+
+/* =================== CLOCK TOOLTIP =================== */
+.clock-tooltip {
+  position: absolute; bottom: calc(var(--taskbar-h) + 8px); right: 12px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 14px; font-size: 12px; color: var(--accent);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 12px rgba(0,255,204,0.1);
+  white-space: nowrap; pointer-events: none;
+  animation: tooltipFade 0.2s ease-out;
+  z-index: 9999;
+  font-family: var(--mono);
+}
+@keyframes tooltipFade { from { opacity: 0; transform: translateY(4px); } }
+
+/* =================== GC WALLPAPER =================== */
+.gc-wallpaper {
+  position: fixed; inset: 0; z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+  overflow: hidden;
+}
+.gc-wallpaper.show { opacity: 0.2; }
+
+/* =================== CSS ICON SVG =================== */
+.icon-img svg { width: 28px; height: 28px; display: block; }
+
+/* =================== MUSICAL SCALE TOAST =================== */
+.melody-toast {
+  position: fixed;
+  top: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 13px;
+  color: var(--accent);
+  font-family: var(--mono);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 16px rgba(0,255,204,0.15);
+  z-index: 99999;
+  animation: toastIn 0.3s ease-out, toastOut 0.3s ease-in 2.5s forwards;
+  pointer-events: none;
+  text-shadow: 0 0 6px rgba(0,255,204,0.3);
+}
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
+@keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
+
+/* =================== DOCK BOUNCE =================== */
+@keyframes dockBounce {
+  0% { transform: translateY(0); }
+  20% { transform: translateY(-10px); }
+  40% { transform: translateY(0); }
+  55% { transform: translateY(-6px); }
+  70% { transform: translateY(0); }
+  85% { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}
+.tb-app.bouncing { animation: dockBounce 0.6s ease-out; }
+
+/* =================== SNAP INDICATOR =================== */
+.snap-indicator {
+  position: fixed;
+  background: rgba(0, 255, 204, 0.06);
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius);
+  z-index: 50;
+  pointer-events: none;
+  transition: all 0.15s ease-out;
+  box-shadow: 0 0 20px rgba(0,255,204,0.08);
+}
+
+/* =================== DESKTOP TOY =================== */
+.desktop-toy {
+  position: fixed;
+  pointer-events: none;
+  z-index: 5;
+  width: 12px; height: 12px;
+  background: transparent;
+  /* Holographic diamond */
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  box-shadow: 0 0 8px var(--accent);
+}
+
+/* =================== SPARKLE =================== */
+@keyframes sparkle {
+  0% { transform: scale(0) rotate(0deg); opacity: 1; }
+  50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+.sparkle {
+  position: fixed; width: 8px; height: 8px;
+  pointer-events: none; z-index: 99999;
+  animation: sparkle 0.6s ease-out forwards;
+}
+.sparkle::before, .sparkle::after {
+  content: ''; position: absolute; background: var(--accent); border-radius: 1px;
+}
+.sparkle::before { width: 100%; height: 2px; top: 50%; left: 0; transform: translateY(-50%); }
+.sparkle::after { width: 2px; height: 100%; left: 50%; top: 0; transform: translateX(-50%); }
+
+/* =================== MATRIX RAIN =================== */
+.matrix-overlay {
+  position: fixed; inset: 0; z-index: 85000;
+  background: rgba(0,0,0,0.9);
+  pointer-events: none;
+  display: none;
+}
+.matrix-overlay.active { display: block; }
+.matrix-col {
+  position: absolute; top: 0;
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--green);
+  text-shadow: 0 0 8px var(--green);
+  writing-mode: vertical-lr;
+  animation: matrixFall linear forwards;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+@keyframes matrixFall {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100vh); }
+}
+
+/* =================== RADIO VISUALIZER =================== */
+.radio-overlay {
+  position: fixed; inset: 0; z-index: 85000;
+  background: rgba(8,8,15,0.95);
+  display: none; align-items: center; justify-content: center;
+  flex-direction: column;
+  cursor: pointer;
+}
+.radio-overlay.active { display: flex; }
+.radio-bars {
+  display: flex; align-items: flex-end; gap: 4px; height: 120px;
+}
+.radio-bar {
+  width: 6px;
+  background: linear-gradient(0deg, var(--accent), var(--pink));
+  border-radius: 3px 3px 0 0;
+  animation: radioBar 0.5s ease-in-out infinite alternate;
+  box-shadow: 0 0 6px var(--accent);
+}
+@keyframes radioBar {
+  from { height: 10px; }
+  to { height: 100px; }
+}
+.radio-label {
+  font-family: var(--mono); font-size: 12px;
+  color: var(--accent); margin-top: 20px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+</style>
+</head>
+<body>
+
+<!-- BOOT SCREEN -->
+<div id="boot-screen">
+  <div class="boot-static"></div>
+  <div class="boot-tracking"></div>
+  <div class="boot-signal" id="bootSignal">SIGNAL ACQUIRED</div>
+  <div class="boot-lines" id="bootLines"></div>
+  <div class="boot-bar"><div class="boot-bar-fill"></div></div>
+</div>
+
+<!-- DESKTOP -->
+<div id="desktop" class="desktop-glitch">
+  <div class="desktop-bg"></div>
+  <div class="scanlines"></div>
+  <div class="crt-vignette"></div>
+  <div class="floating-particles" id="particles"></div>
+  <div class="gc-wallpaper" id="gcWallpaper"></div>
+  <canvas class="watermark-canvas" id="watermarkCanvas"></canvas>
+  <div class="desktop-icons" id="desktopIcons"></div>
+  <div id="windowContainer"></div>
+
+  <!-- Taskbar / Dock -->
+  <div class="taskbar">
+    <button class="tb-start" id="startBtn" title="Start">R</button>
+    <div class="tb-divider"></div>
+    <div class="tb-apps" id="tbApps"></div>
+    <div class="tb-tray">
+      <button class="tb-tray-btn" id="nightToggle" onclick="toggleDayMode()" title="Defragment">DEFRAG</button>
+      <div class="lang-toggle-seg" id="langToggle">
+        <button class="lang-seg active" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-seg" data-lang="jp" onclick="setLang('jp')">JP</button>
+      </div>
+      <span id="clock"></span>
+    </div>
+  </div>
+</div>
+
+<!-- Command Palette -->
+<div class="cmd-overlay" id="cmdOverlay" onclick="if(event.target===this)closeCmdPalette()">
+  <div class="cmd-box">
+    <input class="cmd-input" id="cmdInput" placeholder="Search apps, commands, anything..." oninput="filterCommands()" onkeydown="handleCmdKey(event)">
+    <div class="cmd-results" id="cmdResults"></div>
+  </div>
+</div>
+
+<!-- Context Menu -->
+<div class="ctx-menu" id="ctxMenu"></div>
+
+<!-- Screensaver (lost signal) -->
+<div class="screensaver" id="screensaver" onclick="hideScreensaver()">
+  <div class="screensaver-noise"></div>
+  <div class="screensaver-text">SIGNAL LOST — CLICK TO RECONNECT</div>
+</div>
+
+<!-- Cheese Rain -->
+<div class="cheese-rain" id="cheeseRain"></div>
+
+<!-- Matrix Rain -->
+<div class="matrix-overlay" id="matrixOverlay"></div>
+
+<!-- Radio Visualizer -->
+<div class="radio-overlay" id="radioOverlay" onclick="hideRadio()"></div>
+
+<script>
+// =================== STATE ===================
+let lang = 'en';
+let windows = [];
+let nextZ = 100;
+let nextWinId = 1;
+let focusedWinId = null;
+let idleTimer = null;
+const IDLE_TIMEOUT = 120000;
+let dayMode = false;
+let holoAngle = 0;
+
+// Animate holographic border angle
+function animateHoloBorder() {
+  holoAngle = (holoAngle + 0.5) % 360;
+  document.querySelectorAll('.window').forEach(w => {
+    w.style.setProperty('--holo-angle', holoAngle + 'deg');
+  });
+  requestAnimationFrame(animateHoloBorder);
+}
+requestAnimationFrame(animateHoloBorder);
+
+// Periodic global glitch tear
+function scheduleGlitch() {
+  const delay = 15000 + Math.random() * 15000; // 15-30s
+  setTimeout(() => {
+    const desktop = document.getElementById('desktop');
+    desktop.classList.add('active');
+    setTimeout(() => desktop.classList.remove('active'), 150);
+    scheduleGlitch();
+  }, delay);
+}
+scheduleGlitch();
+
+// =================== SOUND SYSTEM ===================
+let audioCtx = null;
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+document.addEventListener('click', () => { initAudio(); startAmbientHum(); }, { once: true });
+
+// VHS hum (barely audible)
+let ambientNode = null;
+function startAmbientHum() {
+  if (!audioCtx || ambientNode) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(60, audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.003, audioCtx.currentTime);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start();
+  ambientNode = osc;
+}
+
+function playBoop(freq = 520, duration = 0.08, vol = 0.12, type = 'square') {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(freq * 0.5, audioCtx.currentTime + duration);
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+// Bitcrushed blip for icon hover
+function playHoverBlip(freq = 800) {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.03);
+}
+
+// Musical icon scale — synth minor pentatonic
+const musicalScale = {
+  welcome:   { freq: 220.00, note: 'A3' },
+  projects:  { freq: 261.63, note: 'C4' },
+  terminal:  { freq: 293.66, note: 'D4' },
+  gallery:   { freq: 329.63, note: 'E4' },
+  currently: { freq: 392.00, note: 'G4' },
+  gc:        { freq: 440.00, note: 'A4' },
+  japan:     { freq: 523.25, note: 'C5' },
+  trash:     { freq: 587.33, note: 'D5' },
+};
+const scaleOrder = ['welcome','projects','terminal','gallery','currently','gc','japan','trash'];
+let scaleProgress = 0;
+let melodyUnlocked = false;
+
+function playScaleNote(appId) {
+  const note = musicalScale[appId];
+  if (!note) return;
+  // Play as synth tone
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(note.freq, audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.2);
+
+  if (scaleOrder[scaleProgress] === appId) {
+    scaleProgress++;
+    if (scaleProgress >= scaleOrder.length && !melodyUnlocked) {
+      melodyUnlocked = true;
+      triggerMelodyUnlocked();
+    }
+  } else if (scaleOrder[0] === appId) {
+    scaleProgress = 1;
+  } else {
+    scaleProgress = 0;
+  }
+}
+
+function triggerMelodyUnlocked() {
+  // Full synth arpeggio
+  scaleOrder.forEach((id, i) => {
+    setTimeout(() => {
+      const note = musicalScale[id];
+      if (!audioCtx || !note) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(note.freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.25);
+    }, i * 100);
+  });
+  // Sparkle all icons
+  document.querySelectorAll('.desktop-icon').forEach(icon => {
+    const rect = icon.getBoundingClientRect();
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        const sp = document.createElement('div');
+        sp.className = 'sparkle';
+        sp.style.left = (rect.left + Math.random() * rect.width) + 'px';
+        sp.style.top = (rect.top + Math.random() * rect.height) + 'px';
+        document.body.appendChild(sp);
+        setTimeout(() => sp.remove(), 600);
+      }, i * 100);
+    }
+  });
+  const toast = document.createElement('div');
+  toast.className = 'melody-toast';
+  toast.textContent = '// FREQUENCY UNLOCKED //';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function playWindowOpen() {
+  if (!audioCtx) return;
+  // Digital materialize — ascending noise sweep
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(2000, audioCtx.currentTime + 0.15);
+  gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.15);
+}
+
+function playWindowClose() {
+  if (!audioCtx) return;
+  // Descending glitch
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + 0.12);
+  gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.12);
+}
+
+function playTypeBoop() {
+  if (!audioCtx) return;
+  // Mechanical click with bitcrush feel
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(1800 + Math.random() * 600, audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.02);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.02);
+}
+
+// =================== I18N ===================
+const i18n = {
+  en: {
+    welcome_title: 'Welcome to RikaOS!',
+    welcome_body: `<p>Hey! I'm <strong>Rika Ciminieri</strong> — half-Japanese full-stack engineer at Eventbrite.</p>
+<p>Former microbiology student turned tech advocate. I pivoted from petri dishes to pixels because I realized I liked debugging code more than debugging cell cultures.</p>
+<p>I paint, build tiny book nooks, do pilates, have deeply researched One Piece theories, and rank grilled cheeses competitively. I go to Japan almost every year.</p>
+<p class="aside">Currently into: Bridgerton, The Traitors, Heated Rivalry, learning AI, Monopoly Deal, and learning how to sing.</p>
+<p class="aside">Pro tip: Press Cmd+K to open the command palette. Right-click anywhere for more options.</p>`,
+    about: 'About',
+    projects: 'Projects',
+    terminal: 'Terminal',
+    gallery: 'Gallery',
+    gc: 'Grilled Cheese',
+    trash: 'Trash',
+    currently: 'Currently',
+    japan: 'Japan',
+  },
+  jp: {
+    welcome_title: 'RikaOSへようこそ！',
+    welcome_body: `<p>こんにちは！<strong>Rika Ciminieri</strong>です。日米ハーフのフルスタックエンジニアで、Eventbriteで働いています。</p>
+<p>元微生物学の学生からテック業界へ転身。シャーレの培養よりコードのデバッグの方が好きだと気づきました。</p>
+<p>絵を描いたり、小さなブックヌックを作ったり、ピラティスをしたり、ワンピースの考察を深く研究したり、グリルドチーズのランキングも本気でやっています。</p>
+<p class="aside">ヒント: Cmd+Kでコマンドパレットを開けます。右クリックでメニューも。</p>`,
+    about: 'プロフィール',
+    projects: 'プロジェクト',
+    terminal: 'ターミナル',
+    gallery: 'ギャラリー',
+    gc: 'グリルドチーズ',
+    trash: 'ゴミ箱',
+    currently: '今ハマってる',
+    japan: '日本',
+  }
+};
+function t(key) { return i18n[lang][key] || i18n.en[key] || key; }
+
+// =================== CSS-ART ICON SVGs ===================
+const iconSVGs = {
+  // Signal/broadcast icon (concentric arcs)
+  welcome: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(0,255,204,0.8)" stroke-width="1.5" stroke-linecap="round"><circle cx="16" cy="20" r="2" fill="rgba(0,255,204,0.6)" stroke="none"/><path d="M10 17a8 8 0 0 1 12 0" fill="none"/><path d="M7 14a12 12 0 0 1 18 0" fill="none" opacity="0.7"/><path d="M4 11a16 16 0 0 1 24 0" fill="none" opacity="0.4"/><line x1="16" y1="22" x2="16" y2="27" stroke-width="1.2"/></svg>',
+  // Code brackets with cursor
+  projects: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(51,102,255,0.8)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 8L5 16l6 8"/><path d="M21 8l6 8-6 8"/><line x1="18" y1="6" x2="14" y2="26" stroke-width="1.2" opacity="0.5"/><rect x="14" y="14" width="1.5" height="5" rx="0.5" fill="rgba(51,102,255,0.6)" stroke="none"><animate attributeName="opacity" values="1;0;1" dur="0.8s" repeatCount="indefinite"/></rect></svg>',
+  // Monitor with >_
+  terminal: '<svg viewBox="0 0 32 32" fill="none" stroke-linecap="round"><rect x="4" y="5" width="24" height="18" rx="2" fill="rgba(0,0,0,0.3)" stroke="rgba(51,255,153,0.5)" stroke-width="1"/><path d="M9 12l4 4-4 4" stroke="rgba(51,255,153,0.8)" stroke-width="1.5" fill="none"/><line x1="16" y1="20" x2="22" y2="20" stroke="rgba(51,255,153,0.5)" stroke-width="1.2"/><line x1="14" y1="26" x2="18" y2="26" stroke="rgba(51,255,153,0.4)" stroke-width="1.5"/></svg>',
+  // Diamond/gem faceted
+  gallery: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,51,153,0.7)" stroke-width="1.2"><polygon points="16,4 28,12 16,28 4,12" fill="rgba(255,51,153,0.08)"/><line x1="16" y1="4" x2="16" y2="28" opacity="0.4"/><line x1="4" y1="12" x2="28" y2="12" opacity="0.4"/><line x1="16" y1="4" x2="4" y2="12"/><line x1="16" y1="4" x2="28" y2="12"/><line x1="4" y1="12" x2="16" y2="28"/><line x1="28" y1="12" x2="16" y2="28"/><line x1="10" y1="8" x2="16" y2="28" opacity="0.3"/><line x1="22" y1="8" x2="16" y2="28" opacity="0.3"/></svg>',
+  // Radio wave / frequency bars
+  currently: '<svg viewBox="0 0 32 32" fill="none" stroke-linecap="round"><rect x="4" y="22" width="3" height="6" rx="1" fill="rgba(0,255,204,0.5)"><animate attributeName="height" values="6;14;6" dur="1s" repeatCount="indefinite"/><animate attributeName="y" values="22;14;22" dur="1s" repeatCount="indefinite"/></rect><rect x="9" y="18" width="3" height="10" rx="1" fill="rgba(255,51,153,0.5)"><animate attributeName="height" values="10;4;10" dur="0.8s" repeatCount="indefinite"/><animate attributeName="y" values="18;24;18" dur="0.8s" repeatCount="indefinite"/></rect><rect x="14" y="10" width="3" height="18" rx="1" fill="rgba(51,102,255,0.5)"><animate attributeName="height" values="18;8;18" dur="1.2s" repeatCount="indefinite"/><animate attributeName="y" values="10;20;10" dur="1.2s" repeatCount="indefinite"/></rect><rect x="19" y="14" width="3" height="14" rx="1" fill="rgba(255,204,0,0.5)"><animate attributeName="height" values="14;6;14" dur="0.9s" repeatCount="indefinite"/><animate attributeName="y" values="14;22;14" dur="0.9s" repeatCount="indefinite"/></rect><rect x="24" y="20" width="3" height="8" rx="1" fill="rgba(0,255,204,0.5)"><animate attributeName="height" values="8;16;8" dur="1.1s" repeatCount="indefinite"/><animate attributeName="y" values="20;12;20" dur="1.1s" repeatCount="indefinite"/></rect></svg>',
+  // Abstract cheese wedge (geometric)
+  gc: '<svg viewBox="0 0 32 32" fill="none"><polygon points="6,24 26,24 26,10 6,18" fill="rgba(255,204,0,0.15)" stroke="rgba(255,204,0,0.7)" stroke-width="1.2" stroke-linejoin="round"/><circle cx="14" cy="20" r="2" fill="rgba(255,204,0,0.25)" stroke="rgba(255,204,0,0.5)" stroke-width="0.8"/><circle cx="20" cy="18" r="1.5" fill="rgba(255,204,0,0.2)" stroke="rgba(255,204,0,0.4)" stroke-width="0.8"/><circle cx="10" cy="21" r="1" fill="rgba(255,204,0,0.2)" stroke="rgba(255,204,0,0.4)" stroke-width="0.8"/><line x1="26" y1="10" x2="26" y2="24" stroke="rgba(255,204,0,0.6)" stroke-width="1.5"/></svg>',
+  // Torii gate (clean line art)
+  japan: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,51,153,0.7)" stroke-width="1.8" stroke-linecap="round"><line x1="8" y1="10" x2="8" y2="28"/><line x1="24" y1="10" x2="24" y2="28"/><path d="M4 10Q16 6 28 10" stroke-width="2.5"/><line x1="6" y1="15" x2="26" y2="15" stroke-width="1.3"/><circle cx="27" cy="6" r="2" fill="rgba(255,204,0,0.4)" stroke="none"/></svg>',
+  // Recycle with glitch
+  trash: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(106,106,138,0.6)" stroke-width="1.3" stroke-linecap="round"><path d="M16 6l6 10H10z" fill="rgba(106,106,138,0.08)"/><path d="M10 16l-6 10h12" fill="rgba(106,106,138,0.08)"/><path d="M22 16l6 10H16" fill="rgba(106,106,138,0.08)"/><path d="M16 6l6 10"/><path d="M22 16l6 10"/><path d="M28 26H16"/><path d="M10 26l-6-10"/><path d="M4 16h6"/><path d="M10 16L16 6"/><line x1="14" y1="3" x2="18" y2="3" stroke="rgba(255,68,68,0.4)" stroke-width="3"/></svg>',
+};
+
+// =================== FINDER FILE ICONS ===================
+const fileIcons = {
+  doc: '<svg viewBox="0 0 20 20" fill="none" stroke="rgba(0,255,204,0.6)" stroke-width="1"><rect x="3" y="2" width="14" height="16" rx="1.5"/><line x1="6" y1="6" x2="14" y2="6" opacity="0.5"/><line x1="6" y1="9" x2="14" y2="9" opacity="0.5"/><line x1="6" y1="12" x2="10" y2="12" opacity="0.5"/></svg>',
+  spreadsheet: '<svg viewBox="0 0 20 20" fill="none" stroke="rgba(51,255,153,0.6)" stroke-width="1"><rect x="3" y="2" width="14" height="16" rx="1.5"/><line x1="3" y1="7" x2="17" y2="7"/><line x1="3" y1="12" x2="17" y2="12"/><line x1="10" y1="2" x2="10" y2="18"/></svg>',
+  folder: '<svg viewBox="0 0 20 20" fill="none" stroke="rgba(255,204,0,0.6)" stroke-width="1"><path d="M2 5h6l2 2h8v10H2z" fill="rgba(255,204,0,0.08)"/></svg>',
+  music: '<svg viewBox="0 0 20 20" fill="none" stroke="rgba(255,51,153,0.6)" stroke-width="1.2"><circle cx="7" cy="14" r="3" fill="rgba(255,51,153,0.1)"/><line x1="10" y1="14" x2="10" y2="4"/><path d="M10 4l5 2v3l-5-2" fill="rgba(255,51,153,0.15)"/></svg>',
+  text: '<svg viewBox="0 0 20 20" fill="none" stroke="rgba(106,106,138,0.6)" stroke-width="1"><rect x="3" y="2" width="14" height="16" rx="1.5"/><line x1="6" y1="6" x2="14" y2="6" opacity="0.4"/><line x1="6" y1="9" x2="12" y2="9" opacity="0.4"/></svg>',
+  image: '<svg viewBox="0 0 20 20" fill="none" stroke="rgba(51,102,255,0.6)" stroke-width="1"><rect x="3" y="3" width="14" height="14" rx="1.5"/><circle cx="8" cy="8" r="2" fill="rgba(51,102,255,0.15)"/><path d="M3 14l5-5 3 3 2-2 4 4" fill="rgba(51,102,255,0.1)"/></svg>',
+  game: '<svg viewBox="0 0 20 20" fill="none" stroke="rgba(255,204,0,0.6)" stroke-width="1.2"><rect x="2" y="6" width="16" height="10" rx="3"/><circle cx="13" cy="11" r="1.5" fill="rgba(255,204,0,0.2)"/><line x1="6" y1="9" x2="6" y2="13"/><line x1="4" y1="11" x2="8" y2="11"/></svg>',
+  lock: '<svg viewBox="0 0 20 20" fill="none" stroke="rgba(255,68,68,0.5)" stroke-width="1"><rect x="5" y="9" width="10" height="8" rx="1.5" fill="rgba(255,68,68,0.06)"/><path d="M7 9V6a3 3 0 0 1 6 0v3"/></svg>',
+};
+
+// =================== APPS ===================
+const apps = [
+  { id: 'welcome', label: () => t('about'), w: 520, h: 420 },
+  { id: 'projects', label: () => t('projects'), w: 700, h: 500 },
+  { id: 'terminal', label: () => t('terminal'), w: 640, h: 420 },
+  { id: 'gallery', label: () => t('gallery'), w: 680, h: 460 },
+  { id: 'currently', label: () => t('currently'), w: 480, h: 400 },
+  { id: 'gc', label: () => t('gc'), w: 720, h: 520 },
+  { id: 'japan', label: () => t('japan'), w: 520, h: 440 },
+  { id: 'trash', label: () => t('trash'), w: 560, h: 420 },
+];
+
+// =================== BOOT ===================
+const bootMessages = [
+  { text: 'RikaOS v3.0 [HOLOGRAPHIC] — acquiring signal...', delay: 0 },
+  { text: 'mounting /dev/portfolio...                         [OK]', cls: 'ok', delay: 300 },
+  { text: 'loading bilingual engine: en_US + ja_JP...         [OK]', cls: 'ok', delay: 500 },
+  { text: 'calibrating holographic projector...               [OK]', cls: 'ok', delay: 700 },
+  { text: 'initializing chromatic aberration engine...        [OK]', cls: 'ok', delay: 1000 },
+  { text: 'pilates.service — skipped (it\'s not 7am)          [WARN]', cls: 'warn', delay: 1200 },
+  { text: 'glitch_subsystem: operating within parameters      [OK]', cls: 'ok', delay: 1400 },
+  { text: 'signal stable. welcome home, rika.', cls: 'ok', delay: 1700 },
+];
+
+function runBoot() {
+  const container = document.getElementById('bootLines');
+  bootMessages.forEach(msg => {
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.textContent = msg.text;
+      if (msg.cls) div.classList.add(msg.cls);
+      container.appendChild(div);
+    }, msg.delay);
+  });
+  setTimeout(() => {
+    document.getElementById('boot-screen').classList.add('done');
+    document.getElementById('desktop').classList.add('visible');
+    setTimeout(() => {
+      document.getElementById('boot-screen').style.display = 'none';
+      openApp('welcome');
+    }, 800);
+  }, 2600);
+}
+
+// =================== FLOATING PARTICLES ===================
+function initParticles() {
+  const container = document.getElementById('particles');
+  const colors = ['var(--accent)', 'var(--pink)', 'var(--blue)', 'var(--gold)', 'var(--green)'];
+  // Holographic shards (triangles)
+  for (let i = 0; i < 10; i++) {
+    const p = document.createElement('div');
+    p.className = 'holo-particle shard';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.borderBottomColor = colors[Math.floor(Math.random() * colors.length)];
+    const scale = 0.5 + Math.random() * 1;
+    p.style.transform = `scale(${scale})`;
+    p.style.animationDuration = (18 + Math.random() * 20) + 's';
+    p.style.animationDelay = Math.random() * 25 + 's';
+    container.appendChild(p);
+  }
+  // Scan line ghosts (horizontal lines)
+  for (let i = 0; i < 6; i++) {
+    const p = document.createElement('div');
+    p.className = 'holo-particle line';
+    p.style.left = Math.random() * 80 + '%';
+    const c = colors[Math.floor(Math.random() * colors.length)];
+    p.style.background = `linear-gradient(90deg, transparent, ${c.replace('var(--','').replace(')','') === 'accent' ? 'rgba(0,255,204,0.3)' : 'rgba(255,51,153,0.2)'}, transparent)`;
+    p.style.width = (20 + Math.random() * 60) + 'px';
+    p.style.animationDuration = (20 + Math.random() * 15) + 's';
+    p.style.animationDelay = Math.random() * 20 + 's';
+    container.appendChild(p);
+  }
+}
+
+// =================== DESKTOP ICONS ===================
+function renderDesktopIcons() {
+  const container = document.getElementById('desktopIcons');
+  container.innerHTML = '';
+  apps.forEach(app => {
+    const el = document.createElement('div');
+    el.className = 'desktop-icon';
+    el.ondblclick = () => openApp(app.id);
+    el.onmouseenter = () => playScaleNote(app.id);
+    el.innerHTML = `
+      <div class="icon-img">${iconSVGs[app.id] || ''}</div>
+      <div class="icon-label">${app.label()}</div>
+    `;
+    container.appendChild(el);
+  });
+}
+
+// =================== WINDOW MANAGER ===================
+function openApp(appId) {
+  const existing = windows.find(w => w.appId === appId && !w.minimized);
+  if (existing) { focusWindow(existing.id); return; }
+
+  const existingMin = windows.find(w => w.appId === appId && w.minimized);
+  if (existingMin) {
+    existingMin.minimized = false;
+    const el = document.getElementById(`win-${existingMin.id}`);
+    if (el) { el.classList.remove('minimized'); el.style.display = ''; }
+    focusWindow(existingMin.id);
+    updateTaskbar();
+    return;
+  }
+
+  const app = apps.find(a => a.id === appId);
+  if (!app) return;
+
+  const id = nextWinId++;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const winW = Math.min(app.w, vw - 40);
+  const winH = Math.min(app.h, vh - 100);
+  const openCount = windows.filter(w => !w.minimized).length;
+  const offsetX = Math.min(220 + openCount * 30, vw - winW - 20);
+  const offsetY = Math.min(30 + openCount * 25, vh - winH - 80);
+
+  const win = { id, appId, x: offsetX, y: offsetY, w: winW, h: winH, z: nextZ++, minimized: false };
+  windows.push(win);
+  renderWindow(win, app);
+  focusWindow(id);
+  updateTaskbar();
+
+  playWindowOpen();
+
+  setTimeout(() => {
+    const tbApp = document.querySelector(`.tb-app[data-app="${appId}"]`);
+    if (tbApp) {
+      tbApp.classList.add('bouncing');
+      tbApp.addEventListener('animationend', () => tbApp.classList.remove('bouncing'), { once: true });
+    }
+  }, 350);
+}
+
+function renderWindow(win, app) {
+  const el = document.createElement('div');
+  el.className = 'window';
+  el.id = `win-${win.id}`;
+  el.style.left = win.x + 'px';
+  el.style.top = win.y + 'px';
+  el.style.width = win.w + 'px';
+  el.style.height = win.h + 'px';
+  el.style.zIndex = win.z;
+  el.onmousedown = () => focusWindow(win.id);
+  el.innerHTML = `
+    <div class="win-header" onmousedown="startDrag(event, ${win.id})">
+      <div class="win-dots">
+        <button class="win-dot close" onclick="closeWindow(${win.id})"></button>
+        <button class="win-dot minimize" onclick="minimizeWindow(${win.id})"></button>
+        <button class="win-dot maximize" onclick="maximizeWindow(${win.id})"></button>
+      </div>
+      <div class="win-title">${app.label()}</div>
+    </div>
+    <div class="win-body" id="win-body-${win.id}"></div>
+    <div class="win-resize" onmousedown="startResize(event, ${win.id})"></div>
+  `;
+  document.getElementById('windowContainer').appendChild(el);
+  renderAppContent(win.id, app.id);
+}
+
+function renderAppContent(winId, appId) {
+  const body = document.getElementById(`win-body-${winId}`);
+  if (!body) return;
+
+  switch (appId) {
+    case 'welcome':
+      body.innerHTML = `<div class="notepad-content"><h2>${t('welcome_title')}</h2>${t('welcome_body')}</div>`;
+      break;
+
+    case 'projects':
+      body.innerHTML = `<div class="projects-grid">
+        <div class="project-card">
+          <h3>This Portfolio</h3>
+          <p>A custom OS-style portfolio built from scratch. The site itself is the proof of competence — the code is the portfolio.</p>
+          <div class="tags"><span class="tag">React</span><span class="tag">Vite</span><span class="tag">Tailwind</span><span class="tag">TypeScript</span></div>
+        </div>
+        <div class="project-card">
+          <h3>Bilingual CMS</h3>
+          <p>Content management system with first-class EN/JP support. Vertical text, proper typography, and cultural sensitivity built in.</p>
+          <div class="tags"><span class="tag">Next.js</span><span class="tag">i18n</span><span class="tag">MDX</span></div>
+        </div>
+        <div class="project-card">
+          <h3>Event Platform</h3>
+          <p>Contributed to Eventbrite's core event discovery and ticketing. Search, recommendations, and checkout flows used by millions.</p>
+          <div class="tags"><span class="tag">React</span><span class="tag">Python</span><span class="tag">GraphQL</span></div>
+        </div>
+        <div class="project-card">
+          <h3>Lab Dashboard</h3>
+          <p>Real-time microbiology lab monitoring dashboard from my pre-tech days. Tracked cultures, experiments, and contamination alerts.</p>
+          <div class="tags"><span class="tag">D3.js</span><span class="tag">Flask</span><span class="tag">WebSockets</span></div>
+        </div>
+        <div class="project-card">
+          <h3>Grilled Cheese API</h3>
+          <p>A RESTful API for ranking grilled cheese sandwiches. Because someone had to bring rigor to this field.</p>
+          <div class="tags"><span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">PostgreSQL</span></div>
+        </div>
+        <div class="project-card">
+          <h3>AI Experiments</h3>
+          <p>Currently exploring AI-assisted development tools and agents. Building in public as I learn.</p>
+          <div class="tags"><span class="tag">Claude API</span><span class="tag">Python</span><span class="tag">LLMs</span></div>
+        </div>
+      </div>`;
+      break;
+
+    case 'terminal':
+      body.style.padding = '0';
+      body.innerHTML = `<div class="terminal" id="term-${winId}">
+        <div id="term-output-${winId}"><span class="output">RikaOS Terminal v3.0 [HOLOGRAPHIC] — type "help" for commands\n\n</span></div>
+        <div class="term-input-line">
+          <span class="prompt">rika@holo ~ % </span>
+          <input class="term-input" id="term-input-${winId}" autofocus onkeydown="if(event.key==='Enter')execTermCmd(${winId}); else playTypeBoop();">
+        </div>
+      </div>`;
+      setTimeout(() => { const inp = document.getElementById(`term-input-${winId}`); if (inp) inp.focus(); }, 100);
+      break;
+
+    case 'gallery':
+      body.innerHTML = `<h3 style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:16px;color:var(--accent);">The Gallery</h3>
+      <div class="gallery-scroll">
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,rgba(255,153,86,0.2),rgba(255,107,61,0.2));border-color:rgba(255,153,86,0.3);"><svg viewBox="0 0 64 64" fill="none" stroke="rgba(255,153,86,0.7)" stroke-width="1.5"><circle cx="32" cy="20" r="8" fill="rgba(255,153,86,0.15)"/><path d="M10 50Q20 30 32 40Q44 30 54 50" fill="rgba(255,107,61,0.1)"/><line x1="32" y1="28" x2="32" y2="50" opacity="0.3"/></svg></div><h4>Sunset Over Shibuya</h4><p>Paint-by-numbers, acrylic on canvas. Made for a friend who studied abroad in Tokyo.</p></div>
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,rgba(139,94,60,0.2),rgba(196,149,106,0.2));border-color:rgba(139,94,60,0.3);"><svg viewBox="0 0 64 64" fill="none" stroke="rgba(196,149,106,0.7)" stroke-width="1.5"><rect x="16" y="20" width="32" height="28" rx="3" fill="rgba(139,94,60,0.1)"/><path d="M20 20V16a12 12 0 0 1 24 0v4" fill="none"/><rect x="24" y="30" width="6" height="8" rx="1" fill="rgba(255,204,100,0.2)" stroke="rgba(255,204,100,0.4)"/><rect x="34" y="32" width="6" height="6" rx="1" fill="rgba(255,204,100,0.15)" stroke="rgba(255,204,100,0.3)"/></svg></div><h4>Hobbit Hole Book Nook</h4><p>My first book nook! Balsa wood, LED lights, and way too much hot glue.</p></div>
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,rgba(26,115,232,0.2),rgba(78,205,196,0.2));border-color:rgba(26,115,232,0.3);"><svg viewBox="0 0 64 64" fill="none" stroke="rgba(78,205,196,0.7)" stroke-width="1.5"><path d="M8 36Q20 24 32 36Q44 24 56 36" fill="rgba(26,115,232,0.1)"/><path d="M8 40Q20 28 32 40Q44 28 56 40" fill="rgba(78,205,196,0.08)"/><circle cx="44" cy="16" r="6" fill="rgba(255,204,0,0.15)" stroke="rgba(255,204,0,0.4)"/></svg></div><h4>The Great Wave (Remix)</h4><p>Paint-by-numbers reinterpretation of Hokusai's classic. Took 3 weekends.</p></div>
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(167,139,250,0.2));border-color:rgba(124,58,237,0.3);"><svg viewBox="0 0 64 64" fill="none" stroke="rgba(167,139,250,0.7)" stroke-width="1.5"><rect x="12" y="16" width="40" height="32" rx="2" fill="rgba(124,58,237,0.08)"/><rect x="18" y="22" width="10" height="14" rx="1" fill="rgba(255,204,100,0.15)" stroke="rgba(255,204,100,0.3)"/><rect x="32" y="22" width="14" height="8" rx="1" fill="rgba(167,139,250,0.1)"/><circle cx="39" cy="40" r="3" fill="rgba(255,204,100,0.2)" stroke="rgba(255,204,100,0.4)"/></svg></div><h4>Diagon Alley Nook</h4><p>Harry Potter-themed book nook with tiny shop windows that actually light up.</p></div>
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,rgba(255,143,163,0.2),rgba(255,183,197,0.2));border-color:rgba(255,143,163,0.3);"><svg viewBox="0 0 64 64" fill="none" stroke="rgba(255,143,163,0.7)" stroke-width="1.5"><circle cx="20" cy="24" r="4" fill="rgba(255,143,163,0.15)"/><circle cx="32" cy="18" r="5" fill="rgba(255,183,197,0.12)"/><circle cx="44" cy="22" r="3.5" fill="rgba(255,143,163,0.1)"/><line x1="20" y1="28" x2="20" y2="48" stroke-width="1" opacity="0.5"/><line x1="32" y1="23" x2="32" y2="48" stroke-width="1" opacity="0.5"/><line x1="44" y1="25.5" x2="44" y2="48" stroke-width="1" opacity="0.5"/></svg></div><h4>Cherry Blossom Garden</h4><p>After my last Kyoto trip. The pinks are slightly wrong and I love it.</p></div>
+      </div>`;
+      break;
+
+    case 'currently':
+      body.innerHTML = `
+        <h3 style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:16px;color:var(--accent);">What I'm Into Right Now</h3>
+        <div class="currently-grid">
+          <div class="currently-card">
+            <h4>Watching</h4>
+            <div class="item"><span class="item-dot" style="background:var(--pink);"></span> Bridgerton (rewatching... again)</div>
+            <div class="item"><span class="item-dot" style="background:var(--red);"></span> The Traitors</div>
+            <div class="item"><span class="item-dot" style="background:var(--gold);"></span> Terrace House</div>
+          </div>
+          <div class="currently-card">
+            <h4>Reading</h4>
+            <div class="item"><span class="item-dot" style="background:var(--accent);"></span> Heated Rivalry</div>
+            <div class="item"><span class="item-dot" style="background:var(--blue);"></span> One Piece (always)</div>
+          </div>
+          <div class="currently-card">
+            <h4>Playing</h4>
+            <div class="item"><span class="item-dot" style="background:var(--green);"></span> Monopoly Deal</div>
+            <div class="item"><span class="item-dot" style="background:var(--blue);"></span> Learning to sing</div>
+          </div>
+          <div class="currently-card">
+            <h4>Learning</h4>
+            <div class="item"><span class="item-dot" style="background:var(--gold);"></span> AI & LLMs</div>
+            <div class="item"><span class="item-dot" style="background:var(--pink);"></span> Building agents</div>
+            <div class="item"><span class="item-dot" style="background:var(--accent);"></span> Singing (badly)</div>
+          </div>
+          <div class="currently-card">
+            <h4>Listening</h4>
+            <div class="item"><span class="item-dot" style="background:var(--pink);"></span> Yoasobi — Idol</div>
+            <div class="item"><span class="item-dot" style="background:var(--accent);"></span> Dodo</div>
+            <div class="item"><span class="item-dot" style="background:var(--blue);"></span> City Pop playlists</div>
+          </div>
+          <div class="currently-card">
+            <h4>Hills I'll Die On</h4>
+            <div class="item"><span class="item-dot" style="background:var(--red);"></span> MJ is the king of pop</div>
+            <div class="item"><span class="item-dot" style="background:var(--gold);"></span> The Rock's Jumanji is good</div>
+            <div class="item"><span class="item-dot" style="background:var(--green);"></span> Health > everything</div>
+          </div>
+        </div>`;
+      break;
+
+    case 'japan':
+      body.innerHTML = `
+        <h3 style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:4px;color:var(--pink);">日本 — Japan</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Heritage, not decoration. I go almost every year.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <h4 style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;font-family:var(--mono);">Onsen Rankings</h4>
+            <div style="font-size:13px;line-height:2;"><span style="color:var(--gold);">1.</span> Kurokawa, Kumamoto<br><span style="color:var(--text-muted);">2.</span> Hakone open-air<br><span style="color:var(--pink);">3.</span> Kinosaki, Hyogo</div>
+          </div>
+          <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <h4 style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;font-family:var(--mono);">Konbini Tier List</h4>
+            <div style="font-size:13px;line-height:2;"><span style="color:var(--green);">S:</span> 7-Eleven<br><span style="color:var(--accent);">A:</span> FamilyMart<br><span style="color:var(--blue);">B:</span> Lawson</div>
+          </div>
+          <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <h4 style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;font-family:var(--mono);">Drama Corner</h4>
+            <div style="font-size:13px;line-height:1.8;">Hana Yori Dango — GOAT<br>Terrace House — deeply formative<br>Currently: nothing tops these</div>
+          </div>
+          <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <h4 style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;font-family:var(--mono);">Now Playing</h4>
+            <div style="font-size:13px;line-height:1.8;">Yoasobi — Idol (on repeat)<br>Dodo<br>City Pop playlists at 2am</div>
+          </div>
+        </div>`;
+      break;
+
+    case 'gc':
+      body.innerHTML = `
+        <h3 style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:20px;color:var(--gold);text-shadow:0 0 8px rgba(255,204,0,0.3);">The Grilled Cheese Olympics</h3>
+        <div class="gc-podium">
+          <div class="gc-podium-item silver"><div class="gc-medal silver-medal">#2</div><div class="gc-name">Truffle Melt</div><div class="gc-score">38/40</div></div>
+          <div class="gc-podium-item gold"><div class="gc-medal gold-medal">#1</div><div class="gc-name">The Classic</div><div class="gc-score">39/40</div></div>
+          <div class="gc-podium-item bronze"><div class="gc-medal bronze-medal">#3</div><div class="gc-name">Brie & Fig</div><div class="gc-score">36/40</div></div>
+        </div>
+        <h4 style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text);">Tournament Bracket</h4>
+        <div class="gc-bracket">
+          <div class="gc-round">
+            <div class="gc-match"><div class="gc-matchup winner">The Classic</div><div class="gc-matchup">Caprese</div></div>
+            <div class="gc-match"><div class="gc-matchup winner">Truffle Melt</div><div class="gc-matchup">French Onion</div></div>
+            <div class="gc-match"><div class="gc-matchup winner">Brie & Fig</div><div class="gc-matchup">Jalapeno Popper</div></div>
+            <div class="gc-match"><div class="gc-matchup">Starbucks One</div><div class="gc-matchup winner">Kimchi GC</div></div>
+          </div>
+          <div class="gc-round">
+            <div class="gc-match"><div class="gc-matchup winner">The Classic</div><div class="gc-matchup">Truffle Melt</div></div>
+            <div class="gc-match"><div class="gc-matchup winner">Brie & Fig</div><div class="gc-matchup">Kimchi GC</div></div>
+          </div>
+          <div class="gc-round">
+            <div class="gc-match"><div class="gc-matchup winner">The Classic</div><div class="gc-matchup">Brie & Fig</div></div>
+          </div>
+        </div>`;
+      break;
+
+    case 'trash':
+      body.style.padding = '0';
+      body.innerHTML = `<div class="finder" id="finder-${winId}">
+        <div class="finder-toolbar">
+          <span class="finder-path">/Users/rika/Desktop/definitely-not-important/</span>
+          <span style="font-family:var(--mono);font-size:10px;">12 items</span>
+        </div>
+        <div class="finder-list" id="finder-list-${winId}"></div>
+      </div>`;
+      renderFinderList(winId);
+      break;
+  }
+}
+
+// =================== FINDER (TRASH) ===================
+const finderFiles = [
+  { icon: 'doc', name: 'resume_final_FINAL_v3.docx', size: '847 KB', meta: 'Modified: way too many times', clickable: true,
+    content: { title: 'resume_final_FINAL_v3.docx', body: '<p>Wait, you actually opened this?</p><p>The real resume is the portfolio you\'re currently standing inside of. But nice try.</p><p style="margin-top:16px;font-style:italic;color:var(--text-muted);">— Rika, who has been through 47 versions of this document</p>' }},
+  { icon: 'spreadsheet', name: 'grilled-cheese-spreadsheet-v47.xlsx', size: '2.1 MB', meta: 'The sacred texts', clickable: true,
+    content: { title: 'The Sacred Spreadsheet', body: '<p>This spreadsheet has 47 versions because grilled cheese ranking is an iterative science.</p><p>Columns include: Cheese Pull (x/10), Crunch Factor (x/10), Flavor (x/10), and Vibes (x/10).</p><p>The "Vibes" column was controversial. I stand by it.</p>' }},
+  { icon: 'folder', name: 'photos-from-kyoto-2024/', size: '—', meta: 'Folder', disabled: true },
+  { icon: 'music', name: 'yoasobi-idol-loop-3hr.mp3', size: '312 MB', meta: 'No regrets', clickable: true,
+    content: { title: 'yoasobi-idol-loop-3hr.mp3', body: '<p>Three hours of Idol by Yoasobi on loop.</p><p>This is what peak productivity sounds like.</p><p style="font-family:var(--mono);font-size:12px;margin-top:12px;color:var(--accent);">// FREQUENCY: 128kbps // LOOP: INFINITE //</p>' }},
+  { icon: 'text', name: 'one-piece-theories-too-unhinged.txt', size: '94 KB', meta: 'Classified', disabled: true },
+  { icon: 'image', name: 'book-nook-progress-shots/', size: '—', meta: 'Folder', disabled: true },
+  { icon: 'doc', name: 'cover-letter-that-goes-too-hard.pdf', size: '156 KB', meta: 'They said "be authentic"', clickable: true,
+    content: { title: 'Cover Letter That Goes Too Hard', body: '<p>"Dear Hiring Manager,</p><p>I once spent 3 months building a grilled cheese ranking API. Not because anyone asked me to, but because I believe every passion deserves well-structured data.</p><p>I bring this same energy to everything I build. If you want someone who ships fast, cares deeply, and will definitely make your team laugh in standup — hi, I\'m Rika."</p>' }},
+  { icon: 'folder', name: 'screenshots-of-bugs-i-fixed/', size: '—', meta: 'The trophy case', disabled: true },
+  { icon: 'doc', name: 'things-i-will-learn-next.md', size: '12 KB', meta: 'Always growing', clickable: true,
+    content: { title: 'Things I Want to Learn Next', body: '<p>* Rust (because everyone says I should)<br>* WebGL / Three.js (for cooler portfolios)<br>* How to sing (seriously, I\'m taking lessons)<br>* Better Japanese kanji<br>* How to make the perfect croissant<br>* Prompt engineering (meta, I know)</p>' }},
+  { icon: 'game', name: 'monopoly-deal-win-streak.log', size: '4 KB', meta: 'Undefeated (almost)', disabled: true },
+  { icon: 'doc', name: 'bridgerton-hot-takes.txt', size: '28 KB', meta: 'Spoilers inside', clickable: true,
+    content: { title: 'Bridgerton Hot Takes', body: '<p>* Season 2 > Season 1 and I will not be taking questions<br>* The enemies-to-lovers tension was *chef\'s kiss*<br>* Anthony Bridgerton character development arc is elite<br>* Penelope\'s glow-up was everything<br>* I have rewatched the rain scene 14 times</p>' }},
+  { icon: 'lock', name: 'env-files-definitely-not-secrets/', size: '—', meta: 'Nice try, hacker', disabled: true },
+];
+
+function renderFinderList(winId) {
+  const list = document.getElementById(`finder-list-${winId}`);
+  if (!list) return;
+  list.innerHTML = finderFiles.map((f, i) => `
+    <div class="finder-item ${f.disabled ? 'disabled' : ''}" ${f.clickable ? `onclick="openFinderFile(${winId}, ${i})"` : ''}>
+      <span class="fi-icon">${fileIcons[f.icon] || ''}</span>
+      <span class="fi-name">${f.name}</span>
+      <span class="fi-meta">${f.meta}</span>
+      <span class="fi-size">${f.size}</span>
+    </div>
+  `).join('');
+}
+
+function openFinderFile(winId, fileIdx) {
+  const file = finderFiles[fileIdx];
+  if (!file?.content) return;
+  const list = document.getElementById(`finder-list-${winId}`);
+  list.innerHTML = `
+    <div class="finder-preview">
+      <div class="finder-preview-back" onclick="renderFinderList(${winId})">< Back</div>
+      <h3>${file.content.title}</h3>
+      ${file.content.body}
+    </div>
+  `;
+}
+
+// =================== WINDOW MANAGEMENT ===================
+function focusWindow(id) {
+  focusedWinId = id;
+  const win = windows.find(w => w.id === id);
+  if (win) win.z = nextZ++;
+  document.querySelectorAll('.window').forEach(el => {
+    el.classList.remove('focused');
+    const wid = parseInt(el.id.replace('win-', ''));
+    const w = windows.find(x => x.id === wid);
+    if (w) el.style.zIndex = w.z;
+  });
+  const el = document.getElementById(`win-${id}`);
+  if (el) el.classList.add('focused');
+  updateTaskbar();
+}
+
+function closeWindow(id) {
+  playWindowClose();
+  const el = document.getElementById(`win-${id}`);
+  if (el) {
+    el.style.transition = 'transform 0.2s, opacity 0.2s, filter 0.2s';
+    el.style.transform = 'scaleY(0.02) scaleX(0.5)';
+    el.style.filter = 'brightness(3)';
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 200);
+  }
+  windows = windows.filter(w => w.id !== id);
+  if (focusedWinId === id) focusedWinId = null;
+  updateTaskbar();
+}
+
+function minimizeWindow(id) {
+  playBoop(350, 0.08, 0.06, 'square');
+  const win = windows.find(w => w.id === id);
+  if (win) win.minimized = true;
+  const el = document.getElementById(`win-${id}`);
+  if (el) el.classList.add('minimized');
+  if (focusedWinId === id) focusedWinId = null;
+  updateTaskbar();
+}
+
+function maximizeWindow(id) {
+  const el = document.getElementById(`win-${id}`);
+  if (!el) return;
+  const win = windows.find(w => w.id === id);
+  if (!win) return;
+  if (win._maximized) {
+    el.style.left = win._prevX + 'px'; el.style.top = win._prevY + 'px';
+    el.style.width = win._prevW + 'px'; el.style.height = win._prevH + 'px';
+    win._maximized = false;
+  } else {
+    win._prevX = win.x; win._prevY = win.y; win._prevW = win.w; win._prevH = win.h;
+    el.style.left = '0'; el.style.top = '0'; el.style.width = '100vw';
+    el.style.height = `calc(100vh - var(--taskbar-h))`;
+    win._maximized = true;
+  }
+  focusWindow(id);
+}
+
+// =================== DRAG & RESIZE ===================
+let dragState = null;
+function startDrag(e, winId) {
+  if (e.target.classList.contains('win-dot')) return;
+  e.preventDefault();
+  const el = document.getElementById(`win-${winId}`);
+  const rect = el.getBoundingClientRect();
+  dragState = { type: 'drag', winId, startX: e.clientX, startY: e.clientY, origX: rect.left, origY: rect.top };
+  focusWindow(winId);
+}
+function startResize(e, winId) {
+  e.preventDefault(); e.stopPropagation();
+  const el = document.getElementById(`win-${winId}`);
+  const rect = el.getBoundingClientRect();
+  dragState = { type: 'resize', winId, startX: e.clientX, startY: e.clientY, origW: rect.width, origH: rect.height };
+  focusWindow(winId);
+}
+
+// =================== WINDOW SNAP ===================
+let snapIndicator = null;
+let currentSnapSide = null;
+const SNAP_THRESHOLD = 20;
+
+function updateSnapIndicator(mx, my) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  let side = null;
+  if (mx < SNAP_THRESHOLD) side = 'left';
+  else if (mx > vw - SNAP_THRESHOLD) side = 'right';
+  if (side) {
+    if (!snapIndicator) { snapIndicator = document.createElement('div'); snapIndicator.className = 'snap-indicator'; document.body.appendChild(snapIndicator); }
+    if (side === 'left') snapIndicator.style.cssText = `left:4px;top:4px;width:${vw/2-8}px;height:${vh-100}px;`;
+    else snapIndicator.style.cssText = `left:${vw/2+4}px;top:4px;width:${vw/2-8}px;height:${vh-100}px;`;
+  } else { removeSnapIndicator(); }
+  return side;
+}
+function removeSnapIndicator() { if (snapIndicator) { snapIndicator.remove(); snapIndicator = null; } }
+function snapWindow(winId, side) {
+  const el = document.getElementById(`win-${winId}`); const win = windows.find(w => w.id === winId);
+  if (!el || !win) return;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  if (side === 'left') { el.style.left='4px'; el.style.top='4px'; el.style.width=(vw/2-8)+'px'; el.style.height=(vh-100)+'px'; }
+  else { el.style.left=(vw/2+4)+'px'; el.style.top='4px'; el.style.width=(vw/2-8)+'px'; el.style.height=(vh-100)+'px'; }
+  win.x=parseInt(el.style.left); win.y=parseInt(el.style.top); win.w=parseInt(el.style.width); win.h=parseInt(el.style.height);
+  playBoop(200, 0.05, 0.08, 'square'); setTimeout(() => playBoop(250, 0.03, 0.06, 'square'), 30);
+  removeSnapIndicator();
+}
+
+document.addEventListener('mousemove', e => {
+  if (!dragState) return;
+  const el = document.getElementById(`win-${dragState.winId}`);
+  if (!el) return;
+  const win = windows.find(w => w.id === dragState.winId);
+  if (dragState.type === 'drag') {
+    const nx = dragState.origX + (e.clientX - dragState.startX);
+    const ny = dragState.origY + (e.clientY - dragState.startY);
+    el.style.left = nx + 'px'; el.style.top = ny + 'px';
+    if (win) { win.x = nx; win.y = ny; win._maximized = false; }
+    currentSnapSide = updateSnapIndicator(e.clientX, e.clientY);
+  } else if (dragState.type === 'resize') {
+    const nw = Math.max(320, dragState.origW + (e.clientX - dragState.startX));
+    const nh = Math.max(200, dragState.origH + (e.clientY - dragState.startY));
+    el.style.width = nw + 'px'; el.style.height = nh + 'px';
+    if (win) { win.w = nw; win.h = nh; }
+  }
+});
+document.addEventListener('mouseup', () => {
+  if (dragState && currentSnapSide) { snapWindow(dragState.winId, currentSnapSide); currentSnapSide = null; }
+  removeSnapIndicator();
+  dragState = null;
+});
+
+// =================== TASKBAR ===================
+function updateTaskbar() {
+  const container = document.getElementById('tbApps');
+  container.innerHTML = '';
+  windows.forEach(win => {
+    const app = apps.find(a => a.id === win.appId);
+    if (!app) return;
+    const btn = document.createElement('button');
+    btn.className = 'tb-app' + (win.id === focusedWinId && !win.minimized ? ' active' : '');
+    btn.dataset.app = win.appId;
+    btn.innerHTML = `<span class="tb-app-dot"></span>${app.label()}`;
+    btn.onclick = () => {
+      if (win.minimized) { win.minimized = false; const el = document.getElementById(`win-${win.id}`); if (el) { el.classList.remove('minimized'); el.style.display = ''; } }
+      focusWindow(win.id);
+    };
+    container.appendChild(btn);
+  });
+}
+
+// =================== CLOCK ===================
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+}
+setInterval(updateClock, 1000); updateClock();
+
+// =================== TERMINAL ===================
+function execTermCmd(winId) {
+  const input = document.getElementById(`term-input-${winId}`);
+  const output = document.getElementById(`term-output-${winId}`);
+  if (!input || !output) return;
+  const cmd = input.value.trim(); input.value = '';
+  playTypeBoop();
+  output.innerHTML += `<span class="prompt">rika@holo ~ % </span><span class="cmd-text">${escHtml(cmd)}</span>\n`;
+  const result = processCmd(cmd);
+  if (result) output.innerHTML += `<span class="output">${result}</span>\n`;
+  output.innerHTML += '\n';
+  const term = document.getElementById(`term-${winId}`);
+  if (term) term.scrollTop = term.scrollHeight;
+}
+
+function processCmd(cmd) {
+  const parts = cmd.split(/\s+/);
+  const c = parts[0]?.toLowerCase();
+  switch (c) {
+    case '': return '';
+    case 'help': return `Available commands:
+  <span class="highlight">help</span>        — show this help
+  <span class="highlight">whoami</span>      — who is rika?
+  <span class="highlight">ls</span>          — list apps
+  <span class="highlight">cat</span> [file]  — read a file (try: about.md, skills.md, currently.md)
+  <span class="highlight">open</span> [app]  — open an app
+  <span class="highlight">clear</span>       — clear terminal
+  <span class="highlight">neofetch</span>    — system info
+  <span class="highlight">fortune</span>     — random fortune
+  <span class="highlight">cowsay</span> [msg] — moo
+  <span class="highlight">history</span>     — command history
+  <span class="highlight">matrix</span>      — enter the matrix`;
+    case 'whoami': return `Rika Ciminieri\nHalf-Japanese full-stack engineer @ Eventbrite\nFormer microbiology student | Pilates enthusiast | Book nook builder\nFluent in: TypeScript, Python, Japanese, sarcasm`;
+    case 'ls': return apps.map(a => `  ${a.label()}`).join('\n');
+    case 'cat':
+      const file = parts[1];
+      if (!file) return '<span class="error">usage: cat [filename]</span>';
+      if (file === 'about.md') return `# Rika Ciminieri\n\nHalf-Japanese full-stack engineer at Eventbrite.\nFormer microbiology student turned tech advocate.\n\nI build things that make people smile.\n\nCurrently into: Bridgerton, The Traitors, Heated Rivalry,\nlearning AI, Monopoly Deal, singing (badly), traveling.\n\nHills I'll die on:\n- Michael Jackson is the king of pop\n- The Rock's Jumanji is actually a good movie\n- Health and time with people you love matters most`;
+      if (file === 'skills.md') return `# Tech Stack\n\nFrontend:  React, TypeScript, Tailwind, Next.js, Vite\nBackend:   Python, Node.js, Express, FastAPI, GraphQL\nData:      PostgreSQL, Redis, MongoDB\nInfra:     AWS, Docker, CI/CD, Vercel\n\nAlso: i18n, a11y, spring animations, WebGL basics`;
+      if (file === 'currently.md') return `# Currently Into\n\nWatching: Bridgerton (again), The Traitors\nReading:  Heated Rivalry, One Piece\nPlaying:  Monopoly Deal (undefeated streak)\nLearning: AI/LLMs, how to sing\nListening: Yoasobi, Dodo, City Pop`;
+      return `<span class="error">cat: ${escHtml(file)}: No such file</span>\nTry: about.md, skills.md, currently.md`;
+    case 'open':
+      const appName = parts[1]?.replace('.app','');
+      if (appName && apps.find(a => a.id === appName)) { setTimeout(() => openApp(appName), 100); return `Opening ${appName}...`; }
+      return `<span class="error">open: unknown app</span>\nAvailable: ${apps.map(a => a.id).join(', ')}`;
+    case 'clear': setTimeout(() => { const w = windows.find(w => w.appId === 'terminal'); if (w) { const o = document.getElementById(`term-output-${w.id}`); if (o) o.innerHTML = ''; } }, 10); return '';
+    case 'neofetch': return `\n  <span class="highlight">     ██████╗  </span>   rika@holo\n  <span class="highlight">    ██╔══██╗ </span>   ──────────────\n  <span class="highlight">    ██████╔╝ </span>   OS: RikaOS v3.0 [HOLOGRAPHIC]\n  <span class="highlight">    ██╔══██╗ </span>   Shell: holo-terminal\n  <span class="highlight">    ██║  ██║ </span>   Languages: EN, JP\n  <span class="highlight">    ╚═╝  ╚═╝ </span>   Theme: holographic-chaos\n                  Uptime: since 2024\n                  Signal: STRONG`;
+    case 'fortune':
+      const f = ['"A well-organized codebase is worth a thousand comments." — Rika, probably','"Sometimes the real treasure is the bugs we fixed along the way."','"Have you tried turning it off and making a grilled cheese?"','"If you can\'t explain it simply, you don\'t understand it well enough." — Einstein, probably debugging','"The best code is no code at all." — Senior dev energy'];
+      return f[Math.floor(Math.random()*f.length)];
+    case 'cowsay':
+      const msg = parts.slice(1).join(' ') || 'moo';
+      return ` ┌${'─'.repeat(msg.length+2)}┐\n │ ${escHtml(msg)} │\n └${'─'.repeat(msg.length+2)}┘\n        \\   ^__^\n         \\  (oo)\\_______\n            (__)\\       )\\/\\\n                ||----w |\n                ||     ||`;
+    case 'sudo':
+      if (cmd.toLowerCase().includes('make me a sandwich') || cmd.toLowerCase().includes('make me a grilled cheese')) {
+        return `\n  <span class="highlight">    ┌─────────────────┐</span>\n  <span class="highlight">    │  ═══════════════  │</span>  <span class="output">< golden brioche</span>\n  <span class="highlight">    │ ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈ │</span>  <span class="output">< melted gruyere</span>\n  <span class="highlight">    │ ~~~~~~~~~~~~~~~~ │</span>  <span class="output">< caramelized onion</span>\n  <span class="highlight">    │ ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈ │</span>  <span class="output">< more cheese (always)</span>\n  <span class="highlight">    │  ═══════════════  │</span>  <span class="output">< toasted sourdough</span>\n  <span class="highlight">    └─────────────────┘</span>\n\n  <span class="output">Order up! Rika-approved.</span>`;
+      }
+      return '<span class="error">Nice try. No sudo on RikaOS.</span>';
+    case 'rm': return '<span class="error">Whoa. This is a portfolio, not a demolition site.</span>';
+    case 'exit': return 'Where would you even go? You\'re already home.';
+    case 'matrix':
+      setTimeout(() => triggerMatrix(), 100);
+      return '<span style="color:var(--green);">Entering the Matrix...</span>';
+    case 'history':
+      return `  1  npm run dev\n  2  git commit -m "add grilled cheese rankings"\n  3  curl -s "https://api.grilledcheese.rika.dev/v2/rankings"\n  4  python3 -c "import antigravity"\n  5  cat ~/.bridgerton-rewatch-count  # output: 14\n  6  ssh rika@japan-trip-planner.local\n  7  sudo make me a sandwich\n  8  git push origin main --force  # yolo\n  9  node -e "console.log('MJ is the king of pop')"\n 10  history`;
+    default: return `<span class="error">command not found: ${escHtml(c)}</span>\nType <span class="highlight">help</span> for available commands.`;
+  }
+}
+
+function escHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+// =================== COMMAND PALETTE ===================
+const cmdItems = [
+  { icon: '((', label: 'Open About', hint: 'welcome', action: () => openApp('welcome') },
+  { icon: '<>', label: 'Open Projects', hint: 'engineering', action: () => openApp('projects') },
+  { icon: '>_', label: 'Open Terminal', hint: 'commands', action: () => openApp('terminal') },
+  { icon: '/\\', label: 'Open Gallery', hint: 'art + nooks', action: () => openApp('gallery') },
+  { icon: '~~', label: 'Open Currently', hint: 'watching/reading', action: () => openApp('currently') },
+  { icon: '//', label: 'Open Grilled Cheese', hint: 'rankings', action: () => openApp('gc') },
+  { icon: '||', label: 'Open Japan', hint: 'heritage', action: () => openApp('japan') },
+  { icon: '<>', label: 'Open Trash', hint: 'files', action: () => openApp('trash') },
+  { icon: 'EN', label: 'Toggle Language', hint: 'EN / JP', action: () => toggleLang() },
+  { icon: 'XX', label: 'Close All Windows', hint: '', action: () => closeAllWindows() },
+];
+let cmdSelectedIdx = 0;
+function openCmdPalette() { document.getElementById('cmdOverlay').classList.add('open'); const inp = document.getElementById('cmdInput'); inp.value = ''; inp.focus(); cmdSelectedIdx = 0; filterCommands(); }
+function closeCmdPalette() { document.getElementById('cmdOverlay').classList.remove('open'); }
+function filterCommands() {
+  const q = document.getElementById('cmdInput').value.toLowerCase();
+  const filtered = cmdItems.filter(item => item.label.toLowerCase().includes(q) || item.hint.toLowerCase().includes(q));
+  const container = document.getElementById('cmdResults');
+  cmdSelectedIdx = Math.min(cmdSelectedIdx, filtered.length - 1);
+  container.innerHTML = filtered.map((item, i) => `
+    <div class="cmd-item ${i === cmdSelectedIdx ? 'selected' : ''}" onclick="cmdItems.find(c=>c.label==='${item.label}').action();closeCmdPalette();" onmouseenter="cmdSelectedIdx=${i};filterCommands();">
+      <span class="cmd-icon">${item.icon}</span>
+      <span class="cmd-label">${item.label}</span>
+      <span class="cmd-hint">${item.hint}</span>
+    </div>
+  `).join('');
+}
+function handleCmdKey(e) {
+  const items = document.getElementById('cmdResults').querySelectorAll('.cmd-item');
+  if (e.key === 'ArrowDown') { e.preventDefault(); cmdSelectedIdx = Math.min(cmdSelectedIdx + 1, items.length - 1); filterCommands(); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); cmdSelectedIdx = Math.max(cmdSelectedIdx - 1, 0); filterCommands(); }
+  if (e.key === 'Enter') { items[cmdSelectedIdx]?.click(); }
+  if (e.key === 'Escape') { closeCmdPalette(); }
+}
+
+// =================== CONTEXT MENU ===================
+document.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  const menu = document.getElementById('ctxMenu');
+  const items = [
+    { icon: '((', label: 'Open About', action: () => openApp('welcome') },
+    { icon: '<>', label: 'Open Projects', action: () => openApp('projects') },
+    { icon: '>_', label: 'Open Terminal', action: () => openApp('terminal') },
+    { sep: true },
+    { icon: lang === 'en' ? 'JP' : 'EN', label: lang === 'en' ? 'Switch to Japanese' : 'Switch to English', action: () => toggleLang() },
+    { icon: '//', label: 'Command Palette', action: () => openCmdPalette() },
+  ];
+  menu.innerHTML = items.map(item => item.sep ? '<div class="ctx-sep"></div>' : `<div class="ctx-item"><span class="ctx-icon">${item.icon}</span>${item.label}</div>`).join('');
+  const ctxItems = menu.querySelectorAll('.ctx-item');
+  let idx = 0;
+  items.forEach(item => { if (item.sep) return; ctxItems[idx].onclick = () => { item.action(); menu.classList.remove('open'); }; idx++; });
+  menu.style.left = Math.min(e.clientX, window.innerWidth - 220) + 'px';
+  menu.style.top = Math.min(e.clientY, window.innerHeight - 300) + 'px';
+  menu.classList.add('open');
+});
+document.addEventListener('click', () => document.getElementById('ctxMenu').classList.remove('open'));
+
+// =================== LANGUAGE ===================
+function setLang(newLang) {
+  lang = newLang;
+  document.querySelectorAll('.lang-seg').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  // Glitchy text swap effect
+  document.querySelectorAll('.lang-seg').forEach(btn => {
+    btn.style.transition = 'none';
+    btn.style.filter = 'blur(2px) hue-rotate(90deg)';
+    setTimeout(() => { btn.style.transition = 'filter 0.3s'; btn.style.filter = 'none'; }, 50);
+  });
+  renderDesktopIcons();
+  windows.forEach(win => {
+    const app = apps.find(a => a.id === win.appId);
+    if (app && win.appId !== 'terminal') {
+      const titleEl = document.querySelector(`#win-${win.id} .win-title`);
+      if (titleEl) titleEl.textContent = app.label();
+      renderAppContent(win.id, win.appId);
+    }
+  });
+  updateTaskbar();
+  updateWatermark();
+}
+function toggleLang() { setLang(lang === 'en' ? 'jp' : 'en'); }
+
+// =================== DAY MODE (the surprise "defrag") ===================
+function toggleDayMode() {
+  dayMode = !dayMode;
+  document.body.classList.toggle('day-mode', dayMode);
+  document.getElementById('nightToggle').textContent = dayMode ? 'GLITCH' : 'DEFRAG';
+  updateWatermark();
+  // Sound: defrag / glitch
+  if (audioCtx) {
+    if (dayMode) {
+      // Ascending clean tone
+      playBoop(440, 0.15, 0.08, 'sine');
+      setTimeout(() => playBoop(660, 0.15, 0.06, 'sine'), 100);
+      setTimeout(() => playBoop(880, 0.2, 0.05, 'sine'), 200);
+    } else {
+      // Descending glitch
+      playBoop(880, 0.1, 0.06, 'sawtooth');
+      setTimeout(() => playBoop(440, 0.1, 0.05, 'sawtooth'), 80);
+      setTimeout(() => playBoop(220, 0.15, 0.04, 'sawtooth'), 160);
+    }
+  }
+}
+
+// =================== KEYBOARD SHORTCUTS ===================
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); const o = document.getElementById('cmdOverlay'); o.classList.contains('open') ? closeCmdPalette() : openCmdPalette(); }
+  if (e.key === 'Escape') closeCmdPalette();
+  resetIdleTimer();
+});
+document.addEventListener('mousemove', resetIdleTimer);
+
+// =================== KONAMI CODE ===================
+const konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiIdx = 0;
+document.addEventListener('keydown', e => {
+  if (e.key === konamiCode[konamiIdx]) { konamiIdx++; if (konamiIdx === konamiCode.length) { konamiIdx = 0; cheeseRain(); } } else { konamiIdx = 0; }
+});
+function cheeseRain() {
+  const c = document.getElementById('cheeseRain');
+  const cheeseSvg = '<svg viewBox="0 0 32 32" fill="none"><polygon points="4,24 28,24 28,8 4,18" fill="rgba(255,204,0,0.7)" stroke="rgba(255,204,0,0.9)" stroke-width="1.5"/><circle cx="12" cy="20" r="2.5" fill="rgba(255,180,0,0.5)"/><circle cx="20" cy="16" r="2" fill="rgba(255,180,0,0.4)"/><circle cx="8" cy="21" r="1.5" fill="rgba(255,180,0,0.3)"/></svg>';
+  for (let i = 0; i < 40; i++) {
+    const d = document.createElement('div');
+    d.className = 'cheese-drop';
+    d.innerHTML = cheeseSvg;
+    d.style.left = Math.random()*100+'vw';
+    d.style.animationDuration = (2+Math.random()*3)+'s';
+    d.style.animationDelay = Math.random()*2+'s';
+    const size = 20+Math.random()*30;
+    d.style.width = size + 'px';
+    d.style.height = size + 'px';
+    c.appendChild(d);
+  }
+  setTimeout(() => { c.innerHTML = ''; }, 6000);
+}
+
+// =================== SCREENSAVER ===================
+function resetIdleTimer() { clearTimeout(idleTimer); hideScreensaver(); idleTimer = setTimeout(showScreensaver, IDLE_TIMEOUT); }
+function showScreensaver() {
+  document.getElementById('screensaver').classList.add('active');
+  if (audioCtx) {
+    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 1.2);
+    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+    osc.connect(gain).connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 1.2);
+  }
+}
+function hideScreensaver() { document.getElementById('screensaver').classList.remove('active'); }
+
+// =================== HELPERS ===================
+function closeAllWindows() { [...windows].forEach(w => closeWindow(w.id)); }
+
+// =================== CURSOR TRAIL ===================
+let trailDots = [];
+const MAX_TRAIL = 10;
+let lastTrailTime = 0;
+document.addEventListener('mousemove', (e) => {
+  const now = Date.now();
+  if (now - lastTrailTime < 40) return;
+  lastTrailTime = now;
+  const dot = document.createElement('div');
+  dot.className = 'cursor-dot';
+  dot.style.left = (e.clientX - 3) + 'px';
+  dot.style.top = (e.clientY - 3) + 'px';
+  document.body.appendChild(dot);
+  trailDots.push(dot);
+  requestAnimationFrame(() => dot.classList.add('fade'));
+  setTimeout(() => { dot.remove(); trailDots = trailDots.filter(d => d !== dot); }, 300);
+  while (trailDots.length > MAX_TRAIL) { const old = trailDots.shift(); old.remove(); }
+});
+
+// =================== CANVAS WATERMARK ===================
+const rippleCanvas = document.getElementById('watermarkCanvas');
+const rippleCtx = rippleCanvas.getContext('2d');
+let rippleW, rippleH;
+let rippleGrid, ripplePrevGrid, rippleRefImage;
+const RIPPLE_RES = 4;
+let rippleGridW, rippleGridH;
+const RIPPLE_DAMPING = 0.97;
+
+function initRippleCanvas() {
+  rippleW = window.innerWidth;
+  rippleH = window.innerHeight;
+  rippleCanvas.width = rippleW;
+  rippleCanvas.height = rippleH;
+  rippleGridW = Math.ceil(rippleW / RIPPLE_RES);
+  rippleGridH = Math.ceil(rippleH / RIPPLE_RES);
+  rippleGrid = new Float32Array(rippleGridW * rippleGridH);
+  ripplePrevGrid = new Float32Array(rippleGridW * rippleGridH);
+  renderWatermarkText();
+}
+
+function renderWatermarkText() {
+  rippleCtx.clearRect(0, 0, rippleW, rippleH);
+  const text = lang === 'jp' ? '莉香チミニエリ' : 'RIKA CIMINIERI';
+  const fontSize = lang === 'jp' ? 160 : 120;
+  const fontFamily = lang === 'jp' ? "'Noto Sans JP', sans-serif" : "'Space Grotesk', sans-serif";
+  rippleCtx.font = `800 ${fontSize}px ${fontFamily}`;
+  // Holographic color-shift effect via mouse position
+  rippleCtx.fillStyle = dayMode ? '#0088aa' : '#00ffcc';
+  rippleCtx.globalAlpha = 0.04;
+  rippleCtx.textAlign = 'right';
+  rippleCtx.textBaseline = 'bottom';
+  rippleCtx.fillText(text, rippleW - 60, rippleH - 80);
+  rippleCtx.globalAlpha = 1.0;
+  rippleRefImage = rippleCtx.getImageData(0, 0, rippleW, rippleH);
+  rippleGrid.fill(0);
+  ripplePrevGrid.fill(0);
+}
+
+function updateWatermark() { renderWatermarkText(); }
+
+let mouseRippleX = -1, mouseRippleY = -1;
+let mouseX = 0, mouseY = 0;
+document.addEventListener('mousemove', e => {
+  mouseRippleX = Math.floor(e.clientX / RIPPLE_RES);
+  mouseRippleY = Math.floor(e.clientY / RIPPLE_RES);
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+
+function rippleFrame() {
+  if (mouseRippleX >= 1 && mouseRippleX < rippleGridW - 1 && mouseRippleY >= 1 && mouseRippleY < rippleGridH - 1) {
+    const idx = mouseRippleY * rippleGridW + mouseRippleX;
+    rippleGrid[idx] = 512;
+  }
+  const newGrid = new Float32Array(rippleGridW * rippleGridH);
+  for (let y = 1; y < rippleGridH - 1; y++) {
+    for (let x = 1; x < rippleGridW - 1; x++) {
+      const idx = y * rippleGridW + x;
+      newGrid[idx] = (
+        rippleGrid[idx - 1] + rippleGrid[idx + 1] +
+        rippleGrid[idx - rippleGridW] + rippleGrid[idx + rippleGridW]
+      ) / 2 - ripplePrevGrid[idx];
+      newGrid[idx] *= RIPPLE_DAMPING;
+    }
+  }
+  ripplePrevGrid = rippleGrid;
+  rippleGrid = newGrid;
+  if (!rippleRefImage) return requestAnimationFrame(rippleFrame);
+  const imgData = new ImageData(new Uint8ClampedArray(rippleRefImage.data), rippleW, rippleH);
+  const pixels = imgData.data;
+  for (let y = 1; y < rippleGridH - 1; y++) {
+    for (let x = 1; x < rippleGridW - 1; x++) {
+      const idx = y * rippleGridW + x;
+      const displacement = rippleGrid[idx];
+      if (Math.abs(displacement) < 0.5) continue;
+      const offsetX = Math.round((rippleGrid[idx - 1] - rippleGrid[idx + 1]) * 0.5);
+      const offsetY = Math.round((rippleGrid[idx - rippleGridW] - rippleGrid[idx + rippleGridW]) * 0.5);
+      for (let py = 0; py < RIPPLE_RES; py++) {
+        for (let px = 0; px < RIPPLE_RES; px++) {
+          const destX = x * RIPPLE_RES + px;
+          const destY = y * RIPPLE_RES + py;
+          const srcX = Math.min(Math.max(destX + offsetX, 0), rippleW - 1);
+          const srcY = Math.min(Math.max(destY + offsetY, 0), rippleH - 1);
+          const destIdx = (destY * rippleW + destX) * 4;
+          const srcIdx = (srcY * rippleW + srcX) * 4;
+          pixels[destIdx] = rippleRefImage.data[srcIdx];
+          pixels[destIdx + 1] = rippleRefImage.data[srcIdx + 1];
+          pixels[destIdx + 2] = rippleRefImage.data[srcIdx + 2];
+          pixels[destIdx + 3] = rippleRefImage.data[srcIdx + 3];
+          const absDisp = Math.abs(displacement);
+          if (absDisp > 3) {
+            const bloom = Math.min(absDisp / 25, 1);
+            // Holographic color bloom — shifts RGB
+            pixels[destIdx] = Math.min(255, pixels[destIdx] + bloom * 30);     // R (teal has low R)
+            pixels[destIdx + 1] = Math.min(255, pixels[destIdx + 1] + bloom * 60); // G
+            pixels[destIdx + 2] = Math.min(255, pixels[destIdx + 2] + bloom * 50); // B
+            pixels[destIdx + 3] = Math.min(255, pixels[destIdx + 3] + bloom * 100);
+          }
+        }
+      }
+    }
+  }
+  rippleCtx.putImageData(imgData, 0, 0);
+  requestAnimationFrame(rippleFrame);
+}
+
+window.addEventListener('resize', () => { initRippleCanvas(); });
+
+// =================== CLOCK TOOLTIP ===================
+let clockHoverTimer = null;
+let clockTooltip = null;
+const clockFacts = [
+  "Currently thinking about grilled cheese",
+  "Wondering if Luffy is Joy Boy",
+  "Practicing singing (neighbors sorry)",
+  "Debugging something... always",
+  "Ranking sandwiches in my head",
+  "Missing Japan right now",
+  "Building something cool with AI",
+  "Rewatching Bridgerton... again"
+];
+document.getElementById('clock').addEventListener('mouseenter', () => {
+  clockHoverTimer = setTimeout(() => {
+    if (clockTooltip) clockTooltip.remove();
+    clockTooltip = document.createElement('div');
+    clockTooltip.className = 'clock-tooltip';
+    clockTooltip.textContent = clockFacts[Math.floor(Math.random() * clockFacts.length)];
+    document.body.appendChild(clockTooltip);
+  }, 3000);
+});
+document.getElementById('clock').addEventListener('mouseleave', () => {
+  clearTimeout(clockHoverTimer);
+  if (clockTooltip) { clockTooltip.remove(); clockTooltip = null; }
+});
+
+// =================== TRIPLE-CLICK GC WALLPAPER ===================
+let desktopClickCount = 0;
+let desktopClickTimer = null;
+document.getElementById('desktop').addEventListener('click', (e) => {
+  if (e.target.closest('.desktop-icon, .window, .taskbar')) return;
+  desktopClickCount++;
+  clearTimeout(desktopClickTimer);
+  desktopClickTimer = setTimeout(() => { desktopClickCount = 0; }, 500);
+  if (desktopClickCount >= 3) {
+    desktopClickCount = 0;
+    const wp = document.getElementById('gcWallpaper');
+    // Fill with holographic cheese pattern via canvas
+    wp.innerHTML = '';
+    const pCanvas = document.createElement('canvas');
+    pCanvas.width = window.innerWidth;
+    pCanvas.height = window.innerHeight;
+    const pCtx = pCanvas.getContext('2d');
+    pCtx.fillStyle = 'rgba(0,0,0,0)';
+    pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+    for (let x = 0; x < pCanvas.width; x += 60) {
+      for (let y = 0; y < pCanvas.height; y += 60) {
+        pCtx.fillStyle = `hsla(${(x+y) % 360}, 80%, 60%, 0.15)`;
+        pCtx.beginPath();
+        pCtx.moveTo(x+10, y+30);
+        pCtx.lineTo(x+50, y+30);
+        pCtx.lineTo(x+50, y+10);
+        pCtx.closePath();
+        pCtx.fill();
+      }
+    }
+    wp.appendChild(pCanvas);
+    pCanvas.style.width = '100%';
+    pCanvas.style.height = '100%';
+    wp.classList.add('show');
+    setTimeout(() => wp.classList.remove('show'), 3000);
+  }
+});
+
+// =================== DESKTOP TOY (DOUBLE-CLICK EMPTY SPACE) ===================
+document.getElementById('desktop').addEventListener('dblclick', (e) => {
+  if (e.target.closest('.desktop-icon, .window, .taskbar')) return;
+  spawnDesktopToy(e.clientX, e.clientY);
+});
+
+function spawnDesktopToy(x, y) {
+  const toy = document.createElement('div');
+  toy.className = 'desktop-toy';
+  // Random holographic color
+  const hue = Math.random() * 360;
+  toy.style.background = `hsl(${hue}, 100%, 65%)`;
+  toy.style.boxShadow = `0 0 12px hsla(${hue}, 100%, 65%, 0.5)`;
+  toy.style.left = x + 'px'; toy.style.top = y + 'px';
+  const size = 8 + Math.random() * 12;
+  toy.style.width = size + 'px'; toy.style.height = size + 'px';
+  document.body.appendChild(toy);
+  playBoop(400 + Math.random() * 400, 0.05, 0.06, 'triangle');
+  let vx = (Math.random() - 0.5) * 8, vy = -8 - Math.random() * 4;
+  const gravity = 0.3, bounce = 0.65, friction = 0.99;
+  let px = x, py = y, life = 0;
+  function animate() {
+    vy += gravity; vx *= friction; px += vx; py += vy;
+    const floor = window.innerHeight - 100;
+    if (py > floor) { py = floor; vy = -vy * bounce; if (Math.abs(vy) < 1) vy = 0; playBoop(180 + Math.random() * 120, 0.02, 0.03, 'triangle'); }
+    if (px < 0 || px > window.innerWidth - 18) { vx = -vx; px = Math.max(0, Math.min(px, window.innerWidth - 18)); }
+    toy.style.left = px + 'px'; toy.style.top = py + 'px';
+    // Color shift as it moves
+    toy.style.filter = `hue-rotate(${life * 3}deg)`;
+    life++;
+    if (life < 200 && (Math.abs(vx) > 0.1 || Math.abs(vy) > 0.5 || py < floor)) { requestAnimationFrame(animate); }
+    else { toy.style.transition = 'opacity 0.5s'; toy.style.opacity = '0'; setTimeout(() => toy.remove(), 500); }
+  }
+  requestAnimationFrame(animate);
+}
+
+// =================== EASTER EGG: MATRIX ===================
+function triggerMatrix() {
+  const overlay = document.getElementById('matrixOverlay');
+  overlay.classList.add('active');
+  overlay.innerHTML = '';
+  const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+  for (let i = 0; i < 30; i++) {
+    const col = document.createElement('div');
+    col.className = 'matrix-col';
+    col.style.left = (i / 30 * 100) + '%';
+    col.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    col.style.animationDelay = Math.random() * 1 + 's';
+    col.style.fontSize = (10 + Math.random() * 8) + 'px';
+    col.style.opacity = 0.3 + Math.random() * 0.7;
+    let text = '';
+    for (let j = 0; j < 30; j++) {
+      text += chars[Math.floor(Math.random() * chars.length)] + '\n';
+    }
+    col.textContent = text;
+    overlay.appendChild(col);
+  }
+  setTimeout(() => {
+    overlay.classList.remove('active');
+    overlay.innerHTML = '';
+  }, 5000);
+}
+
+// =================== EASTER EGG: SHAKE TO GLITCH ===================
+let shakeHistory = [];
+let shakeLastX = 0, shakeLastY = 0;
+document.addEventListener('mousemove', (e) => {
+  const dx = Math.abs(e.clientX - shakeLastX);
+  const dy = Math.abs(e.clientY - shakeLastY);
+  const speed = dx + dy;
+  shakeLastX = e.clientX;
+  shakeLastY = e.clientY;
+  if (speed > 50) {
+    shakeHistory.push(Date.now());
+    shakeHistory = shakeHistory.filter(t => Date.now() - t < 3000);
+    if (shakeHistory.length > 40) {
+      shakeHistory = [];
+      triggerMaxGlitch();
+    }
+  }
+});
+
+function triggerMaxGlitch() {
+  const desktop = document.getElementById('desktop');
+  // Maximum glitch for 2 seconds
+  desktop.style.animation = 'none';
+  let glitchFrames = 0;
+  const maxGlitch = setInterval(() => {
+    const hue = Math.random() * 360;
+    const tx = (Math.random() - 0.5) * 20;
+    const ty = (Math.random() - 0.5) * 10;
+    const skew = (Math.random() - 0.5) * 5;
+    desktop.style.transform = `translate(${tx}px, ${ty}px) skew(${skew}deg)`;
+    desktop.style.filter = `hue-rotate(${hue}deg) brightness(${0.8 + Math.random() * 0.6}) contrast(${1 + Math.random() * 0.5})`;
+    glitchFrames++;
+    if (glitchFrames > 30) {
+      clearInterval(maxGlitch);
+      // "Repair" snap
+      desktop.style.transition = 'all 0.2s ease-out';
+      desktop.style.transform = 'none';
+      desktop.style.filter = 'none';
+      playBoop(1200, 0.05, 0.08, 'sine');
+      setTimeout(() => playBoop(880, 0.08, 0.06, 'sine'), 50);
+      setTimeout(() => { desktop.style.transition = ''; }, 300);
+    }
+  }, 60);
+  // Glitch sound
+  if (audioCtx) {
+    for (let i = 0; i < 8; i++) {
+      setTimeout(() => playBoop(100 + Math.random() * 2000, 0.05, 0.04, 'sawtooth'), i * 100);
+    }
+  }
+}
+
+// =================== EASTER EGG: HOLD START BUTTON (5s) = RADIO ===================
+let startHoldTimer = null;
+document.getElementById('startBtn').addEventListener('mousedown', () => {
+  startHoldTimer = setTimeout(() => {
+    showRadio();
+  }, 5000);
+});
+document.getElementById('startBtn').addEventListener('mouseup', () => { clearTimeout(startHoldTimer); });
+document.getElementById('startBtn').addEventListener('mouseleave', () => { clearTimeout(startHoldTimer); });
+
+function showRadio() {
+  const overlay = document.getElementById('radioOverlay');
+  overlay.classList.add('active');
+  overlay.innerHTML = '';
+  const bars = document.createElement('div');
+  bars.className = 'radio-bars';
+  for (let i = 0; i < 16; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'radio-bar';
+    bar.style.animationDuration = (0.3 + Math.random() * 0.4) + 's';
+    bar.style.animationDelay = (Math.random() * 0.3) + 's';
+    const hue = (i / 16) * 360;
+    bar.style.background = `linear-gradient(0deg, hsl(${hue}, 100%, 50%), hsl(${(hue + 60) % 360}, 100%, 65%))`;
+    bar.style.boxShadow = `0 0 8px hsla(${hue}, 100%, 50%, 0.4)`;
+    bars.appendChild(bar);
+  }
+  overlay.appendChild(bars);
+  const label = document.createElement('div');
+  label.className = 'radio-label';
+  label.textContent = '// HIDDEN FREQUENCY DETECTED // CLICK TO CLOSE';
+  overlay.appendChild(label);
+
+  // Play chiptune
+  if (audioCtx) {
+    const notes = [523, 587, 659, 784, 880, 784, 659, 587, 523, 440, 392, 440, 523, 659, 784, 880];
+    notes.forEach((freq, i) => {
+      setTimeout(() => {
+        if (!overlay.classList.contains('active')) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+      }, i * 150);
+    });
+  }
+}
+
+function hideRadio() {
+  document.getElementById('radioOverlay').classList.remove('active');
+}
+
+// =================== INIT ===================
+renderDesktopIcons();
+resetIdleTimer();
+initRippleCanvas();
+requestAnimationFrame(rippleFrame);
+initParticles();
+
+const skipBoot = window.location.hash === '#skipboot';
+if (skipBoot) {
+  document.getElementById('boot-screen').style.display = 'none';
+  document.getElementById('desktop').classList.add('visible');
+  openApp('welcome');
+} else {
+  runBoot();
+}
+</script>
+</body>
+</html>
