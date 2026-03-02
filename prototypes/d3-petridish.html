@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Petri Dish — Rika Ciminieri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0f0a;
+  --agar: #e8e4d4;
+  --agar-dark: #1a1f1a;
+  --text: #2a2a2a;
+  --text-light: #e8e8e8;
+  --muted: #666;
+  --muted-light: #999;
+  --eng-color: #4a90d9;
+  --eng-glow: rgba(74, 144, 217, 0.4);
+  --japan-color: #ff8fa3;
+  --japan-glow: rgba(255, 143, 163, 0.4);
+  --op-color: #ff6b35;
+  --op-glow: rgba(255, 107, 53, 0.4);
+  --gc-color: #fbbf24;
+  --gc-glow: rgba(251, 191, 36, 0.4);
+  --gallery-color: #a78bfa;
+  --gallery-glow: rgba(167, 139, 250, 0.4);
+  --accent: #4ade80;
+  --font: 'Inter', 'Noto Sans JP', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+}
+
+html, body {
+  height: 100%; overflow: hidden;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* UV/Dark mode */
+body.uv-mode {
+  --bg: #05000d;
+  --agar: #0a0520;
+  --agar-dark: #0a0520;
+  --text: #e0e0ff;
+}
+
+/* =================== LAMP INTRO =================== */
+#lamp-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: #000;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 1s;
+}
+#lamp-overlay.off { opacity: 0; pointer-events: none; }
+
+.lamp-text {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: #333;
+  text-align: center;
+  animation: lampPulse 1.5s ease-in-out;
+}
+.lamp-text .bright {
+  color: var(--accent);
+  text-shadow: 0 0 20px var(--accent);
+}
+@keyframes lampPulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+/* =================== MICROSCOPE VIEWPORT =================== */
+.viewport {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+
+/* Circular mask */
+.scope-mask {
+  width: 100vmin; height: 100vmin;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    inset 0 0 80px rgba(0,0,0,0.5),
+    inset 0 0 200px rgba(0,0,0,0.3),
+    0 0 0 200vmax #000;
+  transition: box-shadow 0.5s;
+}
+
+body.uv-mode .scope-mask {
+  box-shadow:
+    inset 0 0 80px rgba(30,0,60,0.5),
+    inset 0 0 200px rgba(20,0,50,0.3),
+    0 0 0 200vmax #05000d;
+}
+
+/* Dish surface */
+.dish {
+  position: absolute;
+  width: 200%; height: 200%;
+  left: -50%; top: -50%;
+  background: var(--agar);
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), background 0.5s;
+  transform-origin: center;
+}
+
+body.uv-mode .dish { background: var(--agar-dark); }
+
+/* =================== COLONIES =================== */
+.colony {
+  position: absolute;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s, filter 0.3s;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.colony:hover {
+  transform: scale(1.08);
+  z-index: 10;
+}
+
+.colony-inner {
+  width: 100%; height: 100%;
+  border-radius: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+.colony-label {
+  position: absolute;
+  bottom: -30px; left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.colony:hover .colony-label { opacity: 1; }
+
+/* Engineering colony — geometric, crystalline */
+.colony-eng .colony-inner {
+  background: radial-gradient(circle, rgba(74,144,217,0.3) 0%, rgba(74,144,217,0.15) 50%, rgba(74,144,217,0.05) 100%);
+  border: 2px solid rgba(74,144,217,0.3);
+  animation: colonyPulse 4s ease-in-out infinite;
+}
+.colony-eng .colony-inner::before {
+  content: ''; position: absolute; inset: 15%;
+  background: repeating-conic-gradient(from 0deg, rgba(74,144,217,0.1) 0deg 30deg, transparent 30deg 60deg);
+  border-radius: 50%;
+  animation: colonyRotate 20s linear infinite;
+}
+
+body.uv-mode .colony-eng .colony-inner {
+  background: radial-gradient(circle, rgba(74,144,217,0.6) 0%, rgba(74,144,217,0.2) 100%);
+  box-shadow: 0 0 40px var(--eng-glow), inset 0 0 20px var(--eng-glow);
+}
+
+/* Japan colony — mycelium branching, cherry blossom pink */
+.colony-japan .colony-inner {
+  background: radial-gradient(circle, rgba(255,143,163,0.3) 0%, rgba(255,143,163,0.1) 100%);
+  border: 2px solid rgba(255,143,163,0.25);
+  animation: colonyPulse 5s ease-in-out infinite 0.5s;
+}
+.colony-japan .colony-inner::before {
+  content: ''; position: absolute; inset: 10%;
+  background: radial-gradient(circle at 30% 40%, rgba(255,143,163,0.3) 0%, transparent 40%),
+              radial-gradient(circle at 70% 60%, rgba(255,143,163,0.2) 0%, transparent 35%),
+              radial-gradient(circle at 50% 20%, rgba(255,143,163,0.25) 0%, transparent 30%);
+  border-radius: 50%;
+  animation: colonyPulse 6s ease-in-out infinite reverse;
+}
+
+body.uv-mode .colony-japan .colony-inner {
+  background: radial-gradient(circle, rgba(255,143,163,0.6) 0%, rgba(255,143,163,0.2) 100%);
+  box-shadow: 0 0 40px var(--japan-glow), inset 0 0 20px var(--japan-glow);
+}
+
+/* One Piece colony — explosive, chaotic */
+.colony-op .colony-inner {
+  background: radial-gradient(circle, rgba(255,107,53,0.35) 0%, rgba(255,107,53,0.1) 100%);
+  border: 2px solid rgba(255,107,53,0.3);
+  animation: colonyPulse 3s ease-in-out infinite 1s;
+}
+.colony-op .colony-inner::after {
+  content: ''; position: absolute; inset: 5%;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, transparent 0px, transparent 8px, rgba(255,107,53,0.08) 8px, rgba(255,107,53,0.08) 10px);
+  animation: colonyRotate 15s linear infinite reverse;
+}
+
+body.uv-mode .colony-op .colony-inner {
+  background: radial-gradient(circle, rgba(255,107,53,0.6) 0%, rgba(255,107,53,0.2) 100%);
+  box-shadow: 0 0 40px var(--op-glow), inset 0 0 20px var(--op-glow);
+}
+
+/* Grilled Cheese colony — golden, bubbly */
+.colony-gc .colony-inner {
+  background: radial-gradient(circle, rgba(251,191,36,0.35) 0%, rgba(251,191,36,0.1) 100%);
+  border: 2px solid rgba(251,191,36,0.3);
+  animation: colonyPulse 4.5s ease-in-out infinite 1.5s;
+}
+
+body.uv-mode .colony-gc .colony-inner {
+  background: radial-gradient(circle, rgba(251,191,36,0.6) 0%, rgba(251,191,36,0.2) 100%);
+  box-shadow: 0 0 40px var(--gc-glow), inset 0 0 20px var(--gc-glow);
+}
+
+/* Gallery colony — fractal, colorful */
+.colony-gallery .colony-inner {
+  background: radial-gradient(circle, rgba(167,139,250,0.3) 0%, rgba(167,139,250,0.1) 100%);
+  border: 2px solid rgba(167,139,250,0.25);
+  animation: colonyPulse 5.5s ease-in-out infinite 2s;
+}
+
+body.uv-mode .colony-gallery .colony-inner {
+  background: radial-gradient(circle, rgba(167,139,250,0.6) 0%, rgba(167,139,250,0.2) 100%);
+  box-shadow: 0 0 40px var(--gallery-glow), inset 0 0 20px var(--gallery-glow);
+}
+
+@keyframes colonyPulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+@keyframes colonyRotate { to { transform: rotate(360deg); } }
+
+/* Bubbles for GC colony */
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(251,191,36,0.2);
+  border: 1px solid rgba(251,191,36,0.3);
+  animation: bubbleFloat 3s ease-in-out infinite;
+}
+@keyframes bubbleFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.1); }
+}
+
+/* =================== COLONY DETAIL VIEW =================== */
+.colony-detail {
+  position: fixed; inset: 0;
+  z-index: 500;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.colony-detail.open { display: flex; opacity: 1; }
+
+.detail-bg {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(10px);
+}
+
+.detail-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 800px;
+  max-height: 85vh;
+  margin: auto;
+  overflow-y: auto;
+  padding: 40px;
+  animation: detailSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes detailSlide {
+  from { transform: translateY(20px) scale(0.95); opacity: 0; }
+}
+
+.detail-content::-webkit-scrollbar { width: 4px; }
+.detail-content::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+.detail-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 32px;
+}
+
+.detail-back {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 8px 16px;
+  color: var(--text-light);
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.detail-back:hover { background: rgba(255,255,255,0.15); }
+
+.detail-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.detail-title {
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text-light);
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
+
+.detail-subtitle {
+  font-size: 14px;
+  color: var(--muted-light);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+/* Cell diagram */
+.cell-diagram {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.cell-part {
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border-left: 3px solid;
+}
+
+.cell-part h4 {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+.cell-part p, .cell-part ul {
+  font-size: 14px;
+  color: var(--text-light);
+  line-height: 1.7;
+}
+
+.cell-part ul { list-style: none; }
+.cell-part ul li { padding: 4px 0; }
+.cell-part ul li::before { content: '→ '; opacity: 0.4; }
+
+/* Tech tags */
+.tech-tags {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 8px;
+}
+.tech-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.06);
+  color: var(--text-light);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Project cards for engineering */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.project-cell {
+  background: rgba(74,144,217,0.06);
+  border: 1px solid rgba(74,144,217,0.15);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.project-cell:hover {
+  background: rgba(74,144,217,0.12);
+  transform: translateY(-2px);
+}
+.project-cell h3 {
+  font-size: 15px; font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 6px;
+}
+.project-cell p {
+  font-size: 12px; color: var(--muted-light);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+/* Theory cards */
+.theory-card {
+  background: rgba(255,107,53,0.06);
+  border: 1px solid rgba(255,107,53,0.2);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.theory-card:hover { background: rgba(255,107,53,0.12); }
+.theory-card h3 { color: var(--text-light); font-size: 16px; margin-bottom: 8px; }
+.theory-card .teaser { color: var(--muted-light); font-size: 13px; font-style: italic; }
+.theory-card .full-theory {
+  display: none;
+  color: var(--text-light);
+  font-size: 14px;
+  line-height: 1.7;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,107,53,0.2);
+}
+.theory-card.expanded .full-theory { display: block; }
+.theory-card.expanded .teaser { display: none; }
+
+/* GC rankings */
+.gc-ranking {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 16px;
+  background: rgba(251,191,36,0.04);
+  border: 1px solid rgba(251,191,36,0.1);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+.gc-ranking:hover { background: rgba(251,191,36,0.08); }
+.gc-rank {
+  font-family: var(--display);
+  font-size: 24px; font-weight: 800;
+  min-width: 40px;
+}
+.gc-info h4 { font-size: 14px; color: var(--text-light); }
+.gc-info p { font-size: 12px; color: var(--muted-light); }
+.gc-score-bar {
+  flex: 1; max-width: 120px;
+  height: 6px;
+  background: rgba(251,191,36,0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-left: auto;
+}
+.gc-score-fill {
+  height: 100%;
+  background: var(--gc-color);
+  border-radius: 3px;
+  transition: width 0.6s;
+}
+
+/* Gallery items */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.gallery-piece {
+  background: rgba(167,139,250,0.05);
+  border: 1px solid rgba(167,139,250,0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.gallery-piece:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.gallery-piece-thumb {
+  height: 160px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px;
+  background: rgba(167,139,250,0.08);
+}
+.gallery-piece-info {
+  padding: 14px;
+}
+.gallery-piece-info h4 { font-size: 14px; color: var(--text-light); margin-bottom: 4px; }
+.gallery-piece-info p { font-size: 11px; color: var(--muted-light); }
+
+/* =================== SPECIMEN LABEL =================== */
+.specimen-label {
+  position: fixed;
+  bottom: 20px; left: 20px;
+  z-index: 600;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-light);
+  line-height: 1.6;
+  user-select: none;
+}
+
+.specimen-label .label-title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.specimen-label .culture-toggle {
+  cursor: pointer;
+  color: var(--accent);
+  transition: color 0.2s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.specimen-label .culture-toggle:hover { color: #6ee7a0; }
+
+/* =================== TOOLBAR =================== */
+.toolbar {
+  position: fixed;
+  top: 20px; right: 20px;
+  z-index: 600;
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+.tb-btn {
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
+  color: var(--text-light);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.tb-btn:hover { background: rgba(255,255,255,0.1); }
+.tb-btn.active { background: var(--accent); color: #000; }
+
+/* Zoom slider */
+.zoom-display {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted-light);
+  text-align: center;
+  padding: 4px;
+}
+
+/* =================== TARDIGRADE =================== */
+.tardigrade {
+  position: absolute;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.5s;
+  cursor: pointer;
+  animation: tardigradeWalk 30s linear infinite;
+  z-index: 20;
+}
+.tardigrade.visible { opacity: 0.6; }
+.tardigrade:hover { opacity: 1; transform: scale(1.5); }
+
+@keyframes tardigradeWalk {
+  0% { left: 20%; top: 30%; }
+  25% { left: 60%; top: 45%; }
+  50% { left: 40%; top: 70%; }
+  75% { left: 75%; top: 25%; }
+  100% { left: 20%; top: 30%; }
+}
+
+/* =================== MOBILE =================== */
+@media (max-width: 768px) {
+  .scope-mask { width: 100vw; height: 100vh; border-radius: 0; }
+  .specimen-label { bottom: auto; top: 10px; left: 10px; right: 10px; font-size: 10px; padding: 8px 12px; }
+  .toolbar { top: auto; bottom: 10px; right: 10px; flex-direction: row; }
+  .detail-content { padding: 20px; }
+  .detail-title { font-size: 24px; }
+}
+
+/* =================== CONTAMINATION WARNING =================== */
+.contamination {
+  position: fixed; inset: 0;
+  z-index: 9000;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  align-items: center; justify-content: center;
+  flex-direction: column;
+  animation: contFlash 0.5s;
+}
+.contamination.show { display: flex; }
+@keyframes contFlash {
+  0%, 50% { background: rgba(200,0,0,0.3); }
+  25%, 75% { background: rgba(0,0,0,0.9); }
+}
+.cont-text {
+  font-family: var(--mono);
+  font-size: 24px;
+  color: var(--red, #ef4444);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  animation: contBlink 1s infinite;
+}
+@keyframes contBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.cont-dismiss {
+  margin-top: 20px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<!-- Lamp Intro -->
+<div id="lamp-overlay">
+  <div class="lamp-text">
+    <div>initializing microscope...</div>
+    <div class="bright" style="margin-top:8px;">💡 lamp on</div>
+  </div>
+</div>
+
+<!-- Microscope Viewport -->
+<div class="viewport" id="viewport">
+  <div class="scope-mask">
+    <div class="dish" id="dish">
+      <!-- Colonies rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- Colony Detail Overlay -->
+<div class="colony-detail" id="colonyDetail">
+  <div class="detail-bg" onclick="closeDetail()"></div>
+  <div class="detail-content" id="detailContent"></div>
+</div>
+
+<!-- Specimen Label -->
+<div class="specimen-label" id="specimenLabel">
+  <div class="label-title">SPECIMEN: Rika Ciminieri</div>
+  <div>Full-Stack Engineer / 莉香</div>
+  <div style="margin-top:6px;">
+    CULTURE: <span class="culture-toggle" onclick="toggleLang()">
+      <span id="langDisplay">en-US</span> ↻
+    </span>
+  </div>
+  <div style="margin-top:4px;opacity:0.5;">MAGNIFICATION: <span id="zoomDisplay">1x</span></div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <button class="tb-btn" onclick="zoomIn()" title="Zoom in">🔍</button>
+  <button class="tb-btn" onclick="zoomOut()" title="Zoom out">🔎</button>
+  <button class="tb-btn" id="uvBtn" onclick="toggleUV()" title="UV illumination">🔬</button>
+  <div class="zoom-display" id="zoomLabel">1x</div>
+</div>
+
+<!-- Contamination Warning -->
+<div class="contamination" id="contamination">
+  <div class="cont-text">⚠ Contamination Warning ⚠</div>
+  <div class="cont-dismiss" onclick="dismissContamination()">[ click to sterilize ]</div>
+</div>
+
+<!-- Tardigrade -->
+<div class="tardigrade" id="tardigrade" title="He's been living here since the microbiology days and refuses to leave">🐻</div>
+
+<script>
+// =================== STATE ===================
+let lang = 'en';
+let zoom = 1;
+let uvMode = false;
+let dishX = 0, dishY = 0;
+let isDragging = false;
+let dragStart = { x: 0, y: 0 };
+let rapidClicks = 0;
+let rapidClickTimer = null;
+
+// =================== COLONY DATA ===================
+const colonies = [
+  {
+    id: 'eng',
+    cls: 'colony-eng',
+    x: 35, y: 30,
+    size: 140,
+    label: { en: 'Engineering', jp: 'エンジニアリング' },
+    color: 'var(--eng-color)',
+  },
+  {
+    id: 'japan',
+    cls: 'colony-japan',
+    x: 65, y: 25,
+    size: 110,
+    label: { en: 'Japan / 日本', jp: '日本' },
+    color: 'var(--japan-color)',
+  },
+  {
+    id: 'op',
+    cls: 'colony-op',
+    x: 25, y: 65,
+    size: 120,
+    label: { en: 'One Piece', jp: 'ワンピース' },
+    color: 'var(--op-color)',
+  },
+  {
+    id: 'gc',
+    cls: 'colony-gc',
+    x: 60, y: 60,
+    size: 100,
+    label: { en: 'Grilled Cheese', jp: 'グリルドチーズ' },
+    color: 'var(--gc-color)',
+  },
+  {
+    id: 'gallery',
+    cls: 'colony-gallery',
+    x: 48, y: 46,
+    size: 90,
+    label: { en: 'Gallery', jp: 'ギャラリー' },
+    color: 'var(--gallery-color)',
+  },
+];
+
+// =================== DETAIL CONTENT ===================
+const detailData = {
+  eng: {
+    en: {
+      title: 'Engineering Colony',
+      subtitle: 'Geometric, crystalline clusters — structured and orderly, like the code itself.',
+      badge: 'MAGNIFICATION: 100x',
+      badgeColor: 'var(--eng-color)',
+      content: `
+        <div class="cell-diagram">
+          <div class="cell-part" style="border-color:var(--eng-color);background:rgba(74,144,217,0.05);">
+            <h4>🔬 Nucleus — Core Identity</h4>
+            <p>Full-stack engineer at Eventbrite. I build event discovery, ticketing, and checkout flows used by millions. Before that: microbiology student who discovered she liked debugging code more than debugging cell cultures.</p>
+          </div>
+          <div class="cell-part" style="border-color:var(--eng-color);background:rgba(74,144,217,0.05);">
+            <h4>⚡ Mitochondria — Tech Stack</h4>
+            <p style="font-size:12px;opacity:0.6;margin-bottom:8px;">(the powerhouse of the project)</p>
+            <div class="tech-tags">
+              <span class="tech-tag">React</span><span class="tech-tag">TypeScript</span>
+              <span class="tech-tag">Python</span><span class="tech-tag">Node.js</span>
+              <span class="tech-tag">GraphQL</span><span class="tech-tag">PostgreSQL</span>
+              <span class="tech-tag">Tailwind</span><span class="tech-tag">Next.js</span>
+              <span class="tech-tag">AWS</span><span class="tech-tag">Docker</span>
+            </div>
+          </div>
+          <div class="cell-part" style="border-color:var(--eng-color);background:rgba(74,144,217,0.05);">
+            <h4>🧬 Ribosomes — Code Snippets</h4>
+            <p style="font-family:var(--mono);font-size:12px;opacity:0.8;">
+              const portfolio = await buildDreamJob();<br>
+              // Note: grilled cheese subsystem ONLINE ✓
+            </p>
+          </div>
+        </div>
+        <h3 style="color:var(--text-light);font-size:18px;margin-bottom:16px;">Project Cultures</h3>
+        <div class="project-grid">
+          <div class="project-cell">
+            <h3>🌐 This Portfolio</h3>
+            <p>A microscope-themed portfolio built from scratch. You're literally inside it right now.</p>
+            <div class="tech-tags"><span class="tech-tag">React</span><span class="tech-tag">Vite</span><span class="tech-tag">CSS</span></div>
+          </div>
+          <div class="project-cell">
+            <h3>🧀 Grilled Cheese API</h3>
+            <p>RESTful API for ranking grilled cheese sandwiches. Because science demands rigor.</p>
+            <div class="tech-tags"><span class="tech-tag">Node.js</span><span class="tech-tag">Express</span><span class="tech-tag">PostgreSQL</span></div>
+          </div>
+          <div class="project-cell">
+            <h3>🌏 Bilingual CMS</h3>
+            <p>Content system with first-class EN/JP support. Vertical text, proper typography.</p>
+            <div class="tech-tags"><span class="tech-tag">Next.js</span><span class="tech-tag">i18n</span><span class="tech-tag">MDX</span></div>
+          </div>
+          <div class="project-cell">
+            <h3>🎪 Eventbrite Platform</h3>
+            <p>Core event discovery and ticketing. Search, recommendations, checkout flows.</p>
+            <div class="tech-tags"><span class="tech-tag">React</span><span class="tech-tag">Python</span><span class="tech-tag">GraphQL</span></div>
+          </div>
+        </div>
+      `
+    },
+    jp: {
+      title: 'エンジニアリングコロニー',
+      subtitle: '幾何学的な結晶クラスター — コードのように構造的で秩序正しい。',
+      badge: '倍率: 100x',
+      badgeColor: 'var(--eng-color)',
+      content: `
+        <div class="cell-diagram">
+          <div class="cell-part" style="border-color:var(--eng-color);background:rgba(74,144,217,0.05);">
+            <h4>🔬 核 — コアアイデンティティ</h4>
+            <p>Eventbriteのフルスタックエンジニア。何百万人もが使うイベント発見、チケット販売、決済フローを構築しています。その前は微生物学の学生でした。</p>
+          </div>
+          <div class="cell-part" style="border-color:var(--eng-color);background:rgba(74,144,217,0.05);">
+            <h4>⚡ ミトコンドリア — 技術スタック</h4>
+            <p style="font-size:12px;opacity:0.6;margin-bottom:8px;">（プロジェクトのパワーハウス）</p>
+            <div class="tech-tags">
+              <span class="tech-tag">React</span><span class="tech-tag">TypeScript</span>
+              <span class="tech-tag">Python</span><span class="tech-tag">Node.js</span>
+              <span class="tech-tag">GraphQL</span><span class="tech-tag">PostgreSQL</span>
+            </div>
+          </div>
+        </div>
+      `
+    }
+  },
+  japan: {
+    en: {
+      title: 'Japan Colony / 日本',
+      subtitle: 'Mycelium-like branching networks — organic, flowing, cherry blossom pink. Heritage, not decoration.',
+      badge: 'MAGNIFICATION: 100x',
+      badgeColor: 'var(--japan-color)',
+      content: `
+        <div class="cell-diagram">
+          <div class="cell-part" style="border-color:var(--japan-color);background:rgba(255,143,163,0.05);">
+            <h4>🌸 Nucleus — Connection</h4>
+            <p>Half-Japanese. I go to Japan almost every year. Onsens, konbini runs at 2am, getting lost in Shibuya, finding the perfect ramen spot at 11pm. This isn't a hobby — it's who I am.</p>
+          </div>
+          <div class="cell-part" style="border-color:var(--japan-color);background:rgba(255,143,163,0.05);">
+            <h4>📺 Cell Membrane — Culture</h4>
+            <ul>
+              <li>Terrace House (I have opinions about every season)</li>
+              <li>Hana Yori Dango (the drama that started it all)</li>
+              <li>Yoasobi — "Idol" on repeat</li>
+              <li>Dodo — the artist, not the bird</li>
+            </ul>
+          </div>
+          <div class="cell-part" style="border-color:var(--japan-color);background:rgba(255,143,163,0.05);">
+            <h4>♨️ Endoplasmic Reticulum — Onsen Rankings</h4>
+            <ul>
+              <li>🥇 Kurokawa Onsen, Kumamoto — perfection</li>
+              <li>🥈 Hakone open-air, Kanagawa — the views</li>
+              <li>🥉 Kinosaki Onsen, Hyogo — the town hopping</li>
+            </ul>
+          </div>
+        </div>
+      `
+    },
+    jp: {
+      title: '日本コロニー',
+      subtitle: '菌糸のような分岐ネットワーク — 有機的で流れるような、桜色。装飾ではなく、遺産。',
+      badge: '倍率: 100x',
+      badgeColor: 'var(--japan-color)',
+      content: `
+        <div class="cell-diagram">
+          <div class="cell-part" style="border-color:var(--japan-color);background:rgba(255,143,163,0.05);">
+            <h4>🌸 核 — つながり</h4>
+            <p>日米ハーフ。ほぼ毎年日本に行きます。温泉、深夜2時のコンビニ、渋谷で迷子になること、夜11時に完璧なラーメン屋を見つけること。</p>
+          </div>
+          <div class="cell-part" style="border-color:var(--japan-color);background:rgba(255,143,163,0.05);">
+            <h4>📺 細胞膜 — カルチャー</h4>
+            <ul>
+              <li>テラスハウス（全シーズンに意見あり）</li>
+              <li>花より男子（すべての始まり）</li>
+              <li>YOASOBI — 「アイドル」をリピート</li>
+              <li>Dodo — アーティストの方</li>
+            </ul>
+          </div>
+        </div>
+      `
+    }
+  },
+  op: {
+    en: {
+      title: 'One Piece Colony',
+      subtitle: 'Explosive, chaotic growth — like log-phase E. coli. Click a theory and watch it divide.',
+      badge: 'MAGNIFICATION: 100x',
+      badgeColor: 'var(--op-color)',
+      content: `
+        <div style="margin-bottom:24px;">
+          <p style="color:var(--muted-light);font-size:14px;line-height:1.7;">I have deeply researched One Piece theories. Not "I watched a YouTube video" researched — I mean "I cross-referenced SBS columns with manga panels and built a spreadsheet" researched. Here are my current hypotheses:</p>
+        </div>
+        <div class="theory-card" onclick="this.classList.toggle('expanded')">
+          <h3>🏴‍☠️ Luffy's True Dream</h3>
+          <div class="teaser">"It's not becoming Pirate King. Click to see what I think it really is..."</div>
+          <div class="full-theory">It's about freedom — not just his own, but everyone's. The scene where he whispers his dream to Ace and Sabo, and they react with shock and then laughter? That's not a Pirate King declaration. That's something wild, something that sounds impossible but is so pure that you can't help but smile. I think Luffy's dream is to throw a feast where everyone in the world can eat together freely. It connects to the themes of hunger, freedom, and community that run through the entire series.</div>
+        </div>
+        <div class="theory-card" onclick="this.classList.toggle('expanded')">
+          <h3>📜 The Void Century</h3>
+          <div class="teaser">"800 years of erased history. Who benefits from forgetting?"</div>
+          <div class="full-theory">The World Government erased the Void Century because the Ancient Kingdom represented a world without borders — a unified civilization where all races coexisted. The twenty kingdoms that became the World Government destroyed it because unity threatened their individual power. The poneglyphs aren't just history — they're a blueprint for rebuilding that world. And Joy Boy was its last champion.</div>
+        </div>
+        <div class="theory-card" onclick="this.classList.toggle('expanded')">
+          <h3>👒 Joy Boy's Promise</h3>
+          <div class="teaser">"A promise made 800 years ago, about to be fulfilled..."</div>
+          <div class="full-theory">Joy Boy promised the Fishmen he'd take them to the surface to live under the sun. But it goes deeper — he promised to create a world where the Red Line doesn't exist, where All Blue is real, where every sea connects. Luffy inheriting Joy Boy's will means he'll literally reshape the geography of the One Piece world. The One Piece itself? I think it's the means to do it — the weapon, the knowledge, and the alliance to make it happen.</div>
+        </div>
+      `
+    },
+    jp: {
+      title: 'ワンピースコロニー',
+      subtitle: '爆発的でカオスな増殖 — 対数増殖期の大腸菌のように。',
+      badge: '倍率: 100x',
+      badgeColor: 'var(--op-color)',
+      content: `
+        <div class="theory-card" onclick="this.classList.toggle('expanded')">
+          <h3>🏴‍☠️ ルフィの本当の夢</h3>
+          <div class="teaser">「海賊王になることじゃない。本当の夢は...」</div>
+          <div class="full-theory">自由 — 自分だけでなく、みんなの自由。ルフィがエースとサボに夢を囁いた時、二人は驚いて、そして笑った。あれは海賊王宣言じゃない。もっとワイルドで、不可能に聞こえるけど、純粋すぎて笑うしかないもの。</div>
+        </div>
+        <div class="theory-card" onclick="this.classList.toggle('expanded')">
+          <h3>📜 空白の100年</h3>
+          <div class="teaser">「消された800年の歴史。忘れることで誰が得をする？」</div>
+          <div class="full-theory">世界政府が空白の100年を消したのは、古代王国が国境のない世界を代表していたから。ポーネグリフは歴史だけじゃなく、その世界を再建するための設計図。</div>
+        </div>
+      `
+    }
+  },
+  gc: {
+    en: {
+      title: 'Grilled Cheese Colony',
+      subtitle: 'Golden, bubbly — like a yeast culture in fermentation. Pop a bubble, read a review.',
+      badge: 'MAGNIFICATION: 100x',
+      badgeColor: 'var(--gc-color)',
+      content: `
+        <div style="margin-bottom:24px;">
+          <p style="color:var(--muted-light);font-size:14px;line-height:1.7;">I rank grilled cheeses competitively. Yes, that's a real thing I do. Each sandwich is scored on four criteria: Cheese Pull (x/10), Crunch Factor (x/10), Flavor (x/10), and Vibes (x/10). Here are the current standings:</p>
+        </div>
+        <div class="gc-ranking">
+          <div class="gc-rank" style="color:var(--gc-color);">🥇</div>
+          <div class="gc-info"><h4>The Classic</h4><p>Sharp cheddar on sourdough. Butter, not mayo. Perfect.</p></div>
+          <div class="gc-score-bar"><div class="gc-score-fill" style="width:97%"></div></div>
+        </div>
+        <div class="gc-ranking">
+          <div class="gc-rank" style="color:#94a3b8;">🥈</div>
+          <div class="gc-info"><h4>Truffle Melt</h4><p>Gruyère + truffle oil + caramelized onions. Fancy but earned.</p></div>
+          <div class="gc-score-bar"><div class="gc-score-fill" style="width:95%"></div></div>
+        </div>
+        <div class="gc-ranking">
+          <div class="gc-rank" style="color:#d97706;">🥉</div>
+          <div class="gc-info"><h4>Brie & Fig</h4><p>Brie + fig jam + arugula. The one that converted skeptics.</p></div>
+          <div class="gc-score-bar"><div class="gc-score-fill" style="width:90%"></div></div>
+        </div>
+        <div class="gc-ranking">
+          <div class="gc-rank" style="color:var(--muted-light);">4</div>
+          <div class="gc-info"><h4>Kimchi Grilled Cheese</h4><p>The wildcard. Pepper jack + kimchi + sesame. Fusion at its finest.</p></div>
+          <div class="gc-score-bar"><div class="gc-score-fill" style="width:87%"></div></div>
+        </div>
+        <div class="gc-ranking">
+          <div class="gc-rank" style="color:var(--muted-light);">5</div>
+          <div class="gc-info"><h4>French Onion</h4><p>Gruyère + caramelized onions + thyme butter. Like the soup but better.</p></div>
+          <div class="gc-score-bar"><div class="gc-score-fill" style="width:84%"></div></div>
+        </div>
+        <div class="gc-ranking">
+          <div class="gc-rank" style="color:var(--muted-light);">6</div>
+          <div class="gc-info"><h4>The Starbucks One</h4><p>Yes, Starbucks. I will die on this hill. It's actually good.</p></div>
+          <div class="gc-score-bar"><div class="gc-score-fill" style="width:75%"></div></div>
+        </div>
+        <div style="margin-top:24px;padding:16px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.15);border-radius:10px;">
+          <p style="font-size:13px;color:var(--muted-light);font-style:italic;">"The grilled cheese you make at 2am hits different." — Lab Report, Field Notes</p>
+        </div>
+      `
+    },
+    jp: {
+      title: 'グリルドチーズコロニー',
+      subtitle: '金色で泡立つ — 発酵中の酵母培養のように。泡をタップしてレビューを読む。',
+      badge: '倍率: 100x',
+      badgeColor: 'var(--gc-color)',
+      content: `
+        <div class="gc-ranking">
+          <div class="gc-rank" style="color:var(--gc-color);">🥇</div>
+          <div class="gc-info"><h4>クラシック</h4><p>サワードウにシャープチェダー。バター、マヨじゃなく。完璧。</p></div>
+        </div>
+        <div class="gc-ranking">
+          <div class="gc-rank" style="color:#94a3b8;">🥈</div>
+          <div class="gc-info"><h4>トリュフメルト</h4><p>グリュイエール＋トリュフオイル＋キャラメリゼオニオン。</p></div>
+        </div>
+        <div class="gc-ranking">
+          <div class="gc-rank" style="color:#d97706;">🥉</div>
+          <div class="gc-info"><h4>ブリー＆フィグ</h4><p>ブリー＋フィグジャム＋ルッコラ。</p></div>
+        </div>
+      `
+    }
+  },
+  gallery: {
+    en: {
+      title: 'Gallery Colony',
+      subtitle: 'Fractal, colorful — like slime mold branching toward nutrients. Each terminus is an artwork.',
+      badge: 'MAGNIFICATION: 100x',
+      badgeColor: 'var(--gallery-color)',
+      content: `
+        <div style="margin-bottom:24px;">
+          <p style="color:var(--muted-light);font-size:14px;line-height:1.7;">I paint (paint-by-numbers, mostly for friends), do pilates, and craft tiny book nooks that stack up on my shelves. These are how I turn my brain off and work with my hands.</p>
+        </div>
+        <div class="gallery-grid">
+          <div class="gallery-piece">
+            <div class="gallery-piece-thumb">🎨</div>
+            <div class="gallery-piece-info">
+              <h4>Sunset Over Shibuya</h4>
+              <p>Paint-by-numbers, acrylic. Made for a friend who studied abroad in Tokyo.</p>
+            </div>
+          </div>
+          <div class="gallery-piece">
+            <div class="gallery-piece-thumb">🏠</div>
+            <div class="gallery-piece-info">
+              <h4>Hobbit Hole Book Nook</h4>
+              <p>Balsa wood, LED lights, and way too much hot glue. My first nook!</p>
+            </div>
+          </div>
+          <div class="gallery-piece">
+            <div class="gallery-piece-thumb">🌊</div>
+            <div class="gallery-piece-info">
+              <h4>The Great Wave (Remix)</h4>
+              <p>Paint-by-numbers reinterpretation of Hokusai. 3 weekends.</p>
+            </div>
+          </div>
+          <div class="gallery-piece">
+            <div class="gallery-piece-thumb">📚</div>
+            <div class="gallery-piece-info">
+              <h4>Diagon Alley Nook</h4>
+              <p>Harry Potter themed. Tiny shop windows that actually light up.</p>
+            </div>
+          </div>
+          <div class="gallery-piece">
+            <div class="gallery-piece-thumb">🌸</div>
+            <div class="gallery-piece-info">
+              <h4>Cherry Blossom Garden</h4>
+              <p>After my last Kyoto trip. The pinks are slightly wrong and I love it.</p>
+            </div>
+          </div>
+          <div class="gallery-piece">
+            <div class="gallery-piece-thumb">🏰</div>
+            <div class="gallery-piece-info">
+              <h4>Medieval Library Nook</h4>
+              <p>Newest nook. Tiny books, working chandelier, stone walls.</p>
+            </div>
+          </div>
+        </div>
+      `
+    },
+    jp: {
+      title: 'ギャラリーコロニー',
+      subtitle: 'フラクタル、カラフル — 栄養源に向かって分岐する粘菌のように。',
+      badge: '倍率: 100x',
+      badgeColor: 'var(--gallery-color)',
+      content: `
+        <div class="gallery-grid">
+          <div class="gallery-piece">
+            <div class="gallery-piece-thumb">🎨</div>
+            <div class="gallery-piece-info"><h4>渋谷の夕暮れ</h4><p>数字で塗る絵、アクリル。東京留学した友人のために。</p></div>
+          </div>
+          <div class="gallery-piece">
+            <div class="gallery-piece-thumb">🏠</div>
+            <div class="gallery-piece-info"><h4>ホビットの穴ブックヌック</h4><p>バルサ材、LEDライト。初めてのブックヌック！</p></div>
+          </div>
+          <div class="gallery-piece">
+            <div class="gallery-piece-thumb">🌊</div>
+            <div class="gallery-piece-info"><h4>大波（リミックス）</h4><p>北斎の再解釈。3週末かかりました。</p></div>
+          </div>
+        </div>
+      `
+    }
+  }
+};
+
+// =================== RENDER COLONIES ===================
+function renderColonies() {
+  const dish = document.getElementById('dish');
+  // Clear only colonies (keep other children if any)
+  dish.querySelectorAll('.colony, .tardigrade-dish').forEach(el => el.remove());
+
+  colonies.forEach(c => {
+    const el = document.createElement('div');
+    el.className = `colony ${c.cls}`;
+    el.style.left = `${c.x}%`;
+    el.style.top = `${c.y}%`;
+    el.style.width = `${c.size}px`;
+    el.style.height = `${c.size}px`;
+    el.style.marginLeft = `-${c.size/2}px`;
+    el.style.marginTop = `-${c.size/2}px`;
+    el.onclick = () => openColonyDetail(c.id);
+
+    let extras = '';
+    // GC colony gets bubbles
+    if (c.id === 'gc') {
+      for (let i = 0; i < 6; i++) {
+        const s = 6 + Math.random() * 14;
+        extras += `<div class="bubble" style="
+          width:${s}px;height:${s}px;
+          left:${15 + Math.random() * 60}%;
+          top:${15 + Math.random() * 60}%;
+          animation-delay:${Math.random() * 3}s;
+          animation-duration:${2 + Math.random() * 2}s;
+        "></div>`;
+      }
+    }
+
+    el.innerHTML = `
+      <div class="colony-inner">${extras}</div>
+      <div class="colony-label">${c.label[lang]}</div>
+    `;
+    dish.appendChild(el);
+  });
+}
+
+// =================== DETAIL VIEW ===================
+function openColonyDetail(id) {
+  const data = detailData[id]?.[lang] || detailData[id]?.en;
+  if (!data) return;
+
+  const detail = document.getElementById('colonyDetail');
+  const content = document.getElementById('detailContent');
+
+  content.innerHTML = `
+    <div class="detail-header">
+      <button class="detail-back" onclick="closeDetail()">← back to dish</button>
+      <span class="detail-badge" style="background:${data.badgeColor}20;color:${data.badgeColor};border:1px solid ${data.badgeColor}30;">${data.badge}</span>
+    </div>
+    <div class="detail-title">${data.title}</div>
+    <div class="detail-subtitle">${data.subtitle}</div>
+    ${data.content}
+  `;
+
+  detail.classList.add('open');
+  requestAnimationFrame(() => { detail.style.opacity = '1'; });
+}
+
+function closeDetail() {
+  const detail = document.getElementById('colonyDetail');
+  detail.style.opacity = '0';
+  setTimeout(() => { detail.classList.remove('open'); detail.style.opacity = ''; }, 400);
+}
+
+// =================== ZOOM & PAN ===================
+function updateDish() {
+  const dish = document.getElementById('dish');
+  dish.style.transform = `scale(${zoom}) translate(${dishX}px, ${dishY}px)`;
+  document.getElementById('zoomDisplay').textContent = `${zoom}x`;
+  document.getElementById('zoomLabel').textContent = `${zoom}x`;
+
+  // Show tardigrade at certain zoom
+  const tardi = document.getElementById('tardigrade');
+  tardi.classList.toggle('visible', zoom >= 2);
+}
+
+function zoomIn() {
+  zoom = Math.min(zoom * 1.5, 8);
+  updateDish();
+}
+
+function zoomOut() {
+  zoom = Math.max(zoom / 1.5, 0.5);
+  updateDish();
+}
+
+// Mouse wheel zoom
+document.addEventListener('wheel', e => {
+  if (document.getElementById('colonyDetail').classList.contains('open')) return;
+  e.preventDefault();
+  if (e.deltaY < 0) zoom = Math.min(zoom * 1.15, 8);
+  else zoom = Math.max(zoom / 1.15, 0.5);
+  updateDish();
+}, { passive: false });
+
+// Pan with drag
+const viewport = document.getElementById('viewport');
+viewport.addEventListener('mousedown', e => {
+  if (e.target.closest('.colony') || e.target.closest('.tb-btn')) return;
+  isDragging = true;
+  dragStart = { x: e.clientX - dishX * zoom, y: e.clientY - dishY * zoom };
+  viewport.style.cursor = 'grabbing';
+});
+
+document.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  dishX = (e.clientX - dragStart.x) / zoom;
+  dishY = (e.clientY - dragStart.y) / zoom;
+  updateDish();
+});
+
+document.addEventListener('mouseup', () => {
+  isDragging = false;
+  viewport.style.cursor = '';
+});
+
+// Touch zoom/pan
+let lastTouchDist = 0;
+viewport.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) {
+    isDragging = true;
+    dragStart = { x: e.touches[0].clientX - dishX * zoom, y: e.touches[0].clientY - dishY * zoom };
+  }
+  if (e.touches.length === 2) {
+    lastTouchDist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+  }
+}, { passive: true });
+
+viewport.addEventListener('touchmove', e => {
+  if (e.touches.length === 1 && isDragging) {
+    dishX = (e.touches[0].clientX - dragStart.x) / zoom;
+    dishY = (e.touches[0].clientY - dragStart.y) / zoom;
+    updateDish();
+  }
+  if (e.touches.length === 2) {
+    const dist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    if (lastTouchDist > 0) {
+      const scale = dist / lastTouchDist;
+      zoom = Math.min(Math.max(zoom * scale, 0.5), 8);
+      updateDish();
+    }
+    lastTouchDist = dist;
+  }
+}, { passive: true });
+
+viewport.addEventListener('touchend', () => { isDragging = false; lastTouchDist = 0; });
+
+// =================== UV MODE ===================
+function toggleUV() {
+  uvMode = !uvMode;
+  document.body.classList.toggle('uv-mode', uvMode);
+  document.getElementById('uvBtn').classList.toggle('active', uvMode);
+}
+
+// =================== LANGUAGE ===================
+function toggleLang() {
+  lang = lang === 'en' ? 'jp' : 'en';
+  document.getElementById('langDisplay').textContent = lang === 'en' ? 'en-US' : 'ja-JP';
+  renderColonies();
+  // If detail is open, re-render
+  const detail = document.getElementById('colonyDetail');
+  if (detail.classList.contains('open')) {
+    // Find which colony is shown by checking the title
+    for (const id of Object.keys(detailData)) {
+      const d = detailData[id][lang] || detailData[id].en;
+      if (document.getElementById('detailContent').querySelector('.detail-title')?.textContent.includes(detailData[id].en.title) ||
+          document.getElementById('detailContent').querySelector('.detail-title')?.textContent.includes(detailData[id].jp?.title)) {
+        openColonyDetail(id);
+        break;
+      }
+    }
+  }
+}
+
+// =================== RAPID CLICK EASTER EGG ===================
+document.addEventListener('click', () => {
+  rapidClicks++;
+  clearTimeout(rapidClickTimer);
+  rapidClickTimer = setTimeout(() => { rapidClicks = 0; }, 2000);
+  if (rapidClicks >= 8) {
+    rapidClicks = 0;
+    showContamination();
+  }
+});
+
+function showContamination() {
+  document.getElementById('contamination').classList.add('show');
+}
+
+function dismissContamination() {
+  document.getElementById('contamination').classList.remove('show');
+}
+
+// =================== LAMP INTRO ===================
+function startLamp() {
+  setTimeout(() => {
+    document.getElementById('lamp-overlay').classList.add('off');
+    setTimeout(() => {
+      document.getElementById('lamp-overlay').style.display = 'none';
+    }, 1000);
+  }, 1800);
+}
+
+// =================== INIT ===================
+renderColonies();
+updateDish();
+startLamp();
+</script>
+</body>
+</html>

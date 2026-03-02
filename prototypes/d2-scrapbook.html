@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rika's Scrapbook Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --cream: #f5f0e8;
+  --kraft: #c4a882;
+  --aged: #ede5d5;
+  --ink: #4a3728;
+  --pink: #f4a5b8;
+  --mint: #a8d8b9;
+  --lavender: #c4b5e0;
+  --gold: #e8c547;
+  --sky: #87CEEB;
+  --cork: #c89b5e;
+  --ribbon-pink: #f4a5b8;
+  --ribbon-orange: #e8985a;
+  --ribbon-green: #7bc67b;
+  --ribbon-blue: #6aadcf;
+  --ribbon-yellow: #e8c547;
+  --ribbon-purple: #b39ddb;
+  --ribbon-magenta: #d4749a;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  font-family: 'Lora', serif;
+  background: #3a2f28;
+  color: var(--ink);
+}
+
+/* ===== PAPER TEXTURE MIXIN ===== */
+.paper-texture {
+  background-color: var(--cream);
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+.paper-texture-aged {
+  background-color: var(--aged);
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* ===== COVER ===== */
+.cover-wrapper {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at center, #5a4a3a 0%, #2a1f18 100%);
+  z-index: 100;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+  perspective: 1200px;
+}
+.cover-wrapper.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.cover {
+  width: min(90vw, 700px);
+  height: min(85vh, 520px);
+  background: linear-gradient(135deg, #c4a882 0%, #b89970 40%, #a88a60 100%);
+  border-radius: 6px 16px 16px 6px;
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.15),
+    inset -2px 0 8px rgba(0,0,0,0.1),
+    4px 0 0 #8a7050,
+    6px 0 0 #7a6040;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.15s ease-out;
+  transform-style: preserve-3d;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  overflow: hidden;
+}
+
+.cover::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Spine edge */
+.cover::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0; width: 30px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 60%, transparent 100%);
+  border-radius: 6px 0 0 6px;
+  pointer-events: none;
+}
+
+.cover-title {
+  font-family: 'Caveat', cursive;
+  font-size: clamp(2.4rem, 6vw, 3.8rem);
+  font-weight: 700;
+  color: #3a2a1a;
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.2);
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  line-height: 1.2;
+}
+.cover-subtitle {
+  font-family: 'Noto Serif JP', serif;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  color: #5a4a3a;
+  margin-top: 4px;
+  position: relative;
+  z-index: 2;
+}
+
+.cover-prompt {
+  font-family: 'Caveat', cursive;
+  font-size: 1.3rem;
+  color: #6a5a4a;
+  margin-top: 32px;
+  position: relative; z-index: 2;
+  animation: pulse-prompt 2s ease-in-out infinite;
+}
+@keyframes pulse-prompt {
+  0%, 100% { opacity: 0.6; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(6px); }
+}
+
+/* Cover stickers */
+.sticker {
+  position: absolute;
+  z-index: 3;
+  transition: transform 0.3s ease;
+  pointer-events: auto;
+  user-select: none;
+}
+.sticker:hover {
+  animation: wiggle 0.4s ease;
+}
+@keyframes wiggle {
+  0% { transform: rotate(var(--rot, 0deg)); }
+  25% { transform: rotate(calc(var(--rot, 0deg) + 6deg)); }
+  50% { transform: rotate(calc(var(--rot, 0deg) - 6deg)); }
+  75% { transform: rotate(calc(var(--rot, 0deg) + 3deg)); }
+  100% { transform: rotate(var(--rot, 0deg)); }
+}
+
+.sticker-hello {
+  top: 8%; left: 8%;
+  background: #fff;
+  border: 2px solid #e44;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #333;
+  --rot: -8deg;
+  transform: rotate(-8deg);
+  line-height: 1.3;
+}
+.sticker-hello .hello-top {
+  color: #e44;
+  font-size: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.sticker-hello .hello-name {
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 700;
+}
+
+.sticker-cheese {
+  top: 12%; right: 12%;
+  font-size: 2.8rem;
+  --rot: 12deg;
+  transform: rotate(12deg);
+}
+.sticker-flag {
+  bottom: 18%; left: 10%;
+  font-size: 2.2rem;
+  --rot: -5deg;
+  transform: rotate(-5deg);
+}
+.sticker-skull {
+  bottom: 14%; right: 14%;
+  font-size: 2.4rem;
+  --rot: 8deg;
+  transform: rotate(8deg);
+}
+.sticker-built {
+  top: 50%; right: 6%;
+  background: var(--gold);
+  color: #3a2a1a;
+  font-family: 'Caveat', cursive;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  --rot: 15deg;
+  transform: rotate(15deg);
+  box-shadow: 1px 2px 4px rgba(0,0,0,0.15);
+}
+
+/* ===== BOOK CONTAINER ===== */
+.book-wrapper {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at center, #4a3f35 0%, #2a1f18 100%);
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.6s ease 0.2s, visibility 0.6s ease 0.2s;
+}
+.book-wrapper.visible { opacity: 1; visibility: visible; }
+
+.book {
+  width: min(95vw, 1100px);
+  height: min(88vh, 680px);
+  position: relative;
+  perspective: 2000px;
+  display: flex;
+}
+
+/* Spine */
+.book-spine {
+  position: absolute;
+  left: 50%; top: 0; bottom: 0;
+  width: 4px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #8a7050, #6a5040, #8a7050);
+  box-shadow: 0 0 12px rgba(0,0,0,0.3);
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* Page container */
+.spread {
+  position: absolute; inset: 0;
+  display: flex;
+  transition: opacity 0.05s;
+  pointer-events: none;
+}
+.spread.active { pointer-events: auto; }
+.spread:not(.active) { opacity: 0; visibility: hidden; }
+
+.page {
+  width: 50%; height: 100%;
+  padding: 32px 36px;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.page::-webkit-scrollbar { width: 4px; }
+.page::-webkit-scrollbar-thumb { background: var(--kraft); border-radius: 4px; }
+
+.page-left {
+  border-radius: 8px 0 0 8px;
+  box-shadow: inset -8px 0 16px rgba(0,0,0,0.06), -4px 4px 16px rgba(0,0,0,0.2);
+}
+.page-right {
+  border-radius: 0 8px 8px 0;
+  box-shadow: inset 8px 0 16px rgba(0,0,0,0.06), 4px 4px 16px rgba(0,0,0,0.2);
+}
+
+/* Page turn zones */
+.turn-zone {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 80px;
+  z-index: 40;
+  cursor: pointer;
+  display: flex; align-items: center;
+}
+.turn-zone-left { left: 0; justify-content: flex-start; padding-left: 8px; }
+.turn-zone-right { right: 0; justify-content: flex-end; padding-right: 8px; }
+.turn-zone:hover .turn-arrow { opacity: 0.6; }
+.turn-arrow {
+  font-family: 'Caveat', cursive;
+  font-size: 1.6rem;
+  color: var(--kraft);
+  opacity: 0;
+  transition: opacity 0.3s;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  pointer-events: none;
+}
+
+/* Page turn animation */
+.page-turn-overlay {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 50%;
+  z-index: 60;
+  pointer-events: none;
+  transform-origin: left center;
+  backface-visibility: hidden;
+}
+.page-turn-overlay.turning-right {
+  right: 0;
+  transform-origin: left center;
+  animation: turnRight 0.6s ease-in-out forwards;
+}
+.page-turn-overlay.turning-left {
+  left: 0;
+  transform-origin: right center;
+  animation: turnLeft 0.6s ease-in-out forwards;
+}
+
+@keyframes turnRight {
+  0% { transform: rotateY(0deg); }
+  50% { transform: rotateY(-90deg); box-shadow: -10px 0 30px rgba(0,0,0,0.3); }
+  100% { transform: rotateY(-180deg); }
+}
+@keyframes turnLeft {
+  0% { transform: rotateY(0deg); }
+  50% { transform: rotateY(90deg); box-shadow: 10px 0 30px rgba(0,0,0,0.3); }
+  100% { transform: rotateY(180deg); }
+}
+
+/* ===== RIBBON BOOKMARKS ===== */
+.ribbons {
+  position: absolute;
+  right: -28px;
+  top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 55;
+}
+.ribbon {
+  width: 28px;
+  height: 48px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s ease;
+  border-radius: 0 3px 0 0;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+.ribbon::after {
+  content: '';
+  position: absolute;
+  bottom: -8px; left: 0; right: 0;
+  border-left: 14px solid var(--c);
+  border-right: 14px solid var(--c);
+  border-bottom: 8px solid transparent;
+}
+.ribbon:hover { transform: translateX(6px); }
+.ribbon.active-ribbon { transform: translateX(10px); }
+.ribbon-label {
+  position: absolute;
+  right: 34px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Caveat', cursive;
+  font-size: 0.8rem;
+  color: var(--cream);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+.ribbon:hover .ribbon-label { opacity: 1; }
+
+/* ===== BILINGUAL TOGGLE ===== */
+.lang-toggle {
+  position: fixed;
+  top: 14px; right: 20px;
+  z-index: 200;
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 6px 16px;
+  background: var(--gold);
+  color: #3a2a1a;
+  border: 2px solid #c9a82f;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+  transition: background 0.2s, transform 0.15s;
+  transform: rotate(2deg);
+}
+.lang-toggle:hover {
+  background: #f0d050;
+  transform: rotate(0deg) scale(1.05);
+}
+
+/* ===== WASHI TAPE ===== */
+.washi {
+  position: absolute;
+  height: 18px;
+  width: 80px;
+  opacity: 0.7;
+  z-index: 5;
+  pointer-events: none;
+}
+.washi-pink { background: var(--pink); }
+.washi-mint { background: var(--mint); }
+.washi-lavender { background: var(--lavender); }
+.washi-gold { background: var(--gold); }
+.washi-sky { background: var(--sky); }
+
+/* ===== SPREAD 1: ABOUT ME ===== */
+.polaroid {
+  width: 180px;
+  background: #fff;
+  padding: 10px 10px 36px;
+  box-shadow: 2px 3px 10px rgba(0,0,0,0.15);
+  transform: rotate(-3deg);
+  margin: 20px auto 0;
+  position: relative;
+}
+.polaroid-img {
+  width: 100%; height: 160px;
+  background: linear-gradient(135deg, #d4c8b8, #b8a898);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.4rem;
+}
+.polaroid-caption {
+  font-family: 'Caveat', cursive;
+  font-size: 1rem;
+  color: #555;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.margin-note {
+  font-family: 'Caveat', cursive;
+  font-size: 0.95rem;
+  color: var(--pink);
+  transform: rotate(-2deg);
+  margin: 8px 0;
+  position: relative;
+  padding-left: 16px;
+}
+.margin-note::before {
+  content: '←';
+  position: absolute;
+  left: 0;
+}
+
+.bio-text {
+  font-family: 'Lora', serif;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.bio-text p { margin-bottom: 12px; }
+
+.doodle-star {
+  display: inline-block;
+  font-size: 0.7rem;
+  opacity: 0.3;
+  margin: 0 4px;
+}
+
+/* ===== SPREAD 2: ENGINEERING ===== */
+.timeline {
+  position: relative;
+  padding-left: 28px;
+  margin-top: 16px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 10px; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--ink);
+  opacity: 0.3;
+}
+.timeline-item {
+  position: relative;
+  padding: 10px 0 22px;
+}
+.timeline-dot {
+  position: absolute;
+  left: -22px; top: 14px;
+  width: 10px; height: 10px;
+  background: var(--ink);
+  border-radius: 50%;
+  border: 2px solid var(--cream);
+}
+.timeline-year {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--kraft);
+  margin-bottom: 2px;
+}
+.timeline-label {
+  font-family: 'Caveat', cursive;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.timeline-desc {
+  font-family: 'Lora', serif;
+  font-size: 0.78rem;
+  color: #7a6a5a;
+  margin-top: 2px;
+}
+
+.envelope {
+  background: linear-gradient(135deg, #e8dcc8 0%, #ddd0bc 100%);
+  border: 1px solid #c8b898;
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+}
+.envelope:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+/* Envelope flap */
+.envelope::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 28px;
+  background: linear-gradient(180deg, #d8c8a8, transparent);
+  clip-path: polygon(0 0, 50% 100%, 100% 0);
+  opacity: 0.5;
+}
+.envelope-label {
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 12px;
+}
+.envelope-sublabel {
+  font-family: 'Lora', serif;
+  font-size: 0.72rem;
+  color: #8a7a6a;
+  font-style: italic;
+}
+.envelope-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+}
+.envelope.open .envelope-content {
+  max-height: 300px;
+  padding-top: 12px;
+}
+.envelope.open::before { opacity: 0; }
+.project-name {
+  font-family: 'Caveat', cursive;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.tech-tags {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  margin: 6px 0;
+}
+.tech-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  background: rgba(74,55,40,0.1);
+  color: var(--ink);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.project-desc {
+  font-family: 'Lora', serif;
+  font-size: 0.78rem;
+  color: #6a5a4a;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+.project-link {
+  font-family: 'Caveat', cursive;
+  font-size: 0.9rem;
+  color: var(--ribbon-blue);
+  text-decoration: underline;
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 6px;
+}
+
+/* ===== SPREAD 3: JAPAN ===== */
+.cherry-blossom {
+  position: absolute;
+  width: 20px; height: 20px;
+  opacity: 0.6;
+}
+.cherry-blossom::before {
+  content: '🌸';
+  font-size: 18px;
+}
+
+.train-ticket {
+  background: #fff;
+  border: 1px dashed #aaa;
+  border-radius: 4px;
+  padding: 12px 16px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.75rem;
+  color: #333;
+  position: relative;
+  max-width: 220px;
+  margin: 20px auto;
+  transform: rotate(1deg);
+}
+.train-ticket::before, .train-ticket::after {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  background: var(--cream);
+  border-radius: 50%;
+  top: 50%; transform: translateY(-50%);
+}
+.train-ticket::before { left: -8px; }
+.train-ticket::after { right: -8px; }
+.ticket-route {
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.ticket-details {
+  display: flex; justify-content: space-between;
+  font-size: 0.65rem; color: #888;
+}
+
+.vertical-jp {
+  writing-mode: vertical-rl;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1rem;
+  color: var(--ink);
+  opacity: 0.3;
+  position: absolute;
+  left: 12px; top: 50%;
+  transform: translateY(-50%);
+  letter-spacing: 4px;
+}
+
+/* ===== SPREAD 4: ONE PIECE ===== */
+.corkboard {
+  background: linear-gradient(135deg, #c89b5e 0%, #b88b4e 50%, #c89b5e 100%);
+  border-radius: 4px;
+  padding: 20px;
+  position: relative;
+  min-height: 100%;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.1'/%3E%3C/svg%3E");
+}
+
+.index-card {
+  background: #fff;
+  border: none;
+  width: 160px;
+  min-height: 90px;
+  padding: 12px;
+  position: absolute;
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.3s;
+  transform-style: preserve-3d;
+}
+.index-card:hover { transform: scale(1.05); z-index: 10; }
+.index-card::before {
+  content: '📌';
+  position: absolute;
+  top: -8px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 1rem;
+  z-index: 2;
+}
+
+.card-front, .card-back {
+  backface-visibility: hidden;
+}
+.card-back {
+  position: absolute; inset: 0;
+  padding: 12px;
+  transform: rotateY(180deg);
+  background: #ffffee;
+  font-family: 'Lora', serif;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  color: var(--ink);
+  overflow-y: auto;
+  border-top: 3px solid var(--pink);
+}
+.index-card.flipped {
+  transform: rotateY(180deg) scale(1.1);
+  z-index: 20;
+}
+
+.card-title {
+  font-family: 'Caveat', cursive;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 1px solid #eee;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+.card-subtitle {
+  font-family: 'Lora', serif;
+  font-size: 0.65rem;
+  color: #999;
+  font-style: italic;
+}
+
+/* Red string connections */
+.red-string {
+  position: absolute;
+  height: 2px;
+  background: #cc3333;
+  transform-origin: left center;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+/* Spin wheel */
+.spin-wheel-container {
+  text-align: center;
+  margin-top: 20px;
+}
+.spin-wheel {
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  border: 4px solid var(--ink);
+  margin: 0 auto 12px;
+  position: relative;
+  transition: transform 1.5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+  background: conic-gradient(
+    var(--pink) 0deg 120deg,
+    var(--mint) 120deg 240deg,
+    var(--lavender) 240deg 360deg
+  );
+}
+.spin-wheel-label {
+  position: absolute;
+  font-family: 'Caveat', cursive;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--ink);
+  width: 60px;
+  text-align: center;
+}
+.spin-pointer {
+  position: absolute;
+  top: -14px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem;
+  z-index: 5;
+}
+.spin-btn {
+  font-family: 'Caveat', cursive;
+  font-size: 1rem;
+  font-weight: 700;
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.spin-btn:hover { transform: scale(1.05); }
+
+/* ===== SPREAD 5: GRILLED CHEESE ===== */
+.podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 30px;
+  padding-bottom: 10px;
+}
+.podium-item {
+  text-align: center;
+  position: relative;
+}
+.podium-block {
+  background: linear-gradient(180deg, var(--gold) 0%, #c9a82f 100%);
+  border-radius: 4px 4px 0 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem;
+  color: var(--ink);
+}
+.podium-1 .podium-block { width: 90px; height: 100px; }
+.podium-2 .podium-block { width: 80px; height: 75px; background: linear-gradient(180deg, #d0d0d0, #a8a8a8); }
+.podium-3 .podium-block { width: 80px; height: 55px; background: linear-gradient(180deg, #cd8c3c, #a06820); }
+.podium-name {
+  font-family: 'Caveat', cursive;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 6px;
+  max-width: 90px;
+}
+.podium-source {
+  font-family: 'Lora', serif;
+  font-size: 0.6rem;
+  color: #8a7a6a;
+  font-style: italic;
+}
+
+.trophy-doodle {
+  text-align: center;
+  font-size: 3rem;
+  margin-top: 16px;
+  position: relative;
+}
+.trophy-doodle::after {
+  content: 'Cheese Champion';
+  display: block;
+  font-family: 'Caveat', cursive;
+  font-size: 1rem;
+  color: var(--ink);
+  opacity: 0.5;
+}
+
+.graph-paper {
+  background-color: #fff;
+  background-image:
+    linear-gradient(rgba(74,55,40,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74,55,40,0.06) 1px, transparent 1px);
+  background-size: 16px 16px;
+  padding: 16px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.bracket {
+  font-family: 'Caveat', cursive;
+  font-size: 0.75rem;
+  color: var(--ink);
+}
+.bracket-round {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.bracket-match {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  border: 1px solid rgba(74,55,40,0.2);
+  border-radius: 3px;
+  margin-bottom: 3px;
+  font-size: 0.72rem;
+}
+.bracket-winner { font-weight: 700; color: var(--ink); }
+.bracket-loser { color: #aaa; text-decoration: line-through; }
+
+.sticky-note {
+  background: #fff9c4;
+  padding: 14px;
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.1);
+  transform: rotate(1.5deg);
+  font-family: 'Caveat', cursive;
+  font-size: 0.85rem;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-top: 14px;
+  position: relative;
+}
+.sticky-note::before {
+  content: "Judge's Notes";
+  display: block;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+  text-decoration: underline;
+}
+
+/* ===== SPREAD 6: GALLERY ===== */
+.gallery-wall {
+  background: linear-gradient(180deg, #8a7a6a 0%, #6a5a4a 100%);
+  border-radius: 4px;
+  padding: 24px;
+  min-height: 80%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+}
+.frame {
+  background: #3a2a1a;
+  padding: 8px;
+  box-shadow: 3px 4px 10px rgba(0,0,0,0.3), inset 0 0 6px rgba(255,255,255,0.05);
+  transition: transform 0.3s;
+}
+.frame:hover { transform: scale(1.05) rotate(-1deg); }
+.frame-inner {
+  width: 110px; height: 90px;
+  border: 1px solid #555;
+}
+.frame-label {
+  font-family: 'Caveat', cursive;
+  font-size: 0.7rem;
+  color: var(--cream);
+  text-align: center;
+  margin-top: 6px;
+}
+
+.book-nook {
+  background: #e8dcc8;
+  border-radius: 4px;
+  padding: 8px;
+  text-align: center;
+  box-shadow: 2px 3px 6px rgba(0,0,0,0.1);
+  margin-bottom: 10px;
+}
+.book-nook-img {
+  width: 100%; height: 80px;
+  background: linear-gradient(135deg, #c4a882, #a88a60);
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+}
+.book-nook-caption {
+  font-family: 'Caveat', cursive;
+  font-size: 0.8rem;
+  color: var(--ink);
+  margin-top: 6px;
+}
+
+.filmstrip {
+  display: flex;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 8px;
+  background: #222;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+.filmstrip-frame {
+  min-width: 50px; height: 38px;
+  background: linear-gradient(135deg, #555, #444);
+  border: 2px solid #111;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ===== SPREAD 7: SECRET PAGE ===== */
+.secret-title {
+  font-family: 'Caveat', cursive;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+  margin-top: 40px;
+}
+.secret-subtitle {
+  font-family: 'Lora', serif;
+  font-size: 0.85rem;
+  color: #8a7a6a;
+  text-align: center;
+  font-style: italic;
+  margin-top: 8px;
+}
+
+.fun-facts {
+  list-style: none;
+  margin-top: 16px;
+}
+.fun-facts li {
+  font-family: 'Lora', serif;
+  font-size: 0.82rem;
+  color: var(--ink);
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(74,55,40,0.2);
+  position: relative;
+  padding-left: 20px;
+}
+.fun-facts li::before {
+  content: '✦';
+  position: absolute;
+  left: 0;
+  color: var(--gold);
+}
+
+.review-card {
+  background: #fff;
+  padding: 14px;
+  border-radius: 6px;
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.08);
+  margin-bottom: 10px;
+  transform: rotate(var(--rot, 0deg));
+}
+.review-stars {
+  color: var(--gold);
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+.review-text {
+  font-family: 'Lora', serif;
+  font-size: 0.8rem;
+  color: var(--ink);
+  font-style: italic;
+}
+.review-author {
+  font-family: 'Caveat', cursive;
+  font-size: 0.85rem;
+  color: #8a7a6a;
+  margin-top: 4px;
+  text-align: right;
+}
+
+.spotify-placeholder {
+  background: #191414;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 12px;
+}
+.spotify-icon {
+  width: 32px; height: 32px;
+  background: #1db954;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+}
+.spotify-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: #b3b3b3;
+}
+.spotify-track {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+/* ===== PAGE NUMBER ===== */
+.page-number {
+  position: absolute;
+  bottom: 12px;
+  font-family: 'Caveat', cursive;
+  font-size: 0.85rem;
+  color: var(--kraft);
+  opacity: 0.6;
+}
+.page-left .page-number { left: 20px; }
+.page-right .page-number { right: 20px; }
+
+/* ===== SECTION TITLES ===== */
+.section-title {
+  font-family: 'Caveat', cursive;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+  position: relative;
+  display: inline-block;
+}
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0; right: 0;
+  height: 3px;
+  background: var(--pink);
+  opacity: 0.4;
+  border-radius: 2px;
+}
+
+.section-title-jp {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.85rem;
+  color: #8a7a6a;
+  margin-bottom: 14px;
+  display: block;
+}
+
+/* ===== TORN EDGE ===== */
+.torn-edge-bottom {
+  clip-path: polygon(
+    0% 0%, 100% 0%, 100% 90%,
+    97% 92%, 94% 89%, 90% 93%,
+    86% 88%, 82% 91%, 78% 87%,
+    74% 92%, 70% 88%, 66% 93%,
+    62% 89%, 58% 92%, 54% 87%,
+    50% 91%, 46% 88%, 42% 93%,
+    38% 89%, 34% 92%, 30% 87%,
+    26% 91%, 22% 88%, 18% 93%,
+    14% 89%, 10% 92%, 6% 88%,
+    3% 91%, 0% 89%
+  );
+}
+
+.torn-edge-top {
+  clip-path: polygon(
+    0% 10%, 3% 8%, 6% 12%,
+    10% 7%, 14% 11%, 18% 6%,
+    22% 10%, 26% 7%, 30% 12%,
+    34% 8%, 38% 11%, 42% 6%,
+    46% 10%, 50% 7%, 54% 12%,
+    58% 8%, 62% 11%, 66% 6%,
+    70% 10%, 74% 7%, 78% 12%,
+    82% 8%, 86% 11%, 90% 6%,
+    94% 10%, 97% 7%, 100% 10%,
+    100% 100%, 0% 100%
+  );
+}
+
+/* ===== PENCIL SKETCH LAYER ===== */
+.pencil-layer {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  z-index: 1;
+}
+.pencil-layer.visible {
+  opacity: 0.12;
+}
+
+/* ===== MOBILE STYLES ===== */
+@media (max-width: 768px) {
+  .book {
+    width: 95vw;
+    height: 90vh;
+  }
+  .spread {
+    flex-direction: column;
+  }
+  .page {
+    width: 100%;
+    height: 50%;
+    padding: 18px 20px;
+  }
+  .page-left {
+    border-radius: 8px 8px 0 0;
+    box-shadow: none;
+  }
+  .page-right {
+    border-radius: 0 0 8px 8px;
+    box-shadow: none;
+  }
+
+  .ribbons {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    top: auto;
+    flex-direction: row;
+    justify-content: center;
+    z-index: 200;
+    gap: 0;
+    background: rgba(42, 31, 24, 0.95);
+    padding: 6px 8px;
+    border-radius: 0;
+  }
+  .ribbon {
+    width: auto; height: 36px;
+    padding: 0 10px;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Caveat', cursive;
+    font-size: 0.65rem;
+    color: #fff;
+    font-weight: 600;
+  }
+  .ribbon::after { display: none; }
+  .ribbon:hover { transform: none; }
+  .ribbon .ribbon-label {
+    position: static;
+    transform: none;
+    opacity: 1;
+    font-size: 0.65rem;
+    text-shadow: none;
+  }
+
+  .turn-zone { width: 50px; }
+  .book-spine { display: none; }
+
+  .cover { width: 90vw; height: 80vh; }
+
+  .polaroid { width: 140px; }
+  .polaroid-img { height: 120px; }
+
+  .index-card { width: 130px; min-height: 70px; }
+
+  .gallery-wall { padding: 12px; gap: 8px; }
+  .frame-inner { width: 80px; height: 65px; }
+
+  .section-title { font-size: 1.4rem; }
+}
+
+/* ===== TOUCH SWIPE ===== */
+@media (pointer: coarse) {
+  .turn-zone { display: none; }
+}
+
+/* ===== TRANSITION HELPERS ===== */
+.fade-text {
+  transition: opacity 0.3s ease;
+}
+.fade-text.fading {
+  opacity: 0;
+}
+
+/* Back to cover button */
+.back-to-cover {
+  position: fixed;
+  top: 14px; left: 20px;
+  z-index: 200;
+  font-family: 'Caveat', cursive;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 4px 14px;
+  background: rgba(74,55,40,0.8);
+  color: var(--cream);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s, transform 0.15s;
+}
+.back-to-cover:hover { transform: scale(1.05); }
+.back-to-cover.visible { opacity: 1; visibility: visible; }
+
+/* Bracket layout */
+.bracket-container {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+.bracket-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  flex: 1;
+}
+.bracket-col-header {
+  font-family: 'Caveat', cursive;
+  font-size: 0.7rem;
+  text-align: center;
+  color: #8a7a6a;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.bracket-connector {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 16px;
+}
+.bracket-line {
+  border-right: 1px solid rgba(74,55,40,0.3);
+  border-top: 1px solid rgba(74,55,40,0.3);
+  border-bottom: 1px solid rgba(74,55,40,0.3);
+  height: 30px;
+}
+</style>
+</head>
+<body>
+
+<!-- ========== LANGUAGE TOGGLE ========== -->
+<button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">EN / JP</button>
+
+<!-- ========== BACK TO COVER ========== -->
+<button class="back-to-cover" id="backBtn" onclick="goToCover()">← cover</button>
+
+<!-- ========== COVER ========== -->
+<div class="cover-wrapper" id="coverWrapper">
+  <div class="cover" id="cover" onclick="openBook()">
+    <!-- Stickers -->
+    <div class="sticker sticker-hello">
+      <div class="hello-top">Hello my name is</div>
+      <div class="hello-name">Rika</div>
+    </div>
+    <div class="sticker sticker-cheese">🧀</div>
+    <div class="sticker sticker-flag">🇯🇵</div>
+    <div class="sticker sticker-skull">☠️</div>
+    <div class="sticker sticker-built">Built with ❤️ + 🧀</div>
+
+    <div class="cover-title" data-en="Rika's Portfolio" data-jp="莉香のポートフォリオ">Rika's Portfolio</div>
+    <div class="cover-subtitle" data-en="莉香のポートフォリオ" data-jp="Rika's Portfolio">莉香のポートフォリオ</div>
+    <div class="cover-prompt" data-en="open me →" data-jp="開いてね →">open me →</div>
+  </div>
+</div>
+
+<!-- ========== BOOK ========== -->
+<div class="book-wrapper" id="bookWrapper">
+  <div class="book" id="book">
+    <div class="book-spine"></div>
+
+    <!-- Ribbon bookmarks -->
+    <div class="ribbons" id="ribbons">
+      <div class="ribbon active-ribbon" style="background:var(--ribbon-pink);--c:var(--ribbon-pink)" onclick="goToSpread(0)">
+        <span class="ribbon-label" data-en="About" data-jp="自己紹介">About</span>
+      </div>
+      <div class="ribbon" style="background:var(--ribbon-orange);--c:var(--ribbon-orange)" onclick="goToSpread(1)">
+        <span class="ribbon-label" data-en="Engineering" data-jp="エンジニアリング">Engineering</span>
+      </div>
+      <div class="ribbon" style="background:var(--ribbon-green);--c:var(--ribbon-green)" onclick="goToSpread(2)">
+        <span class="ribbon-label" data-en="Japan" data-jp="日本">Japan</span>
+      </div>
+      <div class="ribbon" style="background:var(--ribbon-blue);--c:var(--ribbon-blue)" onclick="goToSpread(3)">
+        <span class="ribbon-label" data-en="One Piece" data-jp="ワンピース">One Piece</span>
+      </div>
+      <div class="ribbon" style="background:var(--ribbon-yellow);--c:var(--ribbon-yellow)" onclick="goToSpread(4)">
+        <span class="ribbon-label" data-en="Grilled Cheese" data-jp="グリルドチーズ">Grilled Cheese</span>
+      </div>
+      <div class="ribbon" style="background:var(--ribbon-purple);--c:var(--ribbon-purple)" onclick="goToSpread(5)">
+        <span class="ribbon-label" data-en="Gallery" data-jp="ギャラリー">Gallery</span>
+      </div>
+      <div class="ribbon" style="background:var(--ribbon-magenta);--c:var(--ribbon-magenta)" onclick="goToSpread(6)">
+        <span class="ribbon-label" data-en="Secret" data-jp="秘密">Secret</span>
+      </div>
+    </div>
+
+    <!-- Turn zones -->
+    <div class="turn-zone turn-zone-left" onclick="prevSpread()">
+      <span class="turn-arrow">‹</span>
+    </div>
+    <div class="turn-zone turn-zone-right" onclick="nextSpread()">
+      <span class="turn-arrow">›</span>
+    </div>
+
+    <!-- ==================== SPREAD 1: ABOUT ME ==================== -->
+    <div class="spread active" id="spread-0">
+      <div class="page page-left paper-texture" style="position:relative">
+        <!-- Pencil sketch layer -->
+        <div class="pencil-layer" id="pencil-0">
+          <svg width="100%" height="100%" viewBox="0 0 400 600">
+            <circle cx="200" cy="150" r="60" fill="none" stroke="#999" stroke-width="0.5" stroke-dasharray="3 5" />
+            <line x1="150" y1="400" x2="250" y2="400" stroke="#aaa" stroke-width="0.3" />
+            <rect x="60" y="280" width="280" height="180" rx="4" fill="none" stroke="#aaa" stroke-width="0.3" stroke-dasharray="4 6" />
+            <text x="200" y="500" text-anchor="middle" font-family="Caveat" font-size="14" fill="#999">(sketch layer)</text>
+          </svg>
+        </div>
+
+        <!-- Washi tape decoration -->
+        <div class="washi washi-pink" style="top:20px;right:30px;transform:rotate(-25deg);width:70px"></div>
+        <div class="washi washi-mint" style="bottom:60px;left:10px;transform:rotate(15deg);width:60px"></div>
+
+        <div class="polaroid" style="margin-top: 40px;">
+          <div class="washi washi-lavender" style="top:-8px;left:30px;transform:rotate(-5deg);width:50px;z-index:10"></div>
+          <div class="polaroid-img">📸</div>
+          <div class="polaroid-caption" data-en="📸 rika" data-jp="📸 莉香">📸 rika</div>
+        </div>
+
+        <div class="margin-note" style="margin-top:24px" data-en="← this is me trying to look professional" data-jp="← プロっぽく見せようとしてる私">← this is me trying to look professional</div>
+
+        <!-- Doodle stars -->
+        <div style="position:absolute;bottom:90px;right:40px;opacity:0.2;font-size:1.2rem">✦ ✧ ✦</div>
+        <div style="position:absolute;top:30px;left:50px;opacity:0.15;font-size:0.9rem">★</div>
+
+        <span class="page-number">1</span>
+      </div>
+
+      <div class="page page-right paper-texture">
+        <div class="section-title" data-en="About Me" data-jp="自己紹介">About Me</div>
+        <span class="section-title-jp" data-en="" data-jp="">自己紹介</span>
+
+        <div class="bio-text">
+          <p data-en="Half-Japanese full-stack engineer at Eventbrite. Former microbiology student turned tech advocate. I spend my days building features that help people find their next favorite experience — and my nights building tiny book nooks and ranking grilled cheeses." data-jp="Eventbriteのハーフ日本人フルスタックエンジニア。元微生物学の学生からテック推進者に転身。昼間は人々が次のお気に入りの体験を見つけるための機能を作り、夜はミニチュアのブックヌックを作ったり、グリルドチーズのランキングをしたりしています。">Half-Japanese full-stack engineer at Eventbrite. Former microbiology student turned tech advocate. I spend my days building features that help people find their next favorite experience — and my nights building tiny book nooks and ranking grilled cheeses.</p>
+
+          <div class="margin-note" data-en="I also rank grilled cheeses competitively (recruiters love this)" data-jp="グリルドチーズのランキングもガチです（採用担当に大人気）">I also rank grilled cheeses competitively (recruiters love this)</div>
+
+          <p data-en="When I'm not coding, I'm probably doing pilates, watching Bridgerton for the third time, hustling at Monopoly Deal, or explaining why Michael Jackson is objectively the king of pop." data-jp="コーディングしていない時は、ピラティスをしたり、ブリジャートンを3回目に見たり、モノポリーディールで勝負したり、マイケル・ジャクソンが客観的にキング・オブ・ポップである理由を説明しています。">When I'm not coding, I'm probably doing pilates, watching Bridgerton for the third time, hustling at Monopoly Deal, or explaining why Michael Jackson is objectively the king of pop.</p>
+
+          <p data-en="Hills I'll die on: The Rock's Jumanji is actually a good movie. Health and time with people you love is the most important thing in the world." data-jp="絶対に譲れないこと：ロックのジュマンジは実際にいい映画。健康と大切な人との時間が世界で一番大事なこと。">Hills I'll die on: The Rock's Jumanji is actually a good movie. Health and time with people you love is the most important thing in the world.</p>
+
+          <div class="doodle-star">✦</div>
+        </div>
+
+        <div class="washi washi-gold" style="bottom:40px;right:20px;transform:rotate(8deg);width:55px;position:absolute"></div>
+        <span class="page-number">2</span>
+      </div>
+    </div>
+
+    <!-- ==================== SPREAD 2: ENGINEERING ==================== -->
+    <div class="spread" id="spread-1">
+      <div class="page page-left paper-texture-aged" style="position:relative">
+        <div class="pencil-layer" id="pencil-1">
+          <svg width="100%" height="100%" viewBox="0 0 400 600">
+            <line x1="50" y1="50" x2="50" y2="550" stroke="#aaa" stroke-width="0.4" stroke-dasharray="4 6"/>
+            <circle cx="50" cy="100" r="6" fill="none" stroke="#aaa" stroke-width="0.3"/>
+            <circle cx="50" cy="200" r="6" fill="none" stroke="#aaa" stroke-width="0.3"/>
+            <circle cx="50" cy="300" r="6" fill="none" stroke="#aaa" stroke-width="0.3"/>
+          </svg>
+        </div>
+
+        <div class="section-title" data-en="The Journey" data-jp="歩んだ道">The Journey</div>
+        <span class="section-title-jp" data-en="" data-jp="">エンジニアへの道</span>
+
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-year">2017</div>
+            <div class="timeline-label" data-en="Microbiology 🔬" data-jp="微生物学 🔬">Microbiology 🔬</div>
+            <div class="timeline-desc" data-en="Started here. Loved the precision, missed the creativity." data-jp="ここから始まった。精密さは好きだったけど、創造性が足りなかった。">Started here. Loved the precision, missed the creativity.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-year">2019</div>
+            <div class="timeline-label" data-en="Self-taught coding 💻" data-jp="独学でプログラミング 💻">Self-taught coding 💻</div>
+            <div class="timeline-desc" data-en="YouTube tutorials at 2am. The classic origin story." data-jp="深夜2時のYouTubeチュートリアル。定番のオリジンストーリー。">YouTube tutorials at 2am. The classic origin story.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-year">2020</div>
+            <div class="timeline-label" data-en="Bootcamp 🚀" data-jp="ブートキャンプ 🚀">Bootcamp 🚀</div>
+            <div class="timeline-desc" data-en="Went all in. Built things every single day." data-jp="全力投球。毎日何かを作った。">Went all in. Built things every single day.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-year">2021</div>
+            <div class="timeline-label" data-en="First dev job 🎉" data-jp="初めての開発職 🎉">First dev job 🎉</div>
+            <div class="timeline-desc" data-en="Imposter syndrome, meet determination." data-jp="インポスター症候群、決意と出会う。">Imposter syndrome, meet determination.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-year">2022+</div>
+            <div class="timeline-label" data-en="Eventbrite 🎪" data-jp="Eventbrite 🎪">Eventbrite 🎪</div>
+            <div class="timeline-desc" data-en="Full-stack engineer. Building for millions of events." data-jp="フルスタックエンジニア。何百万のイベントのために構築。">Full-stack engineer. Building for millions of events.</div>
+          </div>
+        </div>
+        <span class="page-number">3</span>
+      </div>
+
+      <div class="page page-right paper-texture" style="position:relative">
+        <div class="pencil-layer" id="pencil-1b">
+          <svg width="100%" height="100%" viewBox="0 0 400 600">
+            <rect x="40" y="80" width="320" height="120" rx="3" fill="none" stroke="#bbb" stroke-width="0.3" stroke-dasharray="5 4"/>
+            <rect x="40" y="230" width="320" height="120" rx="3" fill="none" stroke="#bbb" stroke-width="0.3" stroke-dasharray="5 4"/>
+            <rect x="40" y="380" width="320" height="120" rx="3" fill="none" stroke="#bbb" stroke-width="0.3" stroke-dasharray="5 4"/>
+          </svg>
+        </div>
+
+        <div class="section-title" data-en="Projects" data-jp="プロジェクト">Projects</div>
+        <span class="section-title-jp" data-en="click to open →" data-jp="クリックして開く →">click to open →</span>
+
+        <div class="envelope" onclick="this.classList.toggle('open')">
+          <div class="envelope-label" data-en="\"my baby\" 💕" data-jp="「私の赤ちゃん」💕">"my baby" 💕</div>
+          <div class="envelope-sublabel" data-en="the one I'm most proud of" data-jp="一番誇りに思っているもの">the one I'm most proud of</div>
+          <div class="envelope-content">
+            <div class="project-name" data-en="This Portfolio Site" data-jp="このポートフォリオサイト">This Portfolio Site</div>
+            <div class="tech-tags">
+              <span class="tech-tag">React</span>
+              <span class="tech-tag">Vite</span>
+              <span class="tech-tag">Tailwind 4</span>
+              <span class="tech-tag">TypeScript</span>
+              <span class="tech-tag">i18n</span>
+            </div>
+            <div class="project-desc" data-en="A scrapbook-style portfolio that's also a bilingual SPA with spring-physics animations, particle systems, and more easter eggs than a chocolate factory." data-jp="スクラップブックスタイルのポートフォリオ。バイリンガルSPAで、スプリング物理アニメーション、パーティクルシステム、チョコレート工場より多いイースターエッグ付き。">A scrapbook-style portfolio that's also a bilingual SPA with spring-physics animations, particle systems, and more easter eggs than a chocolate factory.</div>
+            <span class="project-link" data-en="view source →" data-jp="ソースを見る →">view source →</span>
+          </div>
+        </div>
+
+        <div class="envelope" onclick="this.classList.toggle('open')">
+          <div class="envelope-label" data-en="\"the fun one\" 🎮" data-jp="「楽しいやつ」🎮">"the fun one" 🎮</div>
+          <div class="envelope-sublabel" data-en="weekend hack that got out of hand" data-jp="週末のハックが暴走した">weekend hack that got out of hand</div>
+          <div class="envelope-content">
+            <div class="project-name" data-en="Grilled Cheese Olympics" data-jp="グリルドチーズオリンピック">Grilled Cheese Olympics</div>
+            <div class="tech-tags">
+              <span class="tech-tag">React</span>
+              <span class="tech-tag">Framer Motion</span>
+              <span class="tech-tag">CSS Art</span>
+            </div>
+            <div class="project-desc" data-en="A tournament bracket for ranking grilled cheese sandwiches. Features drag-and-drop matchups, animated reveals, and heated commentary. Yes, this is real. Yes, I'm serious about it." data-jp="グリルドチーズサンドイッチをランキングするためのトーナメントブラケット。ドラッグ＆ドロップの対戦、アニメーション付きの結果発表、熱いコメンタリー付き。はい、本物です。はい、真剣です。">A tournament bracket for ranking grilled cheese sandwiches. Features drag-and-drop matchups, animated reveals, and heated commentary. Yes, this is real. Yes, I'm serious about it.</div>
+            <span class="project-link" data-en="try it →" data-jp="試してみる →">try it →</span>
+          </div>
+        </div>
+
+        <div class="envelope" onclick="this.classList.toggle('open')">
+          <div class="envelope-label" data-en="\"the one that taught me everything\" 📚" data-jp="「全てを教えてくれたもの」📚">"the one that taught me everything" 📚</div>
+          <div class="envelope-sublabel" data-en="before I knew what I was doing" data-jp="何をしているか分かる前">before I knew what I was doing</div>
+          <div class="envelope-content">
+            <div class="project-name" data-en="Event Discovery Platform" data-jp="イベント検索プラットフォーム">Event Discovery Platform</div>
+            <div class="tech-tags">
+              <span class="tech-tag">Node.js</span>
+              <span class="tech-tag">PostgreSQL</span>
+              <span class="tech-tag">React</span>
+              <span class="tech-tag">REST API</span>
+            </div>
+            <div class="project-desc" data-en="Full-stack event platform with search, filters, and user auth. My first 'real' project that taught me about database design, API architecture, and the joy of finally understanding async/await." data-jp="検索、フィルター、ユーザー認証付きのフルスタックイベントプラットフォーム。データベース設計、APIアーキテクチャ、そしてasync/awaitをようやく理解した喜びを教えてくれた最初の「本物の」プロジェクト。">Full-stack event platform with search, filters, and user auth. My first "real" project that taught me about database design, API architecture, and the joy of finally understanding async/await.</div>
+            <span class="project-link" data-en="read the case study →" data-jp="ケーススタディを読む →">read the case study →</span>
+          </div>
+        </div>
+
+        <div class="washi washi-sky" style="position:absolute;bottom:30px;left:30px;transform:rotate(-10deg);width:65px"></div>
+        <span class="page-number">4</span>
+      </div>
+    </div>
+
+    <!-- ==================== SPREAD 3: JAPAN ==================== -->
+    <div class="spread" id="spread-2">
+      <div class="page page-left paper-texture" style="position:relative;overflow:hidden">
+        <div class="pencil-layer" id="pencil-2">
+          <svg width="100%" height="100%" viewBox="0 0 400 600">
+            <circle cx="100" cy="100" r="20" fill="none" stroke="#ccc" stroke-width="0.3"/>
+            <circle cx="300" cy="200" r="15" fill="none" stroke="#ccc" stroke-width="0.3"/>
+            <circle cx="150" cy="400" r="25" fill="none" stroke="#ccc" stroke-width="0.3"/>
+          </svg>
+        </div>
+
+        <div class="vertical-jp">日本が大好き</div>
+
+        <!-- Cherry blossoms -->
+        <div class="cherry-blossom" style="top:15%;left:25%;transform:rotate(20deg)"></div>
+        <div class="cherry-blossom" style="top:8%;right:20%;transform:rotate(-15deg)"></div>
+        <div class="cherry-blossom" style="top:35%;left:60%;transform:rotate(40deg)"></div>
+        <div class="cherry-blossom" style="bottom:30%;right:25%;transform:rotate(-30deg)"></div>
+        <div class="cherry-blossom" style="bottom:20%;left:35%;transform:rotate(10deg)"></div>
+        <div class="cherry-blossom" style="top:55%;left:15%;transform:rotate(-20deg)"></div>
+        <div class="cherry-blossom" style="top:70%;right:35%;transform:rotate(25deg)"></div>
+
+        <div style="margin-left:30px">
+          <div class="section-title" data-en="Japan 日本" data-jp="日本 Japan">Japan 日本</div>
+          <span class="section-title-jp" data-en="heritage, not decoration" data-jp="飾りじゃない、ルーツ">heritage, not decoration</span>
+        </div>
+
+        <div class="train-ticket" style="margin-top:30px">
+          <div class="ticket-route">東京 → 京都</div>
+          <div class="ticket-details">
+            <span>新幹線 Shinkansen</span>
+            <span>¥13,320</span>
+          </div>
+          <div class="ticket-details" style="margin-top:4px">
+            <span data-en="One way" data-jp="片道">One way</span>
+            <span>2h 15min</span>
+          </div>
+        </div>
+
+        <div class="washi washi-pink" style="position:absolute;top:45%;left:50%;transform:rotate(20deg);width:60px"></div>
+
+        <!-- Small doodle -->
+        <div style="position:absolute;bottom:80px;right:40px;font-family:'Caveat',cursive;font-size:0.8rem;color:var(--kraft);transform:rotate(-5deg);opacity:0.5" data-en="✈️ annual trip" data-jp="✈️ 毎年の旅">✈️ annual trip</div>
+
+        <span class="page-number">5</span>
+      </div>
+
+      <div class="page page-right paper-texture-aged">
+        <div class="bio-text" style="margin-top:12px">
+          <p data-en="I go to Japan almost every year. It's not a vacation — it's going home to the other half of who I am. Onsens at dawn, konbini runs at 2am, getting hopelessly lost in Shibuya and somehow ending up at the best ramen shop in the prefecture." data-jp="ほぼ毎年日本に行きます。バケーションじゃなくて、自分のもう半分の故郷に帰ること。夜明けの温泉、深夜2時のコンビニ、渋谷で迷子になって、なぜかその県で一番のラーメン屋にたどり着く。">I go to Japan almost every year. It's not a vacation — it's going home to the other half of who I am. Onsens at dawn, konbini runs at 2am, getting hopelessly lost in Shibuya and somehow ending up at the best ramen shop in the prefecture.</p>
+
+          <div class="margin-note" data-en="the konbini egg sandwich changed my life" data-jp="コンビニのたまごサンドが人生を変えた">the konbini egg sandwich changed my life</div>
+
+          <p data-en="My Japanese media diet: Terrace House (I have opinions), Yoasobi on repeat, Hana Yori Dango rewatch every winter, Dodo for when I need to feel things. I dream in both languages." data-jp="日本メディア: テラスハウス（意見あります）、Yoasobiヘビロテ、花より男子は毎冬再視聴、Dodoは感情が必要な時。両方の言語で夢を見ます。">My Japanese media diet: Terrace House (I have opinions), Yoasobi on repeat, Hana Yori Dango rewatch every winter, Dodo for when I need to feel things. I dream in both languages.</p>
+
+          <p data-en="The onsen culture is something I think about constantly. The ritual of it — the quiet, the heat, the deliberate slowness. It's the opposite of tech culture and maybe that's why I need it." data-jp="温泉文化は常に考えていること。その儀式的な側面 — 静けさ、熱さ、意図的な遅さ。テック文化の正反対で、だからこそ必要なのかもしれない。">The onsen culture is something I think about constantly. The ritual of it — the quiet, the heat, the deliberate slowness. It's the opposite of tech culture and maybe that's why I need it.</p>
+        </div>
+
+        <div class="washi washi-mint" style="position:absolute;top:20px;right:20px;transform:rotate(-15deg);width:55px"></div>
+        <div class="washi washi-gold" style="position:absolute;bottom:60px;left:20px;transform:rotate(12deg);width:50px"></div>
+
+        <div style="position:absolute;bottom:40px;right:30px;font-family:'Noto Serif JP',serif;font-size:0.75rem;color:var(--kraft);opacity:0.5">
+          日本語も話せます ✨
+        </div>
+
+        <span class="page-number">6</span>
+      </div>
+    </div>
+
+    <!-- ==================== SPREAD 4: ONE PIECE ==================== -->
+    <div class="spread" id="spread-3">
+      <div class="page page-left corkboard" style="position:relative;border-radius:8px 0 0 8px;padding:20px;">
+        <div class="pencil-layer" id="pencil-3">
+          <svg width="100%" height="100%" viewBox="0 0 400 600">
+            <line x1="50" y1="80" x2="350" y2="500" stroke="#8a7050" stroke-width="0.3" stroke-dasharray="6 4"/>
+          </svg>
+        </div>
+
+        <div class="section-title" style="color:#fff;text-shadow:1px 1px 3px rgba(0,0,0,0.3)" data-en="One Piece Theories" data-jp="ワンピース考察">One Piece Theories</div>
+        <span class="section-title-jp" style="color:rgba(255,255,255,0.6)" data-en="the conspiracy board" data-jp="考察ボード">the conspiracy board</span>
+
+        <!-- Red strings -->
+        <div class="red-string" style="top:180px;left:180px;width:120px;transform:rotate(25deg)"></div>
+        <div class="red-string" style="top:280px;left:100px;width:150px;transform:rotate(-15deg)"></div>
+        <div class="red-string" style="top:240px;left:220px;width:100px;transform:rotate(50deg)"></div>
+
+        <!-- Index cards -->
+        <div class="index-card" style="top:120px;left:30px;transform:rotate(-3deg)" onclick="this.classList.toggle('flipped')">
+          <div class="card-front">
+            <div class="card-title" data-en="Luffy's Dream Theory" data-jp="ルフィの夢理論">Luffy's Dream Theory</div>
+            <div class="card-subtitle" data-en="click to flip →" data-jp="クリックで裏返す →">click to flip →</div>
+          </div>
+          <div class="card-back">
+            <span data-en="Luffy's true dream isn't just to be King of the Pirates — it's to throw the biggest party the world has ever seen. Where everyone, from every sea, is free to eat and laugh together. It connects to Joy Boy, the All Blue, and the destruction of the Red Line." data-jp="ルフィの本当の夢は海賊王になることだけじゃない。世界最大のパーティーを開くこと。すべての海から、みんなが自由に食べて笑える場所。ジョイボーイ、オールブルー、レッドライン破壊につながる。">Luffy's true dream isn't just to be King of the Pirates — it's to throw the biggest party the world has ever seen. Where everyone, from every sea, is free to eat and laugh together. It connects to Joy Boy, the All Blue, and the destruction of the Red Line.</span>
+          </div>
+        </div>
+
+        <div class="index-card" style="top:120px;right:30px;transform:rotate(4deg)" onclick="this.classList.toggle('flipped')">
+          <div class="card-front">
+            <div class="card-title" data-en="The Void Century" data-jp="空白の100年">The Void Century</div>
+            <div class="card-subtitle" data-en="click to flip →" data-jp="クリックで裏返す →">click to flip →</div>
+          </div>
+          <div class="card-back">
+            <span data-en="The Void Century was erased because the Ancient Kingdom had technology that could unite the world. The World Government destroyed it to maintain division and control. The poneglyphs are a message from that lost civilization — a recipe for freedom." data-jp="空白の100年が消されたのは、古代王国が世界を統一できる技術を持っていたから。世界政府は分断と支配を維持するためにそれを破壊した。ポーネグリフはその失われた文明からのメッセージ — 自由のレシピ。">The Void Century was erased because the Ancient Kingdom had technology that could unite the world. The World Government destroyed it to maintain division and control. The poneglyphs are a message from that lost civilization — a recipe for freedom.</span>
+          </div>
+        </div>
+
+        <div class="index-card" style="top:300px;left:50%;transform:translateX(-50%) rotate(-2deg)" onclick="this.classList.toggle('flipped')">
+          <div class="card-front">
+            <div class="card-title" data-en="Joy Boy's Identity" data-jp="ジョイボーイの正体">Joy Boy's Identity</div>
+            <div class="card-subtitle" data-en="click to flip →" data-jp="クリックで裏返す →">click to flip →</div>
+          </div>
+          <div class="card-back">
+            <span data-en="Joy Boy wasn't a single person — it's a title passed down to whoever inherits the will of freedom. Luffy is the current Joy Boy. The straw hat is the symbol of this inheritance, passed from Joy Boy → Imu → Roger → Shanks → Luffy." data-jp="ジョイボーイは一人の人間ではなく、自由の意志を受け継ぐ者に渡される称号。ルフィが現在のジョイボーイ。麦わら帽子はこの継承の象徴で、ジョイボーイ→イム→ロジャー→シャンクス→ルフィと受け渡された。">Joy Boy wasn't a single person — it's a title passed down to whoever inherits the will of freedom. Luffy is the current Joy Boy. The straw hat is the symbol of this inheritance, passed from Joy Boy → Imu → Roger → Shanks → Luffy.</span>
+          </div>
+        </div>
+
+        <span class="page-number" style="color:rgba(255,255,255,0.5)">7</span>
+      </div>
+
+      <div class="page page-right paper-texture">
+        <div class="pencil-layer" id="pencil-3b"></div>
+
+        <div style="text-align:center;margin-top:20px">
+          <div style="font-family:'Caveat',cursive;font-size:1.3rem;color:var(--ink);margin-bottom:12px" data-en="Spin for a random theory!" data-jp="ランダム考察を回そう！">Spin for a random theory!</div>
+
+          <div class="spin-wheel-container">
+            <div style="position:relative;display:inline-block">
+              <div class="spin-pointer">▼</div>
+              <div class="spin-wheel" id="spinWheel">
+                <div class="spin-wheel-label" style="top:20px;left:50%;transform:translateX(-50%)" data-en="Luffy" data-jp="ルフィ">Luffy</div>
+                <div class="spin-wheel-label" style="bottom:30px;left:10px" data-en="Void" data-jp="空白">Void</div>
+                <div class="spin-wheel-label" style="bottom:30px;right:10px" data-en="Joy Boy" data-jp="ジョイ">Joy Boy</div>
+              </div>
+            </div>
+            <div style="margin-top:12px">
+              <button class="spin-btn" onclick="spinTheWheel()" data-en="🏴‍☠️ SPIN!" data-jp="🏴‍☠️ 回す！">🏴‍☠️ SPIN!</button>
+            </div>
+          </div>
+
+          <div id="spinResult" style="margin-top:16px;font-family:'Lora',serif;font-size:0.85rem;color:var(--ink);min-height:80px;padding:0 12px;opacity:0;transition:opacity 0.4s"></div>
+        </div>
+
+        <div class="sticky-note" style="margin-top:20px;transform:rotate(-1deg)">
+          <span data-en="I've been reading One Piece since I was a kid. I have a Google Doc of theories that's longer than most term papers. This is not a phase." data-jp="子供の頃からワンピースを読んでいます。考察のGoogleドキュメントはほとんどの論文より長い。これは一時的なものではありません。">I've been reading One Piece since I was a kid. I have a Google Doc of theories that's longer than most term papers. This is not a phase.</span>
+        </div>
+
+        <span class="page-number">8</span>
+      </div>
+    </div>
+
+    <!-- ==================== SPREAD 5: GRILLED CHEESE ==================== -->
+    <div class="spread" id="spread-4">
+      <div class="page page-left paper-texture" style="position:relative">
+        <div class="pencil-layer" id="pencil-4"></div>
+
+        <div class="section-title" data-en="Grilled Cheese Olympics" data-jp="グリルドチーズオリンピック">Grilled Cheese Olympics</div>
+        <span class="section-title-jp" data-en="a very serious competition" data-jp="非常に真剣な大会">a very serious competition</span>
+
+        <div class="washi washi-gold" style="position:absolute;top:15px;right:20px;transform:rotate(-8deg);width:70px"></div>
+
+        <div class="podium">
+          <div class="podium-item podium-2">
+            <div class="podium-name" data-en="The Truffle Melt" data-jp="トリュフメルト">The Truffle Melt</div>
+            <div class="podium-source" data-en="Grilled Cheese Gallery" data-jp="グリルドチーズギャラリー">Grilled Cheese Gallery</div>
+            <div class="podium-block">🥈</div>
+          </div>
+          <div class="podium-item podium-1">
+            <div class="podium-name" data-en="The Classic Gouda" data-jp="クラシックゴーダ">The Classic Gouda</div>
+            <div class="podium-source" data-en="Rika's Kitchen" data-jp="莉香のキッチン">Rika's Kitchen</div>
+            <div class="podium-block">🥇</div>
+          </div>
+          <div class="podium-item podium-3">
+            <div class="podium-name" data-en="Brie & Fig" data-jp="ブリー＆フィグ">Brie & Fig</div>
+            <div class="podium-source" data-en="Café Luna" data-jp="カフェルナ">Café Luna</div>
+            <div class="podium-block">🥉</div>
+          </div>
+        </div>
+
+        <div class="trophy-doodle">🏆</div>
+
+        <span class="page-number">9</span>
+      </div>
+
+      <div class="page page-right paper-texture-aged" style="position:relative">
+        <div class="pencil-layer" id="pencil-4b"></div>
+
+        <div style="font-family:'Caveat',cursive;font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:8px" data-en="The Bracket" data-jp="トーナメント表">The Bracket</div>
+
+        <div class="graph-paper">
+          <div class="bracket-container">
+            <!-- Round 1 -->
+            <div class="bracket-col">
+              <div class="bracket-col-header" data-en="Round 1" data-jp="1回戦">Round 1</div>
+              <div class="bracket-match"><span class="bracket-winner">Classic Gouda</span> vs <span class="bracket-loser">Pepper Jack</span></div>
+              <div class="bracket-match"><span class="bracket-winner">Truffle Melt</span> vs <span class="bracket-loser">Starbucks GC</span></div>
+              <div class="bracket-match"><span class="bracket-winner">Brie & Fig</span> vs <span class="bracket-loser">Cheddar Basic</span></div>
+              <div class="bracket-match"><span class="bracket-winner">Jalapeño Pop</span> vs <span class="bracket-loser">Velveeta Dream</span></div>
+            </div>
+            <!-- Semis -->
+            <div class="bracket-col">
+              <div class="bracket-col-header" data-en="Semis" data-jp="準決勝">Semis</div>
+              <div class="bracket-match"><span class="bracket-winner">Classic Gouda</span> vs <span class="bracket-loser">Truffle Melt</span></div>
+              <div class="bracket-match"><span class="bracket-winner">Brie & Fig</span> vs <span class="bracket-loser">Jalapeño Pop</span></div>
+            </div>
+            <!-- Finals -->
+            <div class="bracket-col">
+              <div class="bracket-col-header" data-en="Final" data-jp="決勝">Final</div>
+              <div class="bracket-match"><span class="bracket-winner" style="color:var(--gold)">🧀 Classic Gouda 🧀</span> vs <span class="bracket-loser">Brie & Fig</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sticky-note">
+          <span data-en="Hot take: the Starbucks grilled cheese doesn't deserve the hate. Is it gourmet? No. Is it reliably melty and available in every city? YES. That counts for something. (I will defend this position.)" data-jp="物議を醸す意見：スタバのグリルドチーズはそこまで叩かれるべきじゃない。グルメ？いいえ。確実にとろけて全都市で買える？はい。それには価値がある。（この立場は譲りません。）">Hot take: the Starbucks grilled cheese doesn't deserve the hate. Is it gourmet? No. Is it reliably melty and available in every city? YES. That counts for something. (I will defend this position.)</span>
+        </div>
+
+        <span class="page-number">10</span>
+      </div>
+    </div>
+
+    <!-- ==================== SPREAD 6: GALLERY ==================== -->
+    <div class="spread" id="spread-5">
+      <div class="page page-left" style="position:relative;border-radius:8px 0 0 8px;overflow:hidden">
+        <div class="pencil-layer" id="pencil-5"></div>
+
+        <div class="section-title" style="position:absolute;top:12px;left:20px;z-index:5;color:#fff;text-shadow:1px 1px 4px rgba(0,0,0,0.4)" data-en="The Gallery" data-jp="ギャラリー">The Gallery</div>
+
+        <div class="gallery-wall" style="height:100%">
+          <div class="frame">
+            <div class="frame-inner" style="background:linear-gradient(135deg, #e8a0a0, #c87070)"></div>
+            <div class="frame-label" data-en="Sunset Study #3" data-jp="夕日の習作 #3">Sunset Study #3</div>
+          </div>
+          <div class="frame" style="transform:rotate(2deg)">
+            <div class="frame-inner" style="background:linear-gradient(135deg, #a0c8e8, #7090b0)"></div>
+            <div class="frame-label" data-en="Ocean (for Mom)" data-jp="海（お母さんへ）">Ocean (for Mom)</div>
+          </div>
+          <div class="frame" style="transform:rotate(-1deg)">
+            <div class="frame-inner" style="background:linear-gradient(135deg, #c8e8a0, #90b070)"></div>
+            <div class="frame-label" data-en="Garden Path" data-jp="庭の小道">Garden Path</div>
+          </div>
+        </div>
+
+        <span class="page-number" style="color:rgba(255,255,255,0.5)">11</span>
+      </div>
+
+      <div class="page page-right paper-texture" style="position:relative">
+        <div class="pencil-layer" id="pencil-5b"></div>
+
+        <div style="font-family:'Caveat',cursive;font-size:1.4rem;font-weight:700;color:var(--ink);margin-bottom:4px" data-en="my tiny worlds 🏠" data-jp="私の小さな世界 🏠">my tiny worlds 🏠</div>
+        <div style="font-family:'Lora',serif;font-size:0.78rem;color:#8a7a6a;font-style:italic;margin-bottom:12px" data-en="book nooks — how I turn my brain off and work with my hands" data-jp="ブックヌック — 頭を休めて手を動かす方法">book nooks — how I turn my brain off and work with my hands</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <div class="book-nook">
+            <div class="book-nook-img">🏠</div>
+            <div class="book-nook-caption" data-en="Hobbit Hole" data-jp="ホビットの穴">Hobbit Hole</div>
+          </div>
+          <div class="book-nook">
+            <div class="book-nook-img">📚</div>
+            <div class="book-nook-caption" data-en="Library Alley" data-jp="図書館小路">Library Alley</div>
+          </div>
+          <div class="book-nook">
+            <div class="book-nook-img">🌸</div>
+            <div class="book-nook-caption" data-en="Sakura Street" data-jp="桜通り">Sakura Street</div>
+          </div>
+        </div>
+
+        <div class="margin-note" style="margin-top:12px" data-en="each one takes about 2 weeks and 47 tiny cuts on my fingers" data-jp="それぞれ約2週間と指の小さな傷47個かかります">each one takes about 2 weeks and 47 tiny cuts on my fingers</div>
+
+        <div style="font-family:'Caveat',cursive;font-size:0.9rem;color:var(--ink);margin-top:12px;opacity:0.6" data-en="process photos ↓" data-jp="制作過程 ↓">process photos ↓</div>
+        <div class="filmstrip">
+          <div class="filmstrip-frame"></div>
+          <div class="filmstrip-frame"></div>
+          <div class="filmstrip-frame"></div>
+          <div class="filmstrip-frame"></div>
+          <div class="filmstrip-frame"></div>
+          <div class="filmstrip-frame"></div>
+        </div>
+
+        <div class="washi washi-lavender" style="position:absolute;top:10px;right:15px;transform:rotate(12deg);width:55px"></div>
+
+        <span class="page-number">12</span>
+      </div>
+    </div>
+
+    <!-- ==================== SPREAD 7: SECRET PAGE ==================== -->
+    <div class="spread" id="spread-6">
+      <div class="page page-left paper-texture" style="position:relative">
+        <div class="pencil-layer" id="pencil-6"></div>
+
+        <div class="secret-title" data-en="You found the secret page! 🎉" data-jp="秘密のページを見つけた！🎉">You found the secret page! 🎉</div>
+        <div class="secret-subtitle" data-en="most people don't make it this far" data-jp="ほとんどの人はここまで来ない">most people don't make it this far</div>
+
+        <ul class="fun-facts" style="margin-top:24px">
+          <li data-en="I once ate grilled cheese sandwiches for 14 meals in a row (for science)" data-jp="グリルドチーズサンドイッチを14食連続で食べたことがある（科学のために）">I once ate grilled cheese sandwiches for 14 meals in a row (for science)</li>
+          <li data-en="My Spotify Wrapped says I listened to Yoasobi for 847 hours" data-jp="Spotify Wrappedによると、Yoasobiを847時間聴いた">My Spotify Wrapped says I listened to Yoasobi for 847 hours</li>
+          <li data-en="I can name every Straw Hat crew member's birthday" data-jp="麦わらの一味全員の誕生日を言える">I can name every Straw Hat crew member's birthday</li>
+          <li data-en="My book nook collection takes up an entire bookshelf" data-jp="ブックヌックのコレクションが本棚まるまる一つを占めている">My book nook collection takes up an entire bookshelf</li>
+          <li data-en="I'm currently learning how to sing (badly, but with enthusiasm)" data-jp="今歌を習っています（下手だけど、情熱はある）">I'm currently learning how to sing (badly, but with enthusiasm)</li>
+          <li data-en="The Rock's Jumanji IS a good movie and I WILL argue about this" data-jp="ロックのジュマンジは良い映画で、これについて議論する覚悟はある">The Rock's Jumanji IS a good movie and I WILL argue about this</li>
+        </ul>
+
+        <div class="spotify-placeholder" style="margin-top:20px">
+          <div class="spotify-icon">♪</div>
+          <div>
+            <div class="spotify-text" data-en="Currently playing" data-jp="再生中">Currently playing</div>
+            <div class="spotify-track">Yoasobi — Idol (アイドル)</div>
+          </div>
+        </div>
+
+        <span class="page-number">13</span>
+      </div>
+
+      <div class="page page-right paper-texture-aged" style="position:relative">
+        <div class="pencil-layer" id="pencil-6b"></div>
+
+        <div style="font-family:'Caveat',cursive;font-size:1.5rem;font-weight:700;color:var(--ink);margin-bottom:16px;text-align:center" data-en="Back Cover Reviews" data-jp="裏表紙レビュー">Back Cover Reviews</div>
+
+        <div class="review-card" style="--rot:-1.5deg">
+          <div class="review-stars">★★★★★</div>
+          <div class="review-text" data-en="\"Would flip through again. My daughter is very talented and I'm not just saying that because she made me grilled cheese.\"" data-jp="「もう一度めくりたい。娘はとても才能がある。グリルドチーズを作ってくれたから言ってるわけじゃない。」">"Would flip through again. My daughter is very talented and I'm not just saying that because she made me grilled cheese."</div>
+          <div class="review-author" data-en="— Rika's Mom" data-jp="— 莉香のお母さん">— Rika's Mom</div>
+        </div>
+
+        <div class="review-card" style="--rot:1deg">
+          <div class="review-stars">★★★★☆</div>
+          <div class="review-text" data-en="\"Needs more grilled cheese. Otherwise perfect.\"" data-jp="「グリルドチーズがもっと必要。それ以外は完璧。」">"Needs more grilled cheese. Otherwise perfect."</div>
+          <div class="review-author" data-en="— Anonymous" data-jp="— 匿名">— Anonymous</div>
+        </div>
+
+        <div class="review-card" style="--rot:-0.5deg">
+          <div class="review-stars">★★★★★</div>
+          <div class="review-text" data-en="\"She really put conspiracy board aesthetics in her portfolio. Respect.\"" data-jp="「本当にポートフォリオに陰謀ボードの美学を入れた。リスペクト。」">"She really put conspiracy board aesthetics in her portfolio. Respect."</div>
+          <div class="review-author" data-en="— A Fellow One Piece Fan" data-jp="— ワンピースファン仲間">— A Fellow One Piece Fan</div>
+        </div>
+
+        <div class="review-card" style="--rot:2deg">
+          <div class="review-stars">★★★★★</div>
+          <div class="review-text" data-en="\"Hire her immediately. — Not Rika, writing this from a different computer.\"" data-jp="「すぐに雇って。— 莉香じゃない人が別のパソコンから書いてます。」">"Hire her immediately. — Not Rika, writing this from a different computer."</div>
+          <div class="review-author" data-en="— Definitely Not Rika" data-jp="— 絶対に莉香じゃない人">— Definitely Not Rika</div>
+        </div>
+
+        <div style="text-align:center;margin-top:20px;font-family:'Caveat',cursive;font-size:1rem;color:var(--kraft)">
+          <span data-en="thanks for reading 💛" data-jp="読んでくれてありがとう 💛">thanks for reading 💛</span>
+        </div>
+
+        <div class="washi washi-pink" style="position:absolute;bottom:20px;right:20px;transform:rotate(-10deg);width:50px"></div>
+
+        <span class="page-number">14</span>
+      </div>
+    </div>
+
+  </div><!-- end .book -->
+</div><!-- end .book-wrapper -->
+
+<script>
+// ===== STATE =====
+let currentSpread = 0;
+const totalSpreads = 7;
+let isBookOpen = false;
+let currentLang = 'en';
+let isTurning = false;
+let touchStartX = 0;
+let touchStartY = 0;
+
+// ===== COVER TILT =====
+const cover = document.getElementById('cover');
+const coverWrapper = document.getElementById('coverWrapper');
+
+coverWrapper.addEventListener('mousemove', (e) => {
+  if (!coverWrapper.classList.contains('hidden')) {
+    const rect = cover.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const rotateY = ((e.clientX - centerX) / rect.width) * 12;
+    const rotateX = ((e.clientY - centerY) / rect.height) * -8;
+    cover.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
+  }
+});
+
+coverWrapper.addEventListener('mouseleave', () => {
+  cover.style.transform = 'rotateY(0deg) rotateX(0deg)';
+});
+
+// ===== OPEN BOOK =====
+function openBook() {
+  coverWrapper.classList.add('hidden');
+  document.getElementById('bookWrapper').classList.add('visible');
+  document.getElementById('backBtn').classList.add('visible');
+  isBookOpen = true;
+  updateRibbons();
+}
+
+function goToCover() {
+  coverWrapper.classList.remove('hidden');
+  document.getElementById('bookWrapper').classList.remove('visible');
+  document.getElementById('backBtn').classList.remove('visible');
+  isBookOpen = false;
+}
+
+// ===== PAGE NAVIGATION =====
+function showSpread(index) {
+  const spreads = document.querySelectorAll('.spread');
+  spreads.forEach((s, i) => {
+    if (i === index) {
+      s.classList.add('active');
+      s.style.opacity = '1';
+      s.style.visibility = 'visible';
+    } else {
+      s.classList.remove('active');
+      s.style.opacity = '0';
+      s.style.visibility = 'hidden';
+    }
+  });
+  currentSpread = index;
+  updateRibbons();
+}
+
+function nextSpread() {
+  if (currentSpread < totalSpreads - 1 && !isTurning) {
+    performPageTurn('right', currentSpread + 1);
+  }
+}
+
+function prevSpread() {
+  if (currentSpread > 0 && !isTurning) {
+    performPageTurn('left', currentSpread - 1);
+  }
+}
+
+function goToSpread(index) {
+  if (index !== currentSpread && !isTurning) {
+    const direction = index > currentSpread ? 'right' : 'left';
+    performPageTurn(direction, index);
+  }
+}
+
+function performPageTurn(direction, targetIndex) {
+  isTurning = true;
+  const book = document.getElementById('book');
+
+  // Create turn overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'page-turn-overlay paper-texture';
+  overlay.style.cssText = direction === 'right'
+    ? 'right:0;left:50%;'
+    : 'left:0;right:50%;';
+
+  book.appendChild(overlay);
+
+  // Show pencil layer briefly during slow turn
+  const pencilIds = [`pencil-${currentSpread}`, `pencil-${currentSpread}b`];
+  pencilIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('visible');
+  });
+
+  // Force reflow
+  overlay.offsetHeight;
+  overlay.classList.add(direction === 'right' ? 'turning-right' : 'turning-left');
+
+  setTimeout(() => {
+    showSpread(targetIndex);
+    // Remove pencil layers
+    pencilIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('visible');
+    });
+  }, 300);
+
+  setTimeout(() => {
+    overlay.remove();
+    isTurning = false;
+  }, 600);
+}
+
+function updateRibbons() {
+  const ribbons = document.querySelectorAll('.ribbon');
+  ribbons.forEach((r, i) => {
+    r.classList.toggle('active-ribbon', i === currentSpread);
+  });
+}
+
+// ===== LANGUAGE TOGGLE =====
+function toggleLanguage() {
+  currentLang = currentLang === 'en' ? 'jp' : 'en';
+  const btn = document.getElementById('langToggle');
+  btn.textContent = currentLang === 'en' ? 'EN / JP' : 'JP / EN';
+
+  // Find all elements with data-en and data-jp
+  const els = document.querySelectorAll('[data-en][data-jp]');
+  els.forEach(el => {
+    el.classList.add('fading');
+    setTimeout(() => {
+      const text = currentLang === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-jp');
+      el.textContent = text;
+      el.classList.remove('fading');
+    }, 150);
+  });
+}
+
+// ===== SPIN WHEEL =====
+let currentWheelRotation = 0;
+const theories = [
+  {
+    en: "LUFFY'S DREAM: His true dream is to throw the biggest party in the world where everyone from every sea eats and laughs together. It's not about being King — it's about freedom for all.",
+    jp: "ルフィの夢：本当の夢は、すべての海からみんなが集まって食べて笑う世界最大のパーティー。王になることではなく、みんなの自由のために。"
+  },
+  {
+    en: "THE VOID CENTURY: The Ancient Kingdom had world-unifying technology. The World Government destroyed it to maintain control. The poneglyphs are their message in a bottle.",
+    jp: "空白の100年：古代王国は世界を統一する技術を持っていた。世界政府は支配を維持するためにそれを破壊。ポーネグリフはボトルメッセージ。"
+  },
+  {
+    en: "JOY BOY: Not a person — a title for whoever carries the will of freedom. The straw hat is the symbol: Joy Boy → Imu → Roger → Shanks → Luffy. The cycle continues.",
+    jp: "ジョイボーイ：人ではなく、自由の意志を持つ者の称号。麦わら帽子が象徴：ジョイボーイ→イム→ロジャー→シャンクス→ルフィ。サイクルは続く。"
+  }
+];
+
+function spinTheWheel() {
+  const wheel = document.getElementById('spinWheel');
+  const result = document.getElementById('spinResult');
+
+  // Random rotation: 3-5 full turns plus random landing
+  const extraDeg = Math.floor(Math.random() * 360);
+  const fullTurns = (3 + Math.floor(Math.random() * 3)) * 360;
+  currentWheelRotation += fullTurns + extraDeg;
+
+  wheel.style.transform = `rotate(${currentWheelRotation}deg)`;
+
+  // Determine which theory based on final position
+  const normalizedDeg = currentWheelRotation % 360;
+  let theoryIndex;
+  if (normalizedDeg < 120) theoryIndex = 0;
+  else if (normalizedDeg < 240) theoryIndex = 1;
+  else theoryIndex = 2;
+
+  // Show result after spin
+  result.style.opacity = '0';
+  setTimeout(() => {
+    const theory = theories[theoryIndex];
+    result.textContent = currentLang === 'en' ? theory.en : theory.jp;
+    result.style.opacity = '1';
+  }, 1600);
+}
+
+// ===== TOUCH / SWIPE SUPPORT =====
+document.addEventListener('touchstart', (e) => {
+  if (!isBookOpen) return;
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+  if (!isBookOpen) return;
+  const touchEndX = e.changedTouches[0].clientX;
+  const touchEndY = e.changedTouches[0].clientY;
+  const diffX = touchEndX - touchStartX;
+  const diffY = touchEndY - touchStartY;
+
+  // Only handle horizontal swipes
+  if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+    if (diffX < 0) {
+      nextSpread();
+    } else {
+      prevSpread();
+    }
+  }
+}, { passive: true });
+
+// ===== KEYBOARD NAVIGATION =====
+document.addEventListener('keydown', (e) => {
+  if (!isBookOpen) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openBook();
+    }
+    return;
+  }
+
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    e.preventDefault();
+    nextSpread();
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    prevSpread();
+  } else if (e.key === 'Escape') {
+    goToCover();
+  } else if (e.key >= '1' && e.key <= '7') {
+    goToSpread(parseInt(e.key) - 1);
+  }
+});
+
+// ===== INIT =====
+showSpread(0);
+</script>
+</body>
+</html>
