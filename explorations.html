@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rika Portfolio — Design Explorations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --shell-bg: #0a0a0f;
+  --tab-bg: #111118;
+  --tab-hover: #1a1a24;
+  --tab-active-bg: #a78bfa;
+  --tab-active-text: #fff;
+  --tab-text: #888899;
+  --tab-text-hover: #ccc;
+  --border: #222233;
+  --sidebar-bg: #111118;
+  --sidebar-text: #c8c8d4;
+  --sidebar-muted: #777788;
+  --sidebar-heading: #e8e8f0;
+  --accent: #a78bfa;
+  --green: #4ade80;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --tab-height: 48px;
+  --sidebar-width: 360px;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  background: var(--shell-bg);
+  color: var(--sidebar-text);
+}
+
+/* Tab Bar */
+.tab-bar {
+  display: flex;
+  align-items: stretch;
+  height: var(--tab-height);
+  background: var(--tab-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 8px;
+  gap: 2px;
+  user-select: none;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tab-text);
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.2s;
+  position: relative;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--tab-text-hover);
+  background: var(--tab-hover);
+}
+
+.tab.active {
+  color: var(--tab-active-text);
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+}
+
+.tab .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  opacity: 0.5;
+}
+
+.tab-spacer { flex: 1; }
+
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--tab-text);
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+.sidebar-toggle:hover { color: var(--tab-text-hover); }
+.sidebar-toggle.open { color: var(--accent); }
+.sidebar-toggle svg { transition: transform 0.2s; }
+.sidebar-toggle.open svg { transform: rotate(180deg); }
+
+/* Main Area */
+.main-area {
+  display: flex;
+  height: calc(100vh - var(--tab-height));
+  overflow: hidden;
+}
+
+/* Iframe */
+.proto-frame {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: var(--shell-bg);
+}
+
+/* Sidebar */
+.sidebar {
+  width: 0;
+  overflow: hidden;
+  background: var(--sidebar-bg);
+  border-left: 1px solid var(--border);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.sidebar.open {
+  width: var(--sidebar-width);
+}
+
+.sidebar-inner {
+  width: var(--sidebar-width);
+  height: 100%;
+  overflow-y: auto;
+  padding: 28px 24px 40px;
+}
+
+.sidebar-inner::-webkit-scrollbar { width: 4px; }
+.sidebar-inner::-webkit-scrollbar-track { background: transparent; }
+.sidebar-inner::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.sb-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--sidebar-heading);
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+}
+
+.sb-subtitle {
+  font-size: 13px;
+  color: var(--sidebar-muted);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.sb-section {
+  margin-bottom: 24px;
+}
+
+.sb-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.sb-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sb-list li {
+  font-size: 13px;
+  line-height: 1.55;
+  padding-left: 14px;
+  position: relative;
+}
+
+.sb-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.6;
+}
+
+.sb-list.tradeoffs li::before { background: var(--amber); }
+
+.sb-tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(167, 139, 250, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(167, 139, 250, 0.15);
+}
+
+.sb-complexity {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.sb-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 20px 0;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .tab { padding: 0 10px; font-size: 11px; }
+  .tab .label { display: none; }
+  .tab .num { opacity: 1; font-size: 13px; }
+  :root { --sidebar-width: 100vw; }
+  .sidebar { position: fixed; top: var(--tab-height); right: 0; bottom: 0; z-index: 100; border-left: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="tab-bar">
+  <button class="tab active" data-dir="1" onclick="switchTab(1)">
+    <span class="num">01</span><span class="label">RikaOS</span>
+  </button>
+  <button class="tab" data-dir="2" onclick="switchTab(2)">
+    <span class="num">02</span><span class="label">Scrapbook</span>
+  </button>
+  <button class="tab" data-dir="3" onclick="switchTab(3)">
+    <span class="num">03</span><span class="label">Petri Dish</span>
+  </button>
+  <button class="tab" data-dir="4" onclick="switchTab(4)">
+    <span class="num">04</span><span class="label">rika tv</span>
+  </button>
+  <button class="tab" data-dir="5" onclick="switchTab(5)">
+    <span class="num">05</span><span class="label">Neighborhood</span>
+  </button>
+  <div class="tab-spacer"></div>
+  <button class="sidebar-toggle" onclick="toggleSidebar()">
+    <span>NOTES</span>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3L9 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+</div>
+
+<div class="main-area">
+  <iframe class="proto-frame" id="protoFrame" src="prototypes/d1-rikaos.html"></iframe>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-inner" id="sidebarContent"></div>
+  </div>
+</div>
+
+<script>
+const protoFiles = {
+  1: 'prototypes/d1-rikaos.html',
+  2: 'prototypes/d2-scrapbook.html',
+  3: 'prototypes/d3-petridish.html',
+  4: 'prototypes/d4-rikatv.html',
+  5: 'prototypes/d5-neighborhood.html'
+};
+
+const sidebarData = {
+  1: {
+    title: 'RikaOS',
+    subtitle: 'Tech-playful. "You just booted up someone\'s personal computer and found a whole world inside."',
+    strengths: [
+      'Strongest metaphor for a developer — the site IS a computer she built',
+      'Infinite extensibility — every new project is a new app',
+      'Window manager, terminal, and command palette demonstrate real engineering',
+      'Recruiter-friendly: projects.app is immediately findable'
+    ],
+    tradeoffs: [
+      'Desktop OS metaphors have been done — needs enough personality to stand out',
+      'Window management complexity on mobile (mitigated by phone-OS transformation)',
+      'Boot sequence could feel slow on repeat visits (add skip option)'
+    ],
+    complexity: 'High — custom window manager, drag/resize system, z-index management, command parser, boot sequence, taskbar state, multiple "apps" each with unique layouts.',
+    mobile: 'Transforms to phone-OS launcher with app grid. Tap opens fullscreen app view. Bottom status bar with back gesture.',
+    recruiter: 'High — projects.app front and center. Terminal impresses technical recruiters. Clear navigation through taskbar.'
+  },
+  2: {
+    title: 'The Scrapbook',
+    subtitle: 'Cozy-intimate. "Found someone\'s personal journal on a rainy day and couldn\'t stop turning pages."',
+    strengths: [
+      'Strongest emotional connection — feels personal and handmade',
+      'Natural storytelling flow through page-turning',
+      'Paper textures, washi tape, and craft aesthetic are unique in dev portfolios',
+      'Envelope metaphor (casual outside → rigorous inside) perfectly balances personality and skill'
+    ],
+    tradeoffs: [
+      'Two-page spread requires careful responsive handling',
+      'Page-turn physics need to feel right or the whole metaphor breaks',
+      'Risk of feeling too crafty/not technical enough (mitigated by envelope reveal pattern)'
+    ],
+    complexity: 'Medium-High — page-turn CSS/JS animation, paper textures, interactive elements per spread (corkboard, envelopes, flipcards), ribbon navigation system.',
+    mobile: 'Single-page view with swipe navigation. Ribbons become bottom tab bar. Touch-optimized interactions.',
+    recruiter: 'Medium — engineering content exists but needs "opening the envelope" to reveal. Table of contents and ribbons help navigation.'
+  },
+  3: {
+    title: 'The Petri Dish',
+    subtitle: 'Bold-unusual. "The one nobody else would ever do. Uncomfortable with how bold it is."',
+    strengths: [
+      'Strongest metaphor alignment — literally connects microbiology past to engineering present',
+      'Zoom-based navigation is genuinely novel for portfolios',
+      'Visual impact is immediate — pulsing colonies on agar are mesmerizing',
+      'Every element has meaning (mitochondria = tech stack is hilarious AND informative)'
+    ],
+    tradeoffs: [
+      'Polarizing — some people won\'t "get it" or might find it strange',
+      'Zoom navigation has a learning curve (mitigated by guided first experience)',
+      'Canvas/WebGL rendering adds significant technical overhead'
+    ],
+    complexity: 'Highest — Canvas/CSS animation for colonies, zoom/pan camera system, Perlin noise, progressive content loading based on zoom level, fermentation game.',
+    mobile: 'Discrete zoom steps (tap to zoom in, pinch gesture). Swipe between colonies at same zoom level. Simplified colony animations.',
+    recruiter: 'Medium — requires zooming into engineering colony. But the novelty factor makes the site memorable and shareable.'
+  },
+  4: {
+    title: 'rika tv',
+    subtitle: 'Funny-entertaining. "This is entertainment. The site is a Japanese variety show and you\'re the audience."',
+    strengths: [
+      'Most entertaining direction — channel-surfing is inherently fun',
+      'Each channel format perfectly matches its content type',
+      'Strong personality expression through show formats and chyrons',
+      'CRT effects and remote control are immediately engaging'
+    ],
+    tradeoffs: [
+      'TV metaphor is less directly connected to engineering than OS or lab',
+      'Many channels to build — each needs its own visual identity',
+      'Risk of style over substance if show formats overshadow actual content'
+    ],
+    complexity: 'High — channel transition animations, CRT shader effects, 6 distinct channel layouts, draggable remote control, keyboard shortcuts, news ticker, chyron system.',
+    mobile: 'Swipe between channels (like stories). Bottom channel indicator. Remote control becomes bottom bar. Fullscreen immersive experience.',
+    recruiter: 'High — Channel 2 (Code Review) is a dedicated engineering showcase. Channel-surfing makes exploring natural.'
+  },
+  5: {
+    title: 'The Neighborhood',
+    subtitle: 'Warm-inviting. "Visiting a friend\'s neighborhood and every building has a story."',
+    strengths: [
+      'Most emotionally warm direction — feels like being invited somewhere',
+      'Isometric map creates instant spatial understanding',
+      'Each building interior is a full content page — no compromises on content depth',
+      'Day/night cycle and animated details make it feel alive'
+    ],
+    tradeoffs: [
+      'Isometric illustration requires significant art direction',
+      'Map navigation on small screens needs careful handling',
+      'Zoom transition between map and interior must be smooth or it feels jarring'
+    ],
+    complexity: 'High — isometric CSS/SVG map, zoom transitions, 6 unique interior layouts, day/night mode, ambient animations (cherry blossoms, cat, smoke), building hover/enter states.',
+    mobile: 'Pan/tap map at slightly-above-overhead angle. Tap building → fullscreen interior. Bottom bar for quick building access.',
+    recruiter: 'High — Workshop building is clearly labeled. Map overview shows breadth immediately. Building metaphor is intuitive.'
+  }
+};
+
+let currentDir = 1;
+let sidebarOpen = false;
+
+function switchTab(dir) {
+  currentDir = dir;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab[data-dir="${dir}"]`).classList.add('active');
+  document.getElementById('protoFrame').src = protoFiles[dir];
+  renderSidebar();
+}
+
+function toggleSidebar() {
+  sidebarOpen = !sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('open', sidebarOpen);
+  document.querySelector('.sidebar-toggle').classList.toggle('open', sidebarOpen);
+  if (sidebarOpen) renderSidebar();
+}
+
+function renderSidebar() {
+  const d = sidebarData[currentDir];
+  if (!d) return;
+  document.getElementById('sidebarContent').innerHTML = `
+    <div class="sb-title">${d.title}</div>
+    <div class="sb-subtitle">${d.subtitle}</div>
+    <div class="sb-divider"></div>
+
+    <div class="sb-section">
+      <div class="sb-label">Strengths</div>
+      <ul class="sb-list">${d.strengths.map(s => `<li>${s}</li>`).join('')}</ul>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-label">Trade-offs</div>
+      <ul class="sb-list tradeoffs">${d.tradeoffs.map(s => `<li>${s}</li>`).join('')}</ul>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-section">
+      <div class="sb-label">Technical Complexity</div>
+      <div class="sb-complexity">${d.complexity}</div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-label">Mobile Strategy</div>
+      <div class="sb-complexity">${d.mobile}</div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-label">Recruiter Clarity</div>
+      <div class="sb-complexity">${d.recruiter}</div>
+    </div>
+  `;
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  const num = parseInt(e.key);
+  if (num >= 1 && num <= 5 && !e.metaKey && !e.ctrlKey && !e.altKey) {
+    // Only if not focused in iframe
+    if (document.activeElement !== document.getElementById('protoFrame')) {
+      switchTab(num);
+    }
+  }
+  if (e.key === 'Escape' && sidebarOpen) {
+    toggleSidebar();
+  }
+});
+
+// Init sidebar content
+renderSidebar();
+</script>
+</body>
+</html>

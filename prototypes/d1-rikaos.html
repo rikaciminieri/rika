@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RikaOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #1a1125;
+  --surface: #231a30;
+  --surface-2: #2d2240;
+  --border: #3d2f55;
+  --text: #ede8f5;
+  --text-muted: #a89bc2;
+  --accent: #a78bfa;
+  --accent-glow: rgba(167, 139, 250, 0.3);
+  --pink: #f472b6;
+  --green: #4ade80;
+  --amber: #fbbf24;
+  --red: #ef4444;
+  --blue: #60a5fa;
+  --taskbar-h: 48px;
+  --radius: 10px;
+  --win-header: 38px;
+  --font: 'Inter', 'Noto Sans JP', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+}
+
+html, body { height: 100%; overflow: hidden; font-family: var(--font); background: var(--bg); color: var(--text); }
+
+/* =================== BOOT SEQUENCE =================== */
+#boot-screen {
+  position: fixed; inset: 0; z-index: 99999;
+  background: #0a0a0f;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  transition: opacity 0.6s;
+}
+#boot-screen.done { opacity: 0; pointer-events: none; }
+
+.boot-logo {
+  font-family: var(--display);
+  font-size: 48px; font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--pink));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 32px;
+  letter-spacing: -0.03em;
+}
+
+.boot-lines {
+  font-size: 12px;
+  color: #555;
+  text-align: left;
+  width: 400px;
+  max-width: 90vw;
+}
+.boot-lines div {
+  opacity: 0;
+  animation: bootFade 0.3s forwards;
+}
+.boot-lines .ok { color: var(--green); }
+.boot-lines .warn { color: var(--amber); }
+@keyframes bootFade { to { opacity: 1; } }
+
+.boot-bar {
+  width: 400px; max-width: 90vw; height: 3px;
+  background: #222; border-radius: 2px;
+  margin-top: 24px; overflow: hidden;
+}
+.boot-bar-fill {
+  height: 100%; width: 0; background: var(--accent);
+  border-radius: 2px;
+  animation: bootFill 2s ease-in-out forwards;
+}
+@keyframes bootFill { to { width: 100%; } }
+
+/* =================== DESKTOP =================== */
+#desktop {
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(167,139,250,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 30%, rgba(244,114,182,0.06) 0%, transparent 50%),
+    var(--bg);
+  opacity: 0;
+  transition: opacity 0.8s 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+#desktop.visible { opacity: 1; }
+
+/* Kanji watermark */
+.watermark {
+  position: fixed;
+  right: 60px; bottom: 80px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 200px; font-weight: 700;
+  color: rgba(167,139,250,0.04);
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+}
+
+/* =================== DESKTOP ICONS =================== */
+.desktop-icons {
+  flex: 1;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 90px);
+  grid-template-rows: repeat(auto-fill, 90px);
+  gap: 8px;
+  align-content: start;
+}
+
+.desktop-icon {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px;
+  width: 84px; height: 84px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.desktop-icon:hover { background: rgba(167,139,250,0.1); }
+.desktop-icon:active { transform: scale(0.95); }
+
+.desktop-icon .icon-img {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.desktop-icon .icon-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =================== WINDOWS =================== */
+.window {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(167,139,250,0.05);
+  display: flex; flex-direction: column;
+  min-width: 320px; min-height: 200px;
+  overflow: hidden;
+  animation: winOpen 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes winOpen {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.window.minimized {
+  animation: winMin 0.2s forwards;
+  pointer-events: none;
+}
+@keyframes winMin {
+  to { transform: scale(0.5) translateY(100vh); opacity: 0; }
+}
+
+.window.focused { box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(167,139,250,0.15), 0 0 30px var(--accent-glow); }
+
+.win-header {
+  height: var(--win-header);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 12px;
+  cursor: grab;
+  user-select: none;
+  flex-shrink: 0;
+}
+.win-header:active { cursor: grabbing; }
+
+.win-dots {
+  display: flex; gap: 7px;
+}
+.win-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.win-dot:hover { transform: scale(1.2); }
+.win-dot.close { background: var(--red); }
+.win-dot.minimize { background: var(--amber); }
+.win-dot.maximize { background: var(--green); }
+
+.win-title {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.win-body {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+}
+
+.win-body::-webkit-scrollbar { width: 6px; }
+.win-body::-webkit-scrollbar-track { background: transparent; }
+.win-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Resize handle */
+.win-resize {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 16px; height: 16px;
+  cursor: nwse-resize;
+}
+
+/* =================== TASKBAR =================== */
+.taskbar {
+  height: var(--taskbar-h);
+  background: rgba(26, 17, 37, 0.85);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 12px;
+  z-index: 9000;
+  gap: 4px;
+}
+
+.tb-start {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, var(--accent), var(--pink));
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s;
+  font-weight: 700;
+  font-family: var(--display);
+}
+.tb-start:hover { transform: scale(1.08); }
+
+.tb-divider {
+  width: 1px; height: 28px;
+  background: var(--border);
+  margin: 0 8px;
+}
+
+.tb-apps {
+  display: flex; gap: 3px; flex: 1;
+  overflow-x: auto;
+}
+
+.tb-app {
+  padding: 4px 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.tb-app:hover { background: rgba(167,139,250,0.08); color: var(--text); }
+.tb-app.active { background: rgba(167,139,250,0.12); color: var(--text); }
+.tb-app .tb-app-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.tb-tray {
+  display: flex; align-items: center; gap: 12px;
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.tb-tray-btn {
+  background: none; border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--mono);
+  transition: color 0.15s;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.tb-tray-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+
+#clock {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* =================== COMMAND PALETTE =================== */
+.cmd-overlay {
+  position: fixed; inset: 0;
+  background: rgba(10,10,15,0.6);
+  backdrop-filter: blur(8px);
+  z-index: 50000;
+  display: none; align-items: flex-start; justify-content: center;
+  padding-top: 20vh;
+}
+.cmd-overlay.open { display: flex; }
+
+.cmd-box {
+  width: 560px; max-width: 90vw;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  overflow: hidden;
+  animation: cmdOpen 0.15s ease-out;
+}
+@keyframes cmdOpen { from { transform: scale(0.96) translateY(-8px); opacity: 0; } }
+
+.cmd-input {
+  width: 100%;
+  padding: 16px 20px;
+  background: transparent;
+  border: none; outline: none;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.cmd-input::placeholder { color: var(--text-muted); }
+
+.cmd-results {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.cmd-item {
+  padding: 10px 20px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 12px;
+  transition: background 0.1s;
+  font-size: 14px;
+}
+.cmd-item:hover, .cmd-item.selected { background: rgba(167,139,250,0.1); }
+.cmd-item .cmd-icon { font-size: 18px; width: 28px; text-align: center; }
+.cmd-item .cmd-label { flex: 1; }
+.cmd-item .cmd-hint { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+
+/* =================== CONTEXT MENU =================== */
+.ctx-menu {
+  position: fixed;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px;
+  min-width: 200px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  z-index: 60000;
+  display: none;
+  animation: ctxOpen 0.12s ease-out;
+}
+@keyframes ctxOpen { from { transform: scale(0.95); opacity: 0; } }
+.ctx-menu.open { display: block; }
+
+.ctx-item {
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex; align-items: center; gap: 10px;
+  transition: background 0.1s;
+  color: var(--text);
+}
+.ctx-item:hover { background: rgba(167,139,250,0.12); }
+.ctx-item .ctx-icon { width: 20px; text-align: center; }
+.ctx-sep { height: 1px; background: var(--border); margin: 4px 8px; }
+
+/* =================== APP-SPECIFIC STYLES =================== */
+
+/* Welcome notepad */
+.notepad-content {
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text);
+}
+.notepad-content h2 {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--pink));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.notepad-content p { margin-bottom: 12px; }
+.notepad-content .aside {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 13px;
+}
+
+/* Terminal */
+.terminal {
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--green);
+  background: #0a0a0f;
+  padding: 20px;
+  height: 100%;
+}
+.terminal .prompt { color: var(--accent); }
+.terminal .cmd-text { color: var(--text); }
+.terminal .output { color: var(--text-muted); white-space: pre-wrap; }
+.terminal .error { color: var(--red); }
+.terminal .highlight { color: var(--amber); }
+
+.term-input-line {
+  display: flex; align-items: center; gap: 0;
+}
+.term-input {
+  background: transparent;
+  border: none; outline: none;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  flex: 1;
+  caret-color: var(--green);
+}
+
+/* Projects */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.project-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.project-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.project-card h3 {
+  font-size: 15px; font-weight: 600;
+  margin-bottom: 6px;
+}
+.project-card p {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.project-card .tags {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.project-card .tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(167,139,250,0.1);
+  color: var(--accent);
+}
+
+/* Gallery */
+.gallery-scroll {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  scroll-snap-type: x mandatory;
+}
+.gallery-scroll::-webkit-scrollbar { height: 4px; }
+.gallery-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.gallery-item {
+  flex-shrink: 0;
+  width: 260px;
+  scroll-snap-align: start;
+}
+.gallery-thumb {
+  width: 100%; height: 200px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+.gallery-item h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.gallery-item p { font-size: 12px; color: var(--text-muted); }
+
+/* Grilled Cheese */
+.gc-podium {
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.gc-podium-item {
+  text-align: center;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.gc-podium-item.gold { border-color: #fbbf24; order: 2; }
+.gc-podium-item.silver { border-color: #94a3b8; order: 1; }
+.gc-podium-item.bronze { border-color: #d97706; order: 3; }
+.gc-medal { font-size: 32px; }
+.gc-name { font-size: 14px; font-weight: 600; margin-top: 8px; }
+.gc-score { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+
+.gc-bracket {
+  display: flex; gap: 40px; align-items: center; overflow-x: auto;
+  padding: 16px 0;
+}
+.gc-round {
+  display: flex; flex-direction: column; gap: 20px;
+  flex-shrink: 0;
+}
+.gc-match {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.gc-matchup {
+  padding: 8px 14px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between;
+}
+.gc-matchup:last-child { border-bottom: none; }
+.gc-matchup.winner { color: var(--accent); font-weight: 600; }
+
+/* =================== MOBILE =================== */
+@media (max-width: 768px) {
+  .desktop-icons {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    padding: 16px;
+    justify-items: center;
+  }
+  .window {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - var(--taskbar-h)) !important;
+    border-radius: 0 !important;
+    min-width: unset !important;
+    min-height: unset !important;
+  }
+  .watermark { display: none; }
+  .cmd-box { border-radius: 0; }
+}
+
+/* =================== SCREENSAVER =================== */
+.screensaver {
+  position: fixed; inset: 0;
+  background: #000;
+  z-index: 80000;
+  display: none;
+  cursor: pointer;
+}
+.screensaver.active { display: flex; align-items: center; justify-content: center; }
+.screensaver-hat {
+  font-size: 80px;
+  position: absolute;
+  animation: dvdBounce 8s linear infinite;
+}
+@keyframes dvdBounce {
+  0% { top: 10%; left: 10%; }
+  25% { top: 60%; left: 80%; }
+  50% { top: 80%; left: 20%; }
+  75% { top: 20%; left: 70%; }
+  100% { top: 10%; left: 10%; }
+}
+
+/* =================== KONAMI =================== */
+.cheese-rain {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 90000;
+}
+.cheese-drop {
+  position: absolute;
+  font-size: 32px;
+  animation: cheeseFall linear forwards;
+}
+@keyframes cheeseFall {
+  from { transform: translateY(-50px) rotate(0deg); }
+  to { transform: translateY(110vh) rotate(360deg); }
+}
+</style>
+</head>
+<body>
+
+<!-- BOOT SCREEN -->
+<div id="boot-screen">
+  <div class="boot-logo">RikaOS</div>
+  <div class="boot-lines" id="bootLines"></div>
+  <div class="boot-bar"><div class="boot-bar-fill"></div></div>
+</div>
+
+<!-- DESKTOP -->
+<div id="desktop">
+  <div class="watermark">莉香</div>
+
+  <div class="desktop-icons" id="desktopIcons"></div>
+
+  <!-- Windows render here -->
+  <div id="windowContainer"></div>
+
+  <!-- Taskbar -->
+  <div class="taskbar">
+    <button class="tb-start" title="Start">R</button>
+    <div class="tb-divider"></div>
+    <div class="tb-apps" id="tbApps"></div>
+    <div class="tb-tray">
+      <button class="tb-tray-btn" id="langToggle" onclick="toggleLang()">EN</button>
+      <button class="tb-tray-btn" onclick="toggleDarkMode()">☀</button>
+      <span id="clock"></span>
+    </div>
+  </div>
+</div>
+
+<!-- Command Palette -->
+<div class="cmd-overlay" id="cmdOverlay" onclick="if(event.target===this)closeCmdPalette()">
+  <div class="cmd-box">
+    <input class="cmd-input" id="cmdInput" placeholder="Search apps, commands, anything..." oninput="filterCommands()" onkeydown="handleCmdKey(event)">
+    <div class="cmd-results" id="cmdResults"></div>
+  </div>
+</div>
+
+<!-- Context Menu -->
+<div class="ctx-menu" id="ctxMenu"></div>
+
+<!-- Screensaver -->
+<div class="screensaver" id="screensaver" onclick="hideScreensaver()">
+  <div class="screensaver-hat">👒</div>
+</div>
+
+<!-- Cheese Rain Container -->
+<div class="cheese-rain" id="cheeseRain"></div>
+
+<script>
+// =================== STATE ===================
+let lang = 'en';
+let windows = [];
+let nextZ = 100;
+let nextWinId = 1;
+let focusedWinId = null;
+let idleTimer = null;
+const IDLE_TIMEOUT = 120000; // 2 min
+
+// =================== I18N ===================
+const i18n = {
+  en: {
+    welcome_title: 'Welcome to RikaOS! 👋',
+    welcome_body: `<p>Hey! I'm <strong>Rika Ciminieri</strong> — half-Japanese full-stack engineer at Eventbrite.</p>
+<p>Former microbiology student turned tech advocate. I pivoted from petri dishes to pixels because I realized I liked debugging code more than debugging cell cultures.</p>
+<p class="aside">(I also rank grilled cheeses competitively. Recruiters already love this.)</p>
+<p>Feel free to explore — open some apps, try the terminal, or just poke around. This desktop is my portfolio, and everything in it is something I built or care about deeply.</p>
+<p class="aside">Pro tip: Press ⌘K to open the command palette. Right-click anywhere for more options.</p>`,
+    projects_title: 'projects.app',
+    terminal_title: 'terminal.app',
+    gallery_title: 'gallery.app',
+    gc_title: 'grilled-cheese.app',
+    welcome_app: 'welcome.app',
+    about: 'About Rika',
+    projects: 'Projects',
+    terminal: 'Terminal',
+    gallery: 'Gallery',
+    gc: 'Grilled Cheese',
+    trash: 'Trash',
+    calculator: 'Calculator',
+  },
+  jp: {
+    welcome_title: 'RikaOSへようこそ！👋',
+    welcome_body: `<p>こんにちは！<strong>Rika Ciminieri</strong>です。日米ハーフのフルスタックエンジニアで、Eventbriteで働いています。</p>
+<p>元微生物学の学生からテック業界へ転身。シャーレの培養よりコードのデバッグの方が好きだと気づきました。</p>
+<p class="aside">（グリルドチーズのランキングも本気でやってます。採用担当者にはウケます。）</p>
+<p>自由に探索してください。アプリを開いたり、ターミナルを試したり。このデスクトップが私のポートフォリオです。</p>
+<p class="aside">ヒント: ⌘Kでコマンドパレットを開けます。右クリックでメニューも。</p>`,
+    projects_title: 'プロジェクト.app',
+    terminal_title: 'ターミナル.app',
+    gallery_title: 'ギャラリー.app',
+    gc_title: 'グリルドチーズ.app',
+    welcome_app: 'ようこそ.app',
+    about: 'プロフィール',
+    projects: 'プロジェクト',
+    terminal: 'ターミナル',
+    gallery: 'ギャラリー',
+    gc: 'グリルドチーズ',
+    trash: 'ゴミ箱',
+    calculator: '電卓',
+  }
+};
+
+function t(key) { return i18n[lang][key] || i18n.en[key] || key; }
+
+// =================== APPS ===================
+const apps = [
+  { id: 'welcome', icon: '📝', label: () => t('about'), w: 560, h: 440 },
+  { id: 'projects', icon: '💻', label: () => t('projects'), w: 700, h: 500 },
+  { id: 'terminal', icon: '⬛', label: () => t('terminal'), w: 640, h: 420 },
+  { id: 'gallery', icon: '🎨', label: () => t('gallery'), w: 680, h: 460 },
+  { id: 'gc', icon: '🧀', label: () => t('gc'), w: 720, h: 520 },
+  { id: 'trash', icon: '🗑️', label: () => t('trash'), w: 400, h: 340 },
+  { id: 'calculator', icon: '🔢', label: () => t('calculator'), w: 320, h: 300 },
+];
+
+// =================== BOOT SEQUENCE ===================
+const bootMessages = [
+  { text: 'RikaOS v2.0.25 — loading kernel...', delay: 0 },
+  { text: 'mounting /dev/portfolio...                    [OK]', cls: 'ok', delay: 200 },
+  { text: 'initializing grilled cheese subsystem...      [OK]', cls: 'ok', delay: 400 },
+  { text: 'loading one piece theories (847 found)...     [OK]', cls: 'ok', delay: 600 },
+  { text: 'calibrating vibes...                          [OK]', cls: 'ok', delay: 900 },
+  { text: 'pilates.service — skipped (it\'s not 7am)     [WARN]', cls: 'warn', delay: 1100 },
+  { text: 'bilingual engine: en_US + ja_JP ready         [OK]', cls: 'ok', delay: 1300 },
+  { text: 'all systems nominal. welcome home, rika. 🏠', cls: 'ok', delay: 1600 },
+];
+
+function runBoot() {
+  const container = document.getElementById('bootLines');
+  bootMessages.forEach(msg => {
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.textContent = msg.text;
+      if (msg.cls) div.classList.add(msg.cls);
+      div.style.animationDelay = '0s';
+      container.appendChild(div);
+    }, msg.delay);
+  });
+
+  setTimeout(() => {
+    document.getElementById('boot-screen').classList.add('done');
+    document.getElementById('desktop').classList.add('visible');
+    setTimeout(() => {
+      document.getElementById('boot-screen').style.display = 'none';
+      openApp('welcome');
+    }, 600);
+  }, 2400);
+}
+
+// =================== DESKTOP ICONS ===================
+function renderDesktopIcons() {
+  const container = document.getElementById('desktopIcons');
+  container.innerHTML = '';
+  apps.forEach(app => {
+    const el = document.createElement('div');
+    el.className = 'desktop-icon';
+    el.ondblclick = () => openApp(app.id);
+    el.onclick = (e) => { if (e.detail === 2) return; /* single click = select */ };
+    el.innerHTML = `
+      <div class="icon-img">${app.icon}</div>
+      <div class="icon-label">${app.label()}</div>
+    `;
+    container.appendChild(el);
+  });
+}
+
+// =================== WINDOW MANAGER ===================
+function openApp(appId) {
+  // Check if already open
+  const existing = windows.find(w => w.appId === appId && !w.minimized);
+  if (existing) {
+    focusWindow(existing.id);
+    return;
+  }
+
+  const existingMin = windows.find(w => w.appId === appId && w.minimized);
+  if (existingMin) {
+    existingMin.minimized = false;
+    const el = document.getElementById(`win-${existingMin.id}`);
+    if (el) {
+      el.classList.remove('minimized');
+      el.style.display = '';
+    }
+    focusWindow(existingMin.id);
+    updateTaskbar();
+    return;
+  }
+
+  const app = apps.find(a => a.id === appId);
+  if (!app) return;
+
+  const id = nextWinId++;
+  const offsetX = 60 + (windows.length % 5) * 30;
+  const offsetY = 40 + (windows.length % 5) * 30;
+
+  const win = {
+    id,
+    appId,
+    x: offsetX,
+    y: offsetY,
+    w: Math.min(app.w, window.innerWidth - 40),
+    h: Math.min(app.h, window.innerHeight - 100),
+    z: nextZ++,
+    minimized: false,
+  };
+
+  windows.push(win);
+  renderWindow(win, app);
+  focusWindow(id);
+  updateTaskbar();
+}
+
+function renderWindow(win, app) {
+  const el = document.createElement('div');
+  el.className = 'window';
+  el.id = `win-${win.id}`;
+  el.style.left = win.x + 'px';
+  el.style.top = win.y + 'px';
+  el.style.width = win.w + 'px';
+  el.style.height = win.h + 'px';
+  el.style.zIndex = win.z;
+  el.onmousedown = () => focusWindow(win.id);
+
+  el.innerHTML = `
+    <div class="win-header" onmousedown="startDrag(event, ${win.id})">
+      <div class="win-dots">
+        <button class="win-dot close" onclick="closeWindow(${win.id})"></button>
+        <button class="win-dot minimize" onclick="minimizeWindow(${win.id})"></button>
+        <button class="win-dot maximize" onclick="maximizeWindow(${win.id})"></button>
+      </div>
+      <div class="win-title">${app.icon} ${app.label()}</div>
+    </div>
+    <div class="win-body" id="win-body-${win.id}"></div>
+    <div class="win-resize" onmousedown="startResize(event, ${win.id})"></div>
+  `;
+
+  document.getElementById('windowContainer').appendChild(el);
+  renderAppContent(win.id, app.id);
+}
+
+function renderAppContent(winId, appId) {
+  const body = document.getElementById(`win-body-${winId}`);
+  if (!body) return;
+
+  switch (appId) {
+    case 'welcome':
+      body.innerHTML = `<div class="notepad-content"><h2>${t('welcome_title')}</h2>${t('welcome_body')}</div>`;
+      break;
+
+    case 'projects':
+      body.innerHTML = `<div class="projects-grid">
+        <div class="project-card">
+          <h3>🌐 This Portfolio</h3>
+          <p>The site you're looking at right now. A custom OS-style portfolio built from scratch with React, Vite, and Tailwind CSS 4.</p>
+          <div class="tags"><span class="tag">React</span><span class="tag">Vite</span><span class="tag">Tailwind</span><span class="tag">TypeScript</span></div>
+        </div>
+        <div class="project-card">
+          <h3>🧀 Grilled Cheese API</h3>
+          <p>A RESTful API for ranking, reviewing, and debating grilled cheese sandwiches. Because yes, this needed to exist.</p>
+          <div class="tags"><span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">PostgreSQL</span></div>
+        </div>
+        <div class="project-card">
+          <h3>🌏 Bilingual CMS</h3>
+          <p>Content management system with first-class bilingual support. EN/JP with proper vertical text and typography handling.</p>
+          <div class="tags"><span class="tag">Next.js</span><span class="tag">i18n</span><span class="tag">MDX</span></div>
+        </div>
+        <div class="project-card">
+          <h3>🏴‍☠️ Theory Engine</h3>
+          <p>NLP-powered One Piece theory analyzer. Cross-references manga panels, SBS columns, and fan theories for connections.</p>
+          <div class="tags"><span class="tag">Python</span><span class="tag">NLP</span><span class="tag">FastAPI</span></div>
+        </div>
+        <div class="project-card">
+          <h3>🎪 Event Platform</h3>
+          <p>Contributed to Eventbrite's core event discovery and ticketing platform. Worked on search, recommendations, and checkout flows.</p>
+          <div class="tags"><span class="tag">React</span><span class="tag">Python</span><span class="tag">GraphQL</span></div>
+        </div>
+        <div class="project-card">
+          <h3>🔬 Lab Dashboard</h3>
+          <p>Real-time microbiology lab monitoring dashboard from my pre-tech days. Tracked cultures, experiments, and contamination alerts.</p>
+          <div class="tags"><span class="tag">D3.js</span><span class="tag">Flask</span><span class="tag">WebSockets</span></div>
+        </div>
+      </div>`;
+      break;
+
+    case 'terminal':
+      body.style.padding = '0';
+      body.innerHTML = `<div class="terminal" id="term-${winId}">
+        <div id="term-output-${winId}"><span class="output">RikaOS Terminal v2.0 — type "help" for commands\n\n</span></div>
+        <div class="term-input-line">
+          <span class="prompt">rika@portfolio ~ % </span>
+          <input class="term-input" id="term-input-${winId}" autofocus
+            onkeydown="if(event.key==='Enter')execTermCmd(${winId})">
+        </div>
+      </div>`;
+      setTimeout(() => {
+        const input = document.getElementById(`term-input-${winId}`);
+        if (input) input.focus();
+      }, 100);
+      break;
+
+    case 'gallery':
+      body.innerHTML = `<h3 style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:16px;">The Gallery</h3>
+      <div class="gallery-scroll">
+        <div class="gallery-item">
+          <div class="gallery-thumb">🎨</div>
+          <h4>Sunset Over Shibuya</h4>
+          <p>Paint-by-numbers, acrylic on canvas. Made for a friend who studied abroad in Tokyo.</p>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-thumb">🏠</div>
+          <h4>Hobbit Hole Book Nook</h4>
+          <p>My first book nook! Balsa wood, LED lights, and way too much hot glue.</p>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-thumb">🌊</div>
+          <h4>The Great Wave (Remix)</h4>
+          <p>Paint-by-numbers reinterpretation of Hokusai's classic. Took 3 weekends.</p>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-thumb">📚</div>
+          <h4>Diagon Alley Nook</h4>
+          <p>Harry Potter-themed book nook with tiny shop windows that actually light up.</p>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-thumb">🌸</div>
+          <h4>Cherry Blossom Garden</h4>
+          <p>Painted this after my last trip to Kyoto. The pinks are slightly wrong and I love it.</p>
+        </div>
+      </div>`;
+      break;
+
+    case 'gc':
+      body.innerHTML = `
+        <h3 style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:20px;">🧀 The Grilled Cheese Olympics</h3>
+        <div class="gc-podium">
+          <div class="gc-podium-item silver">
+            <div class="gc-medal">🥈</div>
+            <div class="gc-name">Truffle Melt</div>
+            <div class="gc-score">38/40</div>
+          </div>
+          <div class="gc-podium-item gold">
+            <div class="gc-medal">🥇</div>
+            <div class="gc-name">The Classic</div>
+            <div class="gc-score">39/40</div>
+          </div>
+          <div class="gc-podium-item bronze">
+            <div class="gc-medal">🥉</div>
+            <div class="gc-name">Brie & Fig</div>
+            <div class="gc-score">36/40</div>
+          </div>
+        </div>
+        <h4 style="font-size:14px;font-weight:600;margin-bottom:12px;">Tournament Bracket</h4>
+        <div class="gc-bracket">
+          <div class="gc-round">
+            <div class="gc-match"><div class="gc-matchup winner">The Classic</div><div class="gc-matchup">Caprese</div></div>
+            <div class="gc-match"><div class="gc-matchup winner">Truffle Melt</div><div class="gc-matchup">French Onion</div></div>
+            <div class="gc-match"><div class="gc-matchup winner">Brie & Fig</div><div class="gc-matchup">Jalapeño Popper</div></div>
+            <div class="gc-match"><div class="gc-matchup">Starbucks One</div><div class="gc-matchup winner">Kimchi GC</div></div>
+          </div>
+          <div class="gc-round">
+            <div class="gc-match"><div class="gc-matchup winner">The Classic</div><div class="gc-matchup">Truffle Melt</div></div>
+            <div class="gc-match"><div class="gc-matchup winner">Brie & Fig</div><div class="gc-matchup">Kimchi GC</div></div>
+          </div>
+          <div class="gc-round">
+            <div class="gc-match"><div class="gc-matchup winner">The Classic 🏆</div><div class="gc-matchup">Brie & Fig</div></div>
+          </div>
+        </div>`;
+      break;
+
+    case 'trash':
+      body.innerHTML = `
+        <div style="text-align:center;padding:30px 10px;">
+          <div style="font-size:48px;margin-bottom:16px;">🗑️</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">3 items in trash</p>
+          <div style="text-align:left;max-width:300px;margin:0 auto;">
+            <div style="padding:10px 14px;background:var(--surface-2);border-radius:8px;margin-bottom:8px;font-size:13px;display:flex;gap:10px;align-items:center;">
+              <span>📄</span> resume_final_FINAL_v3.docx
+            </div>
+            <div style="padding:10px 14px;background:var(--surface-2);border-radius:8px;margin-bottom:8px;font-size:13px;display:flex;gap:10px;align-items:center;">
+              <span>📝</span> one-piece-theories-too-unhinged.txt
+            </div>
+            <div style="padding:10px 14px;background:var(--surface-2);border-radius:8px;font-size:13px;display:flex;gap:10px;align-items:center;">
+              <span>📊</span> grilled-cheese-spreadsheet-v47.xlsx
+            </div>
+          </div>
+        </div>`;
+      break;
+
+    case 'calculator':
+      body.innerHTML = `
+        <div style="text-align:center;padding:20px;">
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;font-family:var(--mono);">🧀 Grilled Cheese Unit Converter</p>
+          <div style="background:var(--surface-2);border-radius:10px;padding:16px;margin-bottom:16px;">
+            <input id="calcInput" type="number" value="1" min="0" style="background:transparent;border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:var(--mono);font-size:18px;width:100%;text-align:center;outline:none;" oninput="updateCalc()">
+            <select id="calcUnit" style="margin-top:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--mono);font-size:12px;width:100%;outline:none;" onchange="updateCalc()">
+              <option value="hours">hours of work</option>
+              <option value="meetings">meetings survived</option>
+              <option value="bugs">bugs fixed</option>
+              <option value="commits">git commits</option>
+            </select>
+          </div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">is equivalent to</div>
+          <div id="calcResult" style="font-size:28px;font-weight:700;font-family:var(--display);background:linear-gradient(135deg,var(--accent),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">grilled cheeses earned</div>
+        </div>`;
+      updateCalc();
+      break;
+  }
+}
+
+function updateCalc() {
+  const val = parseFloat(document.getElementById('calcInput')?.value) || 0;
+  const unit = document.getElementById('calcUnit')?.value || 'hours';
+  const rates = { hours: 0.5, meetings: 2, bugs: 1.5, commits: 0.3 };
+  const result = (val * (rates[unit] || 1)).toFixed(1);
+  const el = document.getElementById('calcResult');
+  if (el) el.textContent = `🧀 ${result}`;
+}
+
+function focusWindow(id) {
+  focusedWinId = id;
+  const win = windows.find(w => w.id === id);
+  if (win) win.z = nextZ++;
+
+  document.querySelectorAll('.window').forEach(el => {
+    el.classList.remove('focused');
+    const wid = parseInt(el.id.replace('win-', ''));
+    const w = windows.find(x => x.id === wid);
+    if (w) el.style.zIndex = w.z;
+  });
+
+  const el = document.getElementById(`win-${id}`);
+  if (el) el.classList.add('focused');
+  updateTaskbar();
+}
+
+function closeWindow(id) {
+  const el = document.getElementById(`win-${id}`);
+  if (el) {
+    el.style.transition = 'transform 0.2s, opacity 0.2s';
+    el.style.transform = 'scale(0.9)';
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 200);
+  }
+  windows = windows.filter(w => w.id !== id);
+  if (focusedWinId === id) focusedWinId = null;
+  updateTaskbar();
+}
+
+function minimizeWindow(id) {
+  const win = windows.find(w => w.id === id);
+  if (win) win.minimized = true;
+  const el = document.getElementById(`win-${id}`);
+  if (el) el.classList.add('minimized');
+  if (focusedWinId === id) focusedWinId = null;
+  updateTaskbar();
+}
+
+function maximizeWindow(id) {
+  const el = document.getElementById(`win-${id}`);
+  if (!el) return;
+  const win = windows.find(w => w.id === id);
+  if (!win) return;
+
+  if (win._maximized) {
+    el.style.left = win._prevX + 'px';
+    el.style.top = win._prevY + 'px';
+    el.style.width = win._prevW + 'px';
+    el.style.height = win._prevH + 'px';
+    win._maximized = false;
+  } else {
+    win._prevX = win.x; win._prevY = win.y;
+    win._prevW = win.w; win._prevH = win.h;
+    el.style.left = '0';
+    el.style.top = '0';
+    el.style.width = '100vw';
+    el.style.height = `calc(100vh - ${getComputedStyle(document.documentElement).getPropertyValue('--taskbar-h')})`;
+    win._maximized = true;
+  }
+  focusWindow(id);
+}
+
+// =================== DRAG & RESIZE ===================
+let dragState = null;
+
+function startDrag(e, winId) {
+  if (e.target.classList.contains('win-dot')) return;
+  e.preventDefault();
+  const el = document.getElementById(`win-${winId}`);
+  const rect = el.getBoundingClientRect();
+  dragState = { type: 'drag', winId, startX: e.clientX, startY: e.clientY, origX: rect.left, origY: rect.top };
+  focusWindow(winId);
+}
+
+function startResize(e, winId) {
+  e.preventDefault();
+  e.stopPropagation();
+  const el = document.getElementById(`win-${winId}`);
+  const rect = el.getBoundingClientRect();
+  dragState = { type: 'resize', winId, startX: e.clientX, startY: e.clientY, origW: rect.width, origH: rect.height };
+  focusWindow(winId);
+}
+
+document.addEventListener('mousemove', e => {
+  if (!dragState) return;
+  const el = document.getElementById(`win-${dragState.winId}`);
+  if (!el) return;
+
+  const win = windows.find(w => w.id === dragState.winId);
+
+  if (dragState.type === 'drag') {
+    const nx = dragState.origX + (e.clientX - dragState.startX);
+    const ny = dragState.origY + (e.clientY - dragState.startY);
+    el.style.left = nx + 'px';
+    el.style.top = ny + 'px';
+    if (win) { win.x = nx; win.y = ny; win._maximized = false; }
+  } else if (dragState.type === 'resize') {
+    const nw = Math.max(320, dragState.origW + (e.clientX - dragState.startX));
+    const nh = Math.max(200, dragState.origH + (e.clientY - dragState.startY));
+    el.style.width = nw + 'px';
+    el.style.height = nh + 'px';
+    if (win) { win.w = nw; win.h = nh; }
+  }
+});
+
+document.addEventListener('mouseup', () => { dragState = null; });
+
+// =================== TASKBAR ===================
+function updateTaskbar() {
+  const container = document.getElementById('tbApps');
+  container.innerHTML = '';
+  windows.forEach(win => {
+    const app = apps.find(a => a.id === win.appId);
+    if (!app) return;
+    const btn = document.createElement('button');
+    btn.className = 'tb-app' + (win.id === focusedWinId && !win.minimized ? ' active' : '');
+    btn.innerHTML = `<span class="tb-app-dot"></span>${app.icon} ${app.label()}`;
+    btn.onclick = () => {
+      if (win.minimized) {
+        win.minimized = false;
+        const el = document.getElementById(`win-${win.id}`);
+        if (el) { el.classList.remove('minimized'); el.style.display = ''; }
+      }
+      focusWindow(win.id);
+    };
+    container.appendChild(btn);
+  });
+}
+
+// =================== CLOCK ===================
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours().toString().padStart(2, '0');
+  const m = now.getMinutes().toString().padStart(2, '0');
+  const el = document.getElementById('clock');
+  if (el) el.textContent = `${h}:${m}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// =================== TERMINAL ===================
+function execTermCmd(winId) {
+  const input = document.getElementById(`term-input-${winId}`);
+  const output = document.getElementById(`term-output-${winId}`);
+  if (!input || !output) return;
+
+  const cmd = input.value.trim();
+  input.value = '';
+
+  // Echo command
+  output.innerHTML += `<span class="prompt">rika@portfolio ~ % </span><span class="cmd-text">${escHtml(cmd)}</span>\n`;
+
+  const result = processCmd(cmd);
+  if (result) output.innerHTML += `<span class="output">${result}</span>\n`;
+  output.innerHTML += '\n';
+
+  // Scroll to bottom
+  const term = document.getElementById(`term-${winId}`);
+  if (term) term.scrollTop = term.scrollHeight;
+}
+
+function processCmd(cmd) {
+  const parts = cmd.split(/\s+/);
+  const c = parts[0]?.toLowerCase();
+
+  switch (c) {
+    case '': return '';
+    case 'help':
+      return `Available commands:
+  <span class="highlight">help</span>        — show this help
+  <span class="highlight">whoami</span>      — who is rika?
+  <span class="highlight">ls</span>          — list apps
+  <span class="highlight">cat</span> [file]  — read a file (try: about.md, skills.md)
+  <span class="highlight">open</span> [app]  — open an app
+  <span class="highlight">clear</span>       — clear terminal
+  <span class="highlight">echo</span> [msg]  — print a message
+  <span class="highlight">date</span>        — current date
+  <span class="highlight">neofetch</span>    — system info
+  <span class="highlight">cowsay</span> [msg] — 🐄
+  <span class="highlight">fortune</span>     — random fortune`;
+
+    case 'whoami':
+      return `Rika Ciminieri
+Half-Japanese full-stack engineer @ Eventbrite
+Former microbiology student · Grilled cheese olympian
+Fluent in: TypeScript, Python, Japanese, sarcasm`;
+
+    case 'ls':
+      return apps.map(a => `${a.icon} ${a.id}.app`).join('\n');
+
+    case 'cat':
+      const file = parts[1];
+      if (!file) return '<span class="error">usage: cat [filename]</span>';
+      if (file === 'about.md' || file === 'about') {
+        return `# Rika Ciminieri
+
+Half-Japanese full-stack engineer at Eventbrite.
+Former microbiology student turned tech advocate.
+
+I build things that make people smile (and occasionally
+rank grilled cheeses with questionable rigor).
+
+Currently into: Bridgerton, The Traitors, Heated Rivalry,
+learning AI, Monopoly Deal, traveling.
+
+Hills I'll die on:
+- Michael Jackson is the king of pop
+- The Rock's Jumanji is actually a good movie
+- Health and time with people you love matters most`;
+      }
+      if (file === 'skills.md' || file === 'skills') {
+        return `# Tech Stack
+
+Frontend:  React, TypeScript, Tailwind, Next.js, Vite
+Backend:   Python, Node.js, Express, FastAPI, GraphQL
+Data:      PostgreSQL, Redis, MongoDB
+Infra:     AWS, Docker, CI/CD, Vercel
+Other:     i18n, a11y, Spring animations, WebGL basics
+
+Also skilled in: grilled cheese evaluation, One Piece
+theory construction, pilates (intermediate)`;
+      }
+      return `<span class="error">cat: ${escHtml(file)}: No such file</span>
+<span class="output">Try: about.md, skills.md</span>`;
+
+    case 'open':
+      const appName = parts[1]?.replace('.app', '');
+      if (appName && apps.find(a => a.id === appName)) {
+        setTimeout(() => openApp(appName), 100);
+        return `Opening ${appName}.app...`;
+      }
+      return `<span class="error">open: unknown app "${escHtml(parts[1] || '')}"</span>\nAvailable: ${apps.map(a => a.id).join(', ')}`;
+
+    case 'clear':
+      setTimeout(() => {
+        const winObj = windows.find(w => w.appId === 'terminal');
+        if (winObj) {
+          const out = document.getElementById(`term-output-${winObj.id}`);
+          if (out) out.innerHTML = '';
+        }
+      }, 10);
+      return '';
+
+    case 'echo':
+      return escHtml(parts.slice(1).join(' '));
+
+    case 'date':
+      return new Date().toString();
+
+    case 'neofetch':
+      return `
+  <span class="highlight">     ██████╗  </span>   rika@portfolio
+  <span class="highlight">    ██╔══██╗ </span>   ──────────────
+  <span class="highlight">    ██████╔╝ </span>   OS: RikaOS v2.0
+  <span class="highlight">    ██╔══██╗ </span>   Host: portfolio.rika.dev
+  <span class="highlight">    ██║  ██║ </span>   Shell: rika-terminal
+  <span class="highlight">    ╚═╝  ╚═╝ </span>   Languages: EN, JP
+                  Theme: kawaii-tech-dark
+                  Icons: emoji-suite-v3
+                  Uptime: since 2024
+                  Grilled Cheeses Ranked: 47`;
+
+    case 'cowsay':
+      const msg = parts.slice(1).join(' ') || 'moo';
+      const pad = '─'.repeat(msg.length + 2);
+      return `
+ ┌${pad}┐
+ │ ${escHtml(msg)} │
+ └${pad}┘
+        \\   ^__^
+         \\  (oo)\\_______
+            (__)\\       )\\/\\
+                ||----w |
+                ||     ||`;
+
+    case 'fortune':
+      const fortunes = [
+        '"The grilled cheese you make at 2am hits different." — Ancient Proverb',
+        '"A well-organized codebase is worth a thousand comments." — Rika, probably',
+        '"If Luffy can become Pirate King, you can refactor that legacy code."',
+        '"Sometimes the real treasure is the bugs we fixed along the way."',
+        '"Have you tried turning it off and eating a grilled cheese?"',
+      ];
+      return fortunes[Math.floor(Math.random() * fortunes.length)];
+
+    case 'sudo':
+      return '<span class="error">Nice try. No sudo on RikaOS. 🧀</span>';
+
+    case 'rm':
+      return '<span class="error">Whoa there. This is a portfolio, not a demolition site.</span>';
+
+    case 'exit':
+      return 'Where would you even go? You\'re already home. 🏠';
+
+    default:
+      return `<span class="error">command not found: ${escHtml(c)}</span>\nType <span class="highlight">help</span> for available commands.`;
+  }
+}
+
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// =================== COMMAND PALETTE ===================
+const cmdItems = [
+  { icon: '📝', label: 'Open Welcome', hint: 'about', action: () => openApp('welcome') },
+  { icon: '💻', label: 'Open Projects', hint: 'projects.app', action: () => openApp('projects') },
+  { icon: '⬛', label: 'Open Terminal', hint: 'terminal.app', action: () => openApp('terminal') },
+  { icon: '🎨', label: 'Open Gallery', hint: 'gallery.app', action: () => openApp('gallery') },
+  { icon: '🧀', label: 'Open Grilled Cheese', hint: 'gc.app', action: () => openApp('gc') },
+  { icon: '🗑️', label: 'Open Trash', hint: 'easter egg', action: () => openApp('trash') },
+  { icon: '🔢', label: 'Open Calculator', hint: 'gc units', action: () => openApp('calculator') },
+  { icon: '🌐', label: 'Toggle Language', hint: 'EN ↔ JP', action: () => toggleLang() },
+  { icon: '🖥️', label: 'Close All Windows', hint: '', action: () => closeAllWindows() },
+];
+let cmdSelectedIdx = 0;
+
+function openCmdPalette() {
+  document.getElementById('cmdOverlay').classList.add('open');
+  const input = document.getElementById('cmdInput');
+  input.value = '';
+  input.focus();
+  cmdSelectedIdx = 0;
+  filterCommands();
+}
+
+function closeCmdPalette() {
+  document.getElementById('cmdOverlay').classList.remove('open');
+}
+
+function filterCommands() {
+  const q = document.getElementById('cmdInput').value.toLowerCase();
+  const filtered = cmdItems.filter(item =>
+    item.label.toLowerCase().includes(q) || item.hint.toLowerCase().includes(q)
+  );
+  const container = document.getElementById('cmdResults');
+  cmdSelectedIdx = Math.min(cmdSelectedIdx, filtered.length - 1);
+  container.innerHTML = filtered.map((item, i) => `
+    <div class="cmd-item ${i === cmdSelectedIdx ? 'selected' : ''}"
+         onclick="cmdItems.find(c=>c.label==='${item.label}').action();closeCmdPalette();"
+         onmouseenter="cmdSelectedIdx=${i};filterCommands();">
+      <span class="cmd-icon">${item.icon}</span>
+      <span class="cmd-label">${item.label}</span>
+      <span class="cmd-hint">${item.hint}</span>
+    </div>
+  `).join('');
+}
+
+function handleCmdKey(e) {
+  const container = document.getElementById('cmdResults');
+  const items = container.querySelectorAll('.cmd-item');
+  if (e.key === 'ArrowDown') { e.preventDefault(); cmdSelectedIdx = Math.min(cmdSelectedIdx + 1, items.length - 1); filterCommands(); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); cmdSelectedIdx = Math.max(cmdSelectedIdx - 1, 0); filterCommands(); }
+  if (e.key === 'Enter') { items[cmdSelectedIdx]?.click(); }
+  if (e.key === 'Escape') { closeCmdPalette(); }
+}
+
+// =================== CONTEXT MENU ===================
+document.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  const menu = document.getElementById('ctxMenu');
+  const items = [
+    { icon: '📝', label: 'Open Welcome', action: () => openApp('welcome') },
+    { icon: '💻', label: 'Open Projects', action: () => openApp('projects') },
+    { icon: '⬛', label: 'Open Terminal', action: () => openApp('terminal') },
+    { sep: true },
+    { icon: '🌐', label: lang === 'en' ? 'Switch to 日本語' : 'Switch to English', action: () => toggleLang() },
+    { icon: '⌨️', label: 'Command Palette (⌘K)', action: () => openCmdPalette() },
+    { sep: true },
+    { icon: '🗑️', label: 'Empty Recycle Bin', action: () => openApp('trash') },
+  ];
+
+  menu.innerHTML = items.map(item => {
+    if (item.sep) return '<div class="ctx-sep"></div>';
+    return `<div class="ctx-item" onclick="this.dataset.action()"><span class="ctx-icon">${item.icon}</span>${item.label}</div>`;
+  }).join('');
+
+  // Bind click handlers
+  const ctxItems = menu.querySelectorAll('.ctx-item');
+  let idx = 0;
+  items.forEach(item => {
+    if (item.sep) return;
+    ctxItems[idx].onclick = () => { item.action(); menu.classList.remove('open'); };
+    idx++;
+  });
+
+  menu.style.left = Math.min(e.clientX, window.innerWidth - 220) + 'px';
+  menu.style.top = Math.min(e.clientY, window.innerHeight - 300) + 'px';
+  menu.classList.add('open');
+});
+
+document.addEventListener('click', () => {
+  document.getElementById('ctxMenu').classList.remove('open');
+});
+
+// =================== LANGUAGE ===================
+function toggleLang() {
+  lang = lang === 'en' ? 'jp' : 'en';
+  document.getElementById('langToggle').textContent = lang.toUpperCase();
+  renderDesktopIcons();
+  // Re-render open windows
+  windows.forEach(win => {
+    const app = apps.find(a => a.id === win.appId);
+    if (app && win.appId !== 'terminal') {
+      const titleEl = document.querySelector(`#win-${win.id} .win-title`);
+      if (titleEl) titleEl.textContent = `${app.icon} ${app.label()}`;
+      renderAppContent(win.id, win.appId);
+    }
+  });
+  updateTaskbar();
+}
+
+// =================== DARK MODE (already dark, this is light toggle) ===================
+let lightMode = false;
+function toggleDarkMode() {
+  lightMode = !lightMode;
+  // Just a placeholder — invert some colors
+  document.body.style.filter = lightMode ? 'invert(0.9) hue-rotate(180deg)' : '';
+  document.querySelector('.taskbar .tb-tray-btn:nth-child(2)').textContent = lightMode ? '🌙' : '☀';
+}
+
+// =================== KEYBOARD SHORTCUTS ===================
+document.addEventListener('keydown', e => {
+  // ⌘K command palette
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    const overlay = document.getElementById('cmdOverlay');
+    if (overlay.classList.contains('open')) closeCmdPalette();
+    else openCmdPalette();
+  }
+
+  // Escape
+  if (e.key === 'Escape') {
+    closeCmdPalette();
+  }
+
+  // Reset idle timer
+  resetIdleTimer();
+});
+
+document.addEventListener('mousemove', resetIdleTimer);
+
+// =================== KONAMI CODE ===================
+const konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiIdx = 0;
+
+document.addEventListener('keydown', e => {
+  if (e.key === konamiCode[konamiIdx]) {
+    konamiIdx++;
+    if (konamiIdx === konamiCode.length) {
+      konamiIdx = 0;
+      cheeseRain();
+    }
+  } else {
+    konamiIdx = 0;
+  }
+});
+
+function cheeseRain() {
+  const container = document.getElementById('cheeseRain');
+  for (let i = 0; i < 40; i++) {
+    const drop = document.createElement('div');
+    drop.className = 'cheese-drop';
+    drop.textContent = '🧀';
+    drop.style.left = Math.random() * 100 + 'vw';
+    drop.style.animationDuration = (2 + Math.random() * 3) + 's';
+    drop.style.animationDelay = Math.random() * 2 + 's';
+    drop.style.fontSize = (20 + Math.random() * 30) + 'px';
+    container.appendChild(drop);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 6000);
+}
+
+// =================== SCREENSAVER ===================
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  hideScreensaver();
+  idleTimer = setTimeout(showScreensaver, IDLE_TIMEOUT);
+}
+
+function showScreensaver() {
+  document.getElementById('screensaver').classList.add('active');
+}
+
+function hideScreensaver() {
+  document.getElementById('screensaver').classList.remove('active');
+}
+
+// =================== HELPERS ===================
+function closeAllWindows() {
+  [...windows].forEach(w => closeWindow(w.id));
+}
+
+// =================== INIT ===================
+renderDesktopIcons();
+resetIdleTimer();
+
+// Check if we should skip boot (e.g., in iframe reload)
+const skipBoot = window.location.hash === '#skipboot';
+if (skipBoot) {
+  document.getElementById('boot-screen').style.display = 'none';
+  document.getElementById('desktop').classList.add('visible');
+  openApp('welcome');
+} else {
+  runBoot();
+}
+</script>
+</body>
+</html>
