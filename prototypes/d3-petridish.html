@@ -570,6 +570,109 @@ body.uv-mode .colony-gallery .colony-inner {
   100% { left: 20%; top: 30%; }
 }
 
+/* =================== COLONY NAV SIDEBAR =================== */
+.colony-nav {
+  position: fixed;
+  left: 20px; top: 50%;
+  transform: translateY(-50%);
+  z-index: 600;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.colony-nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 12px;
+  color: var(--text-light);
+  white-space: nowrap;
+}
+.colony-nav-item:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.15);
+}
+.colony-nav-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.colony-nav-label {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.colony-nav-item:hover .colony-nav-label { opacity: 1; }
+
+/* =================== GUIDED INTRO =================== */
+.guide-overlay {
+  position: fixed; inset: 0;
+  z-index: 900;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center; justify-content: center;
+  animation: fadeIn 0.5s;
+  cursor: pointer;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.guide-card {
+  background: rgba(20,25,20,0.95);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 32px 40px;
+  max-width: 420px;
+  text-align: center;
+  animation: guideSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes guideSlide { from { transform: translateY(20px) scale(0.95); opacity: 0; } }
+
+.guide-card h2 {
+  font-family: var(--display);
+  font-size: 22px; font-weight: 700;
+  color: var(--text-light);
+  margin-bottom: 12px;
+}
+.guide-card p {
+  font-size: 14px;
+  color: var(--muted-light);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.guide-card .guide-hints {
+  display: flex; flex-direction: column; gap: 8px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+.guide-hint {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--text-light);
+}
+.guide-hint-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.guide-dismiss {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 8px 20px;
+  border-radius: 8px;
+  background: rgba(74,222,128,0.1);
+  border: 1px solid rgba(74,222,128,0.2);
+  display: inline-block;
+  transition: all 0.2s;
+}
+.guide-dismiss:hover { background: rgba(74,222,128,0.2); }
+
 /* =================== MOBILE =================== */
 @media (max-width: 768px) {
   .scope-mask { width: 100vw; height: 100vh; border-radius: 0; }
@@ -577,6 +680,9 @@ body.uv-mode .colony-gallery .colony-inner {
   .toolbar { top: auto; bottom: 10px; right: 10px; flex-direction: row; }
   .detail-content { padding: 20px; }
   .detail-title { font-size: 24px; }
+  .colony-nav { left: 10px; }
+  .colony-nav-label { display: none; }
+  .colony-nav-item { padding: 8px; }
 }
 
 /* =================== CONTAMINATION WARNING =================== */
@@ -666,6 +772,24 @@ body.uv-mode .colony-gallery .colony-inner {
 <!-- Tardigrade -->
 <div class="tardigrade" id="tardigrade" title="He's been living here since the microbiology days and refuses to leave">🐻</div>
 
+<!-- Colony Navigation Sidebar -->
+<div class="colony-nav" id="colonyNav"></div>
+
+<!-- Guided Intro -->
+<div class="guide-overlay" id="guideOverlay" onclick="dismissGuide()">
+  <div class="guide-card" onclick="event.stopPropagation()">
+    <h2>Welcome to the Lab</h2>
+    <p>My portfolio is a living experiment. Each colony is a different part of who I am — click one to explore.</p>
+    <div class="guide-hints">
+      <div class="guide-hint"><div class="guide-hint-icon">👆</div><span>Click a colony to dive in</span></div>
+      <div class="guide-hint"><div class="guide-hint-icon">🔍</div><span>Scroll to zoom, drag to pan</span></div>
+      <div class="guide-hint"><div class="guide-hint-icon">🔬</div><span>Try UV mode for a different view</span></div>
+      <div class="guide-hint"><div class="guide-hint-icon">◀</div><span>Use the sidebar for quick navigation</span></div>
+    </div>
+    <div class="guide-dismiss" onclick="dismissGuide()">Start Exploring</div>
+  </div>
+</div>
+
 <script>
 // =================== STATE ===================
 let lang = 'en';
@@ -718,6 +842,14 @@ const colonies = [
     size: 90,
     label: { en: 'Gallery', jp: 'ギャラリー' },
     color: 'var(--gallery-color)',
+  },
+  {
+    id: 'currently',
+    cls: 'colony-gallery',
+    x: 45, y: 72,
+    size: 80,
+    label: { en: 'Currently Into', jp: '今ハマってる' },
+    color: '#4ecdc4',
   },
 ];
 
@@ -1052,6 +1184,85 @@ const detailData = {
   }
 };
 
+// Currently Into detail data
+detailData.currently = {
+  en: {
+    title: 'Currently Into',
+    subtitle: 'A living culture — always growing, always changing. What I\'m obsessing over right now.',
+    badge: 'MAGNIFICATION: 100x',
+    badgeColor: '#4ecdc4',
+    content: `
+      <div class="cell-diagram">
+        <div class="cell-part" style="border-color:#4ecdc4;background:rgba(78,205,196,0.05);">
+          <h4>📺 Watching</h4>
+          <ul>
+            <li>Bridgerton (rewatching... again. Season 2 supremacy.)</li>
+            <li>The Traitors (trust no one)</li>
+            <li>Terrace House (the panel commentary IS the show)</li>
+          </ul>
+        </div>
+        <div class="cell-part" style="border-color:#4ecdc4;background:rgba(78,205,196,0.05);">
+          <h4>📖 Reading</h4>
+          <ul>
+            <li>Heated Rivalry — enemies-to-lovers done right</li>
+            <li>One Piece (always and forever)</li>
+          </ul>
+        </div>
+        <div class="cell-part" style="border-color:#4ecdc4;background:rgba(78,205,196,0.05);">
+          <h4>🎮 Playing & Learning</h4>
+          <ul>
+            <li>Monopoly Deal (undefeated streak, don't @ me)</li>
+            <li>AI & LLMs — building agents, learning in public</li>
+            <li>Singing lessons (I'm bad but I'm committed)</li>
+          </ul>
+        </div>
+        <div class="cell-part" style="border-color:#4ecdc4;background:rgba(78,205,196,0.05);">
+          <h4>🎵 Listening</h4>
+          <ul>
+            <li>Yoasobi — Idol (on permanent repeat)</li>
+            <li>Dodo</li>
+            <li>City Pop playlists at 2am</li>
+          </ul>
+        </div>
+        <div class="cell-part" style="border-color:#4ecdc4;background:rgba(78,205,196,0.05);">
+          <h4>⚔️ Hills I'll Die On</h4>
+          <ul>
+            <li>Michael Jackson is the king of pop. Non-negotiable.</li>
+            <li>The Rock's Jumanji is actually a good movie</li>
+            <li>Health and time with people you love > everything</li>
+          </ul>
+        </div>
+      </div>
+    `
+  },
+  jp: {
+    title: '今ハマってるもの',
+    subtitle: '生きた培養 — 常に成長し、常に変化。今ハマっているもの。',
+    badge: '倍率: 100x',
+    badgeColor: '#4ecdc4',
+    content: `
+      <div class="cell-diagram">
+        <div class="cell-part" style="border-color:#4ecdc4;background:rgba(78,205,196,0.05);">
+          <h4>📺 見てるもの</h4>
+          <ul>
+            <li>ブリジャートン（また見てる...）</li>
+            <li>ザ・トレイターズ</li>
+            <li>テラスハウス</li>
+          </ul>
+        </div>
+        <div class="cell-part" style="border-color:#4ecdc4;background:rgba(78,205,196,0.05);">
+          <h4>🎵 聴いてるもの</h4>
+          <ul>
+            <li>YOASOBI — アイドル</li>
+            <li>Dodo</li>
+            <li>シティポップ</li>
+          </ul>
+        </div>
+      </div>
+    `
+  }
+};
+
 // =================== RENDER COLONIES ===================
 function renderColonies() {
   const dish = document.getElementById('dish');
@@ -1265,10 +1476,43 @@ function startLamp() {
   }, 1800);
 }
 
+// =================== COLONY NAV ===================
+function renderColonyNav() {
+  const nav = document.getElementById('colonyNav');
+  if (!nav) return;
+  nav.innerHTML = colonies.map(c => `
+    <div class="colony-nav-item" onclick="openColonyDetail('${c.id}')">
+      <div class="colony-nav-dot" style="background:${c.color};"></div>
+      <span class="colony-nav-label">${c.label[lang]}</span>
+    </div>
+  `).join('');
+}
+
+// =================== GUIDE ===================
+function dismissGuide() {
+  const overlay = document.getElementById('guideOverlay');
+  if (overlay) {
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity 0.3s';
+    setTimeout(() => overlay.remove(), 300);
+  }
+}
+
+// Make colony labels always visible (not just on hover)
+function makeLabelsVisible() {
+  setTimeout(() => {
+    document.querySelectorAll('.colony-label').forEach(el => {
+      el.style.opacity = '0.6';
+    });
+  }, 2500);
+}
+
 // =================== INIT ===================
 renderColonies();
+renderColonyNav();
 updateDish();
 startLamp();
+makeLabelsVisible();
 </script>
 </body>
 </html>
