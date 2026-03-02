@@ -1,0 +1,2460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terrarium OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #1a2e1a;
+  --surface: rgba(255,255,255,0.08);
+  --surface-2: #1e3420;
+  --border: rgba(255,255,255,0.12);
+  --text: #e0ead8;
+  --text-muted: #8aaa80;
+  --accent: #4ec97a;
+  --accent-glow: rgba(78,201,122,0.2);
+  --brown: #8a6a3a;
+  --amber: #c4a43a;
+  --pink: #d48a8a;
+  --blue: #5a8aaa;
+  --teal: #3aaa8a;
+  --red: #c45a5a;
+  --green: #4ec97a;
+  --taskbar-h: 88px;
+  --radius: 16px;
+  --win-header: 40px;
+  --font: 'Inter', 'Noto Sans JP', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+}
+
+body.night-mode {
+  --bg: #0a0f1a;
+  --surface: rgba(96,255,160,0.04);
+  --surface-2: #0e1520;
+  --border: rgba(96,255,160,0.1);
+  --text: #c0d8e8;
+  --text-muted: #5a8a9a;
+  --accent: #60ffa0;
+  --accent-glow: rgba(96,255,160,0.15);
+  --brown: #4a3a2a;
+  --amber: #6a8a3a;
+}
+
+body.night-mode .taskbar {
+  background: rgba(10,15,26,0.9);
+  border-color: rgba(96,255,160,0.15);
+}
+body.night-mode .boot-screen-wrap { background: #050810; }
+body.night-mode .desktop-bg { background: #0a0f1a; }
+body.night-mode .condensation-drop { background: radial-gradient(circle at 35% 35%, rgba(96,255,160,0.08), rgba(96,255,160,0.02)); }
+
+html, body { height: 100%; overflow: hidden; font-family: var(--font); background: var(--bg); color: var(--text); }
+
+/* =================== BOOT SEQUENCE =================== */
+#boot-screen {
+  position: fixed; inset: 0; z-index: 99999;
+  background: #0a1a0a;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  transition: opacity 0.8s;
+  overflow: hidden;
+}
+#boot-screen.done { opacity: 0; pointer-events: none; }
+
+/* Glass dome outline for boot */
+.boot-dome {
+  width: 300px; height: 300px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 50%;
+  position: relative;
+  margin-bottom: 32px;
+  overflow: hidden;
+  opacity: 0;
+  animation: domeAppear 0.4s 0.1s forwards;
+}
+@keyframes domeAppear { to { opacity: 1; } }
+
+.boot-soil {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 0;
+  background: linear-gradient(180deg, #5a3a1a, #3a2a10, #2a1a08);
+  animation: soilFill 0.8s 0.3s ease-out forwards;
+  border-radius: 0 0 150px 150px;
+}
+@keyframes soilFill { to { height: 35%; } }
+
+.boot-pebble {
+  position: absolute; border-radius: 50%;
+  opacity: 0; animation: pebblePop 0.3s forwards;
+}
+
+.boot-moss {
+  position: absolute; border-radius: 50%;
+  background: radial-gradient(circle, rgba(78,201,122,0.6), rgba(58,170,138,0.3), transparent);
+  filter: blur(4px);
+  transform: scale(0); animation: mossGrow 0.6s forwards;
+}
+@keyframes mossGrow { to { transform: scale(1); } }
+
+.boot-sprout {
+  position: absolute; bottom: 35%;
+  width: 2px; height: 0;
+  background: linear-gradient(180deg, #4ec97a, #2a6a3a);
+  border-radius: 1px;
+  animation: sproutGrow 0.5s forwards;
+}
+@keyframes sproutGrow { to { height: 30px; } }
+
+.boot-sprout::after {
+  content: '';
+  position: absolute; top: -4px; left: -4px;
+  width: 10px; height: 8px;
+  background: #4ec97a;
+  border-radius: 0 60% 60% 0;
+  transform: rotate(-20deg);
+}
+
+@keyframes pebblePop { to { opacity: 1; transform: scale(1); } }
+
+.boot-reflection {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(ellipse 120px 60px at 35% 30%, rgba(255,255,255,0.08), transparent);
+  opacity: 0; animation: reflectionAppear 0.5s 1.8s forwards;
+}
+@keyframes reflectionAppear { to { opacity: 1; } }
+
+.boot-logo {
+  font-family: var(--display);
+  font-size: 42px; font-weight: 800;
+  background: linear-gradient(135deg, #4ec97a, #3aaa8a);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 24px;
+  letter-spacing: -0.03em;
+}
+
+.boot-lines { font-size: 11px; color: #3a5a3a; text-align: left; width: 400px; max-width: 90vw; }
+.boot-lines div { opacity: 0; animation: bootFade 0.3s forwards; }
+.boot-lines .ok { color: #4ec97a; }
+.boot-lines .warn { color: #c4a43a; }
+@keyframes bootFade { to { opacity: 1; } }
+
+.boot-bar { width: 400px; max-width: 90vw; height: 3px; background: #1a2a1a; border-radius: 2px; margin-top: 24px; overflow: hidden; }
+.boot-bar-fill { height: 100%; width: 0; background: linear-gradient(90deg, #4ec97a, #3aaa8a); border-radius: 2px; animation: bootFill 2.2s ease-in-out forwards; }
+@keyframes bootFill { to { width: 100%; } }
+
+/* =================== DESKTOP =================== */
+#desktop {
+  position: fixed; inset: 0;
+  opacity: 0;
+  transition: opacity 0.8s 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+#desktop.visible { opacity: 1; }
+
+/* Terrarium floor background */
+.desktop-bg {
+  position: fixed; inset: 0;
+  z-index: -1;
+  background: var(--bg);
+  overflow: hidden;
+}
+/* Layered moss/soil texture */
+.desktop-bg::before {
+  content: '';
+  position: absolute;
+  width: 150%; height: 150%;
+  top: -25%; left: -25%;
+  background:
+    radial-gradient(ellipse 500px 400px at 20% 30%, rgba(78,201,122,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 600px 500px at 70% 20%, rgba(58,170,138,0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 500px at 55% 70%, rgba(138,106,58,0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 300px at 10% 85%, rgba(196,164,58,0.03) 0%, transparent 70%);
+  animation: meshDrift 25s ease-in-out infinite alternate;
+}
+@keyframes meshDrift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(20px, -15px) rotate(0.5deg); }
+  66% { transform: translate(-15px, 10px) rotate(-0.3deg); }
+  100% { transform: translate(8px, -8px) rotate(0.2deg); }
+}
+
+/* Glass dome vignette */
+.desktop-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(255,255,255,0.03) 65%, rgba(255,255,255,0.06) 80%, rgba(255,255,255,0.03) 100%);
+}
+
+/* Pebbles layer */
+.pebbles-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.pebble {
+  position: absolute; border-radius: 50% 45% 55% 50%;
+  opacity: 0.15;
+}
+
+/* Moss patches */
+.moss-patch {
+  position: absolute; border-radius: 50%;
+  background: radial-gradient(circle, rgba(78,201,122,0.12), transparent);
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+/* Condensation drops */
+.condensation-layer { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+.condensation-drop {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.15), rgba(255,255,255,0.03));
+  animation: condensationGrow linear infinite;
+}
+@keyframes condensationGrow {
+  0% { transform: scale(0.5); opacity: 0.3; }
+  70% { transform: scale(1); opacity: 0.6; }
+  80% { transform: scale(1) translateY(2px); opacity: 0.5; }
+  100% { transform: scale(0.3) translateY(8px); opacity: 0; }
+}
+
+/* Canvas watermark */
+.watermark-canvas {
+  position: fixed;
+  right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Floating particles — pollen/spores */
+.floating-particles {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+}
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  animation: pollenFloat linear infinite;
+}
+@keyframes pollenFloat {
+  0% { opacity: 0; transform: translate(0, 0) scale(0); }
+  10% { opacity: 0.5; }
+  50% { transform: translate(30px, -40vh) scale(1); opacity: 0.4; }
+  90% { opacity: 0.3; }
+  100% { opacity: 0; transform: translate(-20px, -80vh) scale(0.5); }
+}
+
+/* Butterfly */
+.butterfly {
+  position: fixed; pointer-events: none; z-index: 2;
+  width: 14px; height: 10px;
+  animation: butterflyPath 20s ease-in-out infinite;
+}
+.butterfly::before, .butterfly::after {
+  content: '';
+  position: absolute;
+  width: 7px; height: 10px;
+  border-radius: 50% 50% 50% 0;
+  background: rgba(212,138,138,0.5);
+}
+.butterfly::before { left: 0; transform-origin: right center; animation: wingFlap 0.3s ease-in-out infinite; }
+.butterfly::after { right: 0; transform: scaleX(-1); transform-origin: left center; animation: wingFlap 0.3s ease-in-out infinite reverse; }
+@keyframes wingFlap { 0%, 100% { transform: rotateY(0); } 50% { transform: rotateY(70deg); } }
+@keyframes butterflyPath {
+  0% { top: 60%; left: 10%; }
+  15% { top: 30%; left: 30%; }
+  30% { top: 45%; left: 55%; }
+  45% { top: 20%; left: 70%; }
+  60% { top: 50%; left: 80%; }
+  75% { top: 35%; left: 45%; }
+  90% { top: 55%; left: 20%; }
+  100% { top: 60%; left: 10%; }
+}
+
+/* Mist layer */
+.mist-layer {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, transparent 50%, rgba(255,255,255,0.015) 70%, rgba(255,255,255,0.025) 85%, transparent 100%);
+  animation: mistShift 15s ease-in-out infinite alternate;
+}
+@keyframes mistShift { 0% { transform: translateX(-3%); } 100% { transform: translateX(3%); } }
+
+/* =================== DESKTOP ICONS =================== */
+.desktop-icons {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-content: start;
+  max-width: 200px;
+}
+
+.desktop-icon {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px;
+  width: 84px; height: 84px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.desktop-icon:hover { background: rgba(78,201,122,0.08); }
+.desktop-icon:active { transform: scale(0.95); }
+
+.desktop-icon .icon-img {
+  width: 52px; height: 52px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.desktop-icon:hover .icon-img {
+  animation: iconCondense 0.5s ease-in-out;
+  transform: scale(1.1);
+}
+@keyframes iconCondense {
+  0% { transform: scale(1); filter: brightness(1); }
+  30% { transform: scale(1.12); filter: brightness(1.15); }
+  60% { transform: scale(1.08); filter: brightness(1.08); }
+  100% { transform: scale(1.1); filter: brightness(1); }
+}
+
+/* Icon backgrounds — glass jar aesthetic */
+.icon-welcome { background: linear-gradient(135deg, rgba(78,201,122,0.3), rgba(58,170,138,0.2)); border: 1px solid rgba(78,201,122,0.3); }
+.icon-projects { background: linear-gradient(135deg, rgba(138,106,58,0.4), rgba(90,70,30,0.3)); border: 1px solid rgba(138,106,58,0.3); }
+.icon-terminal { background: #0f1a0f; border: 1px solid rgba(78,201,122,0.2); }
+.icon-gallery { background: linear-gradient(135deg, rgba(212,138,138,0.25), rgba(196,164,58,0.2)); border: 1px solid rgba(212,138,138,0.2); }
+.icon-gc { background: linear-gradient(135deg, rgba(196,164,58,0.35), rgba(138,106,58,0.25)); border: 1px solid rgba(196,164,58,0.3); }
+.icon-trash { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+.icon-currently { background: linear-gradient(135deg, rgba(58,170,138,0.3), rgba(90,138,170,0.2)); border: 1px solid rgba(58,170,138,0.2); }
+.icon-japan { background: linear-gradient(135deg, rgba(212,138,138,0.2), rgba(255,255,255,0.08)); border: 1px solid rgba(212,138,138,0.2); }
+
+.desktop-icon .icon-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =================== WINDOWS =================== */
+.window {
+  position: absolute;
+  background: rgba(26,46,26,0.92);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-top-color: rgba(255,255,255,0.18);
+  border-left-color: rgba(255,255,255,0.14);
+  border-radius: var(--radius);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.3), 0 0 0 1px rgba(78,201,122,0.05), inset 0 1px 0 rgba(255,255,255,0.05);
+  display: flex; flex-direction: column;
+  min-width: 320px; min-height: 200px;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  animation: winOpen 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes winOpen {
+  from { transform: scale(0.3); opacity: 0; border-radius: 50%; }
+  50% { border-radius: var(--radius); }
+  70% { transform: scale(1.03); opacity: 1; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.window.minimized { animation: winMin 0.3s forwards; pointer-events: none; }
+@keyframes winMin { to { transform: scale(0.3) translateY(100vh); opacity: 0; border-radius: 50%; } }
+
+.window.focused { box-shadow: 0 16px 48px rgba(0,0,0,0.35), 0 0 0 1px rgba(78,201,122,0.15), 0 0 30px var(--accent-glow); }
+
+.win-header {
+  height: var(--win-header);
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 12px;
+  cursor: grab;
+  user-select: none;
+  flex-shrink: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+  backdrop-filter: blur(8px);
+}
+.win-header:active { cursor: grabbing; }
+
+.win-dots { display: flex; gap: 7px; }
+.win-dot {
+  width: 13px; height: 13px; border-radius: 50%; border: none; cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+.win-dot:hover { transform: scale(1.3); }
+/* dewdrop close */
+.win-dot.close {
+  background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.3), var(--red));
+  box-shadow: 0 1px 3px rgba(196,90,90,0.4);
+}
+/* pollen minimize */
+.win-dot.minimize {
+  background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.3), var(--amber));
+  box-shadow: 0 1px 3px rgba(196,164,58,0.4);
+}
+/* leaf maximize */
+.win-dot.maximize {
+  background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.3), var(--green));
+  box-shadow: 0 1px 3px rgba(78,201,122,0.4);
+}
+
+.win-title { flex: 1; text-align: center; font-size: 12px; font-weight: 500; color: var(--text-muted); pointer-events: none; }
+
+.win-body { flex: 1; overflow: auto; padding: 20px; }
+.win-body::-webkit-scrollbar { width: 6px; }
+.win-body::-webkit-scrollbar-track { background: transparent; }
+.win-body::-webkit-scrollbar-thumb { background: rgba(78,201,122,0.3); border-radius: 3px; }
+
+.win-resize { position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; cursor: nwse-resize; }
+
+/* =================== TASKBAR — WOODEN POTTING BENCH =================== */
+.taskbar {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: auto;
+  width: auto;
+  max-width: 90vw;
+  background: linear-gradient(180deg, rgba(138,106,58,0.5), rgba(90,60,30,0.6));
+  backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid rgba(138,106,58,0.3);
+  border-top-color: rgba(200,170,100,0.25);
+  border-radius: 14px;
+  display: flex; align-items: center;
+  padding: 8px 16px;
+  z-index: 9000;
+  gap: 4px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.tb-start {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(78,201,122,0.3);
+  background: radial-gradient(circle at 45% 40%, rgba(78,201,122,0.4), rgba(26,46,26,0.6));
+  color: var(--accent);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-weight: 700;
+  font-family: var(--display);
+  position: relative;
+  overflow: hidden;
+}
+/* Seed that sprouts on hover */
+.tb-start::after {
+  content: '';
+  position: absolute;
+  bottom: 50%; left: 50%;
+  width: 2px; height: 0;
+  background: var(--accent);
+  border-radius: 1px;
+  transform: translateX(-50%);
+  transition: height 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tb-start:hover { transform: scale(1.15); border-color: var(--accent); }
+.tb-start:hover::after { height: 12px; }
+
+.tb-divider { width: 1px; height: 28px; background: rgba(138,106,58,0.4); margin: 0 8px; }
+
+.tb-apps { display: flex; gap: 3px; flex: 1; overflow-x: auto; }
+
+.tb-app {
+  padding: 6px 14px; border-radius: 8px; border: none;
+  background: transparent; color: var(--text-muted);
+  font-family: var(--font); font-size: 12px;
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex; align-items: center; gap: 6px;
+}
+.tb-app:hover { background: rgba(78,201,122,0.1); color: var(--text); transform: translateY(-2px); }
+.tb-app.active { background: rgba(78,201,122,0.15); color: var(--text); }
+.tb-app .tb-app-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+
+.tb-tray { display: flex; align-items: center; gap: 12px; margin-left: auto; font-size: 12px; color: var(--text-muted); }
+.tb-tray-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; font-family: var(--mono); transition: color 0.15s; padding: 4px 8px; border-radius: 6px; }
+.tb-tray-btn:hover { color: var(--accent); background: rgba(78,201,122,0.08); }
+#clock { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+
+/* Firefly jar for night toggle */
+.night-toggle-jar {
+  width: 24px; height: 28px;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 4px 4px 6px 6px;
+  position: relative;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.3s;
+}
+.night-toggle-jar::before {
+  content: '';
+  position: absolute; top: -4px; left: 4px; right: 4px; height: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px 2px 0 0;
+}
+.night-toggle-jar .firefly-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #c4a43a;
+  box-shadow: 0 0 6px #c4a43a;
+  transition: all 0.3s;
+}
+body.night-mode .night-toggle-jar { border-color: rgba(96,255,160,0.2); }
+body.night-mode .night-toggle-jar .firefly-dot {
+  background: #60ffa0;
+  box-shadow: 0 0 8px #60ffa0, 0 0 16px rgba(96,255,160,0.3);
+  animation: fireflyPulse 2s ease-in-out infinite;
+}
+@keyframes fireflyPulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+/* Language — wooden sign */
+.lang-toggle-seg {
+  display: flex; border-radius: 6px; overflow: hidden;
+  border: 1px solid rgba(138,106,58,0.3);
+  background: rgba(138,106,58,0.15);
+}
+.lang-seg {
+  padding: 3px 10px; border: none; background: transparent;
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+}
+.lang-seg.active {
+  background: var(--accent); color: #0a1a0a;
+}
+.lang-seg:hover:not(.active) { background: rgba(78,201,122,0.1); }
+
+/* =================== COMMAND PALETTE =================== */
+.cmd-overlay { position: fixed; inset: 0; background: rgba(10,20,10,0.6); backdrop-filter: blur(8px); z-index: 50000; display: none; align-items: flex-start; justify-content: center; padding-top: 20vh; }
+.cmd-overlay.open { display: flex; }
+.cmd-box { width: 560px; max-width: 90vw; background: rgba(26,46,26,0.95); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.5); overflow: hidden; animation: cmdOpen 0.15s ease-out; backdrop-filter: blur(20px); }
+@keyframes cmdOpen { from { transform: scale(0.94) translateY(-12px); opacity: 0; } }
+.cmd-input { width: 100%; padding: 16px 20px; background: transparent; border: none; outline: none; color: var(--text); font-family: var(--font); font-size: 16px; border-bottom: 1px solid var(--border); }
+.cmd-input::placeholder { color: var(--text-muted); }
+.cmd-results { max-height: 320px; overflow-y: auto; }
+.cmd-item { padding: 10px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background 0.1s; font-size: 14px; }
+.cmd-item:hover, .cmd-item.selected { background: rgba(78,201,122,0.1); }
+.cmd-item .cmd-icon { font-size: 14px; width: 28px; text-align: center; font-family: var(--mono); }
+.cmd-item .cmd-label { flex: 1; }
+.cmd-item .cmd-hint { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+
+/* =================== CONTEXT MENU =================== */
+.ctx-menu { position: fixed; background: rgba(26,46,26,0.95); border: 1px solid var(--border); border-radius: 14px; padding: 6px; min-width: 200px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); z-index: 60000; display: none; animation: ctxOpen 0.12s ease-out; backdrop-filter: blur(16px); }
+@keyframes ctxOpen { from { transform: scale(0.95); opacity: 0; } }
+.ctx-menu.open { display: block; }
+.ctx-item { padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 10px; transition: background 0.1s; color: var(--text); }
+.ctx-item:hover { background: rgba(78,201,122,0.12); }
+.ctx-item .ctx-icon { width: 20px; text-align: center; }
+.ctx-sep { height: 1px; background: var(--border); margin: 4px 8px; }
+
+/* =================== APP: WELCOME =================== */
+.notepad-content { font-family: var(--font); font-size: 14px; line-height: 1.8; color: var(--text); }
+.notepad-content h2 { font-family: var(--display); font-size: 22px; font-weight: 700; margin-bottom: 12px; background: linear-gradient(135deg, #4ec97a, #3aaa8a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.notepad-content p { margin-bottom: 12px; }
+.notepad-content .aside { color: var(--text-muted); font-style: italic; font-size: 13px; }
+
+/* =================== APP: TERMINAL (Field Research Notebook) =================== */
+.terminal { font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--accent); background: linear-gradient(180deg, #1a1408, #12100a); padding: 20px; height: 100%; }
+.terminal .prompt { color: var(--teal); }
+.terminal .cmd-text { color: var(--text); }
+.terminal .output { color: var(--text-muted); white-space: pre-wrap; }
+.terminal .error { color: var(--red); }
+.terminal .highlight { color: var(--amber); }
+.term-input-line { display: flex; align-items: center; gap: 0; }
+.term-input { background: transparent; border: none; outline: none; color: var(--text); font-family: var(--mono); font-size: 13px; flex: 1; caret-color: var(--accent); }
+
+/* =================== APP: PROJECTS =================== */
+.projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.project-card { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.2s; }
+.project-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+.project-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.project-card p { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
+.project-card .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.project-card .tag { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 6px; background: rgba(78,201,122,0.1); color: var(--accent); }
+
+/* =================== APP: GALLERY =================== */
+.gallery-scroll { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 16px; scroll-snap-type: x mandatory; }
+.gallery-scroll::-webkit-scrollbar { height: 4px; }
+.gallery-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.gallery-item { flex-shrink: 0; width: 260px; scroll-snap-align: start; }
+.gallery-thumb { width: 100%; height: 200px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 48px; margin-bottom: 10px; border: 1px solid var(--border); }
+.gallery-item h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.gallery-item p { font-size: 12px; color: var(--text-muted); }
+
+/* =================== APP: GRILLED CHEESE =================== */
+.gc-podium { display: flex; align-items: flex-end; justify-content: center; gap: 16px; margin-bottom: 32px; }
+.gc-podium-item { text-align: center; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+.gc-podium-item.gold { border-color: #c4a43a; order: 2; }
+.gc-podium-item.silver { border-color: #7a8a7a; order: 1; }
+.gc-podium-item.bronze { border-color: #8a6a3a; order: 3; }
+.gc-medal { font-size: 32px; }
+.gc-name { font-size: 14px; font-weight: 600; margin-top: 8px; }
+.gc-score { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+.gc-bracket { display: flex; gap: 40px; align-items: center; overflow-x: auto; padding: 16px 0; }
+.gc-round { display: flex; flex-direction: column; gap: 20px; flex-shrink: 0; }
+.gc-match { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.gc-matchup { padding: 8px 14px; font-size: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+.gc-matchup:last-child { border-bottom: none; }
+.gc-matchup.winner { color: var(--accent); font-weight: 600; }
+
+/* =================== APP: FINDER (TRASH / COMPOST) =================== */
+.finder { height: 100%; display: flex; flex-direction: column; }
+.finder-toolbar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.03); font-size: 12px; color: var(--text-muted); }
+.finder-path { font-family: var(--mono); font-size: 11px; color: var(--text-muted); flex: 1; }
+.finder-list { flex: 1; overflow-y: auto; }
+.finder-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  cursor: pointer;
+  transition: background 0.1s;
+  font-size: 13px;
+}
+.finder-item:hover { background: rgba(78,201,122,0.06); }
+.finder-item.disabled { opacity: 0.35; cursor: not-allowed; }
+.finder-item.disabled:hover { background: transparent; }
+.finder-item .fi-icon { font-size: 16px; width: 28px; text-align: center; flex-shrink: 0; }
+.finder-item .fi-name { flex: 1; }
+.finder-item .fi-meta { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+.finder-item .fi-size { font-size: 11px; color: var(--text-muted); font-family: var(--mono); min-width: 60px; text-align: right; }
+
+.finder-preview { padding: 24px; animation: fadeIn 0.2s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.finder-preview h3 { font-size: 16px; margin-bottom: 12px; font-family: var(--display); }
+.finder-preview p { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 8px; }
+.finder-preview-back { font-size: 12px; color: var(--accent); cursor: pointer; margin-bottom: 16px; display: inline-block; }
+.finder-preview-back:hover { text-decoration: underline; }
+
+/* =================== APP: CURRENTLY INTO =================== */
+.currently-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.currently-card { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.currently-card h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 8px; font-family: var(--mono); }
+.currently-card .item { font-size: 13px; padding: 4px 0; display: flex; align-items: center; gap: 8px; }
+.currently-card .item-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* =================== CURSOR TRAIL — leaf spores =================== */
+.cursor-dot {
+  position: fixed;
+  width: 8px; height: 5px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--accent);
+  pointer-events: none;
+  z-index: 99998;
+  opacity: 0.4;
+  transition: opacity 0.5s, transform 0.5s;
+}
+.cursor-dot.fade { opacity: 0; transform: scale(0) rotate(90deg); }
+
+/* =================== MOBILE =================== */
+@media (max-width: 768px) {
+  .desktop-icons { flex-direction: row; flex-wrap: wrap; max-width: 100%; justify-content: center; padding: 16px; }
+  .window { position: fixed !important; inset: 0 !important; width: 100vw !important; height: calc(100vh - var(--taskbar-h)) !important; border-radius: 0 !important; min-width: unset !important; min-height: unset !important; }
+  .watermark-canvas { display: none; }
+  .cmd-box { border-radius: 0; }
+  .taskbar { left: 8px; right: 8px; transform: none; width: auto; max-width: none; border-radius: 12px; bottom: 8px; padding: 6px 12px; }
+  .butterfly { display: none; }
+  .condensation-layer { display: none; }
+}
+
+/* =================== SCREENSAVER =================== */
+.screensaver { position: fixed; inset: 0; background: #050a15; z-index: 80000; display: none; cursor: pointer; overflow: hidden; }
+.screensaver.active { display: block; }
+
+/* Bioluminescent mushrooms */
+.bio-mushroom {
+  position: absolute;
+  width: 20px; height: 24px;
+}
+.bio-mushroom .cap {
+  width: 20px; height: 12px;
+  border-radius: 50% 50% 0 0;
+  background: radial-gradient(ellipse at center, rgba(96,255,160,0.6), rgba(96,255,160,0.1));
+  box-shadow: 0 0 20px rgba(96,255,160,0.3), 0 0 40px rgba(96,255,160,0.1);
+  animation: mushroomGlow 3s ease-in-out infinite;
+}
+.bio-mushroom .stem {
+  width: 4px; height: 12px;
+  background: rgba(96,255,160,0.15);
+  margin: 0 auto;
+  border-radius: 0 0 2px 2px;
+}
+@keyframes mushroomGlow {
+  0%, 100% { opacity: 0.5; box-shadow: 0 0 15px rgba(96,255,160,0.2); }
+  50% { opacity: 1; box-shadow: 0 0 30px rgba(96,255,160,0.4), 0 0 60px rgba(96,255,160,0.15); }
+}
+
+.screensaver-firefly {
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: #ffd54f;
+  box-shadow: 0 0 8px #ffd54f, 0 0 16px rgba(255,213,79,0.3);
+  animation: fireflyFloat linear infinite;
+}
+@keyframes fireflyFloat {
+  0% { transform: translate(0, 0); opacity: 0; }
+  10% { opacity: 0.8; }
+  50% { transform: translate(40px, -60px); opacity: 1; }
+  90% { opacity: 0.4; }
+  100% { transform: translate(-20px, -120px); opacity: 0; }
+}
+
+.screensaver-text {
+  position: absolute;
+  bottom: 15%;
+  width: 100%;
+  text-align: center;
+  font-family: var(--display);
+  font-size: 14px;
+  color: rgba(96,255,160,0.25);
+  letter-spacing: 0.1em;
+}
+
+/* =================== KONAMI =================== */
+.cheese-rain { position: fixed; inset: 0; pointer-events: none; z-index: 90000; }
+.cheese-drop { position: absolute; font-size: 32px; animation: cheeseFall linear forwards; }
+@keyframes cheeseFall { from { transform: translateY(-50px) rotate(0deg); } to { transform: translateY(110vh) rotate(360deg); } }
+
+/* =================== CLOCK TOOLTIP =================== */
+.clock-tooltip {
+  position: absolute; bottom: calc(var(--taskbar-h) + 8px); right: 12px;
+  background: rgba(26,46,26,0.95); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 14px; font-size: 12px; color: var(--text);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  white-space: nowrap; pointer-events: none;
+  animation: tooltipFade 0.2s ease-out;
+  z-index: 9999;
+}
+@keyframes tooltipFade { from { opacity: 0; transform: translateY(4px); } }
+
+/* =================== GRILLED CHEESE WALLPAPER =================== */
+.gc-wallpaper {
+  position: fixed; inset: 0; z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ctext x='10' y='35' font-size='24'%3E%F0%9F%A7%80%3C/text%3E%3C/svg%3E");
+  background-size: 60px 60px;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.gc-wallpaper.show { opacity: 0.15; }
+
+/* =================== SVG ICON STYLES =================== */
+.icon-img svg { width: 28px; height: 28px; display: block; }
+
+/* =================== MUSICAL SCALE TOAST =================== */
+.melody-toast {
+  position: fixed;
+  top: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(26,46,26,0.95);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 13px;
+  color: var(--accent);
+  font-family: var(--font);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2), 0 0 20px var(--accent-glow);
+  z-index: 99999;
+  animation: toastIn 0.3s ease-out, toastOut 0.3s ease-in 2.5s forwards;
+  pointer-events: none;
+}
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
+@keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
+
+/* =================== DOCK BOUNCE =================== */
+@keyframes dockBounce {
+  0% { transform: translateY(0); }
+  20% { transform: translateY(-10px); }
+  40% { transform: translateY(0); }
+  55% { transform: translateY(-6px); }
+  70% { transform: translateY(0); }
+  85% { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}
+.tb-app.bouncing { animation: dockBounce 0.6s ease-out; }
+
+/* =================== WINDOW SNAP INDICATOR =================== */
+.snap-indicator {
+  position: fixed;
+  background: rgba(78,201,122,0.08);
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius);
+  z-index: 50;
+  pointer-events: none;
+  transition: all 0.15s ease-out;
+}
+
+/* =================== DESKTOP TOY — seed/pebble =================== */
+.desktop-toy {
+  position: fixed;
+  pointer-events: none;
+  z-index: 5;
+  width: 14px; height: 12px;
+  border-radius: 50% 50% 45% 55%;
+  background: radial-gradient(circle at 35% 35%, var(--brown), #5a3a1a);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3), inset 0 -2px 4px rgba(0,0,0,0.2);
+}
+
+/* =================== SPARKLE — leaf burst =================== */
+@keyframes sparkle {
+  0% { transform: scale(0) rotate(0deg); opacity: 1; }
+  50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+.sparkle {
+  position: fixed; width: 10px; height: 6px;
+  pointer-events: none; z-index: 99999;
+  background: var(--accent);
+  border-radius: 50% 50% 50% 0;
+  animation: sparkle 0.6s ease-out forwards;
+}
+
+/* =================== GOLDEN BEETLE =================== */
+.golden-beetle {
+  position: fixed; z-index: 99999; pointer-events: none;
+  width: 16px; height: 10px;
+  animation: beetlePath 3s ease-in-out forwards;
+}
+.golden-beetle .beetle-body {
+  width: 16px; height: 10px;
+  background: radial-gradient(ellipse, #ffd700, #b8860b);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255,215,0,0.4);
+  position: relative;
+}
+.golden-beetle .beetle-body::before {
+  content: ''; position: absolute;
+  top: 1px; left: 7px; width: 2px; height: 8px;
+  background: rgba(0,0,0,0.3);
+}
+.golden-beetle .beetle-leg {
+  position: absolute; width: 6px; height: 1px;
+  background: #8a6a2a;
+  animation: legWiggle 0.15s ease-in-out infinite alternate;
+}
+@keyframes legWiggle { to { transform: rotate(15deg); } }
+@keyframes beetlePath {
+  0% { left: -20px; top: 60%; transform: rotate(10deg); opacity: 0; }
+  5% { opacity: 1; }
+  25% { left: 30%; top: 55%; transform: rotate(-5deg); }
+  50% { left: 55%; top: 65%; transform: rotate(12deg); }
+  75% { left: 80%; top: 50%; transform: rotate(-8deg); }
+  95% { opacity: 1; }
+  100% { left: 105%; top: 58%; transform: rotate(5deg); opacity: 0; }
+}
+
+/* =================== RAIN EFFECT =================== */
+.rain-drop {
+  position: fixed; pointer-events: none; z-index: 99998;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(90,138,170,0.4));
+  animation: rainFall linear forwards;
+}
+@keyframes rainFall {
+  from { transform: translateY(-20px); opacity: 0.6; }
+  to { transform: translateY(100vh); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- BOOT SCREEN -->
+<div id="boot-screen">
+  <div class="boot-dome" id="bootDome">
+    <div class="boot-soil" id="bootSoil"></div>
+    <div id="bootPebbles"></div>
+    <div id="bootMoss"></div>
+    <div id="bootSprouts"></div>
+    <div class="boot-reflection" id="bootReflection"></div>
+  </div>
+  <div class="boot-logo">Terrarium OS</div>
+  <div class="boot-lines" id="bootLines"></div>
+  <div class="boot-bar"><div class="boot-bar-fill"></div></div>
+</div>
+
+<!-- DESKTOP -->
+<div id="desktop">
+  <div class="desktop-bg"></div>
+  <div class="pebbles-layer" id="pebblesLayer"></div>
+  <div class="mist-layer"></div>
+  <div class="condensation-layer" id="condensationLayer"></div>
+  <div class="floating-particles" id="particles"></div>
+  <div class="butterfly" id="butterfly"></div>
+  <div class="gc-wallpaper" id="gcWallpaper"></div>
+  <canvas class="watermark-canvas" id="watermarkCanvas"></canvas>
+  <div class="desktop-icons" id="desktopIcons"></div>
+  <div id="windowContainer"></div>
+
+  <!-- Taskbar / Potting Bench -->
+  <div class="taskbar">
+    <button class="tb-start" title="Start">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><ellipse cx="8" cy="12" rx="4" ry="2" fill="rgba(78,201,122,0.3)"/><circle cx="8" cy="10" r="3" fill="rgba(138,106,58,0.6)" stroke="rgba(138,106,58,0.8)" stroke-width="0.5"/></svg>
+    </button>
+    <div class="tb-divider"></div>
+    <div class="tb-apps" id="tbApps"></div>
+    <div class="tb-tray">
+      <div class="night-toggle-jar" id="nightToggle" onclick="toggleNightMode()" title="Toggle night mode">
+        <div class="firefly-dot"></div>
+      </div>
+      <div class="lang-toggle-seg" id="langToggle">
+        <button class="lang-seg active" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-seg" data-lang="jp" onclick="setLang('jp')">JP</button>
+      </div>
+      <span id="clock"></span>
+    </div>
+  </div>
+</div>
+
+<!-- Command Palette -->
+<div class="cmd-overlay" id="cmdOverlay" onclick="if(event.target===this)closeCmdPalette()">
+  <div class="cmd-box">
+    <input class="cmd-input" id="cmdInput" placeholder="Search the terrarium..." oninput="filterCommands()" onkeydown="handleCmdKey(event)">
+    <div class="cmd-results" id="cmdResults"></div>
+  </div>
+</div>
+
+<!-- Context Menu -->
+<div class="ctx-menu" id="ctxMenu"></div>
+
+<!-- Screensaver (nightfall) -->
+<div class="screensaver" id="screensaver" onclick="hideScreensaver()">
+  <div id="screensaverContent"></div>
+  <div class="screensaver-text">the garden sleeps — click to wake</div>
+</div>
+
+<!-- Cheese Rain -->
+<div class="cheese-rain" id="cheeseRain"></div>
+
+<script>
+// =================== STATE ===================
+let lang = 'en';
+let windows = [];
+let nextZ = 100;
+let nextWinId = 1;
+let focusedWinId = null;
+let idleTimer = null;
+const IDLE_TIMEOUT = 120000;
+let nightMode = false;
+
+// =================== SOUND SYSTEM ===================
+let audioCtx = null;
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+document.addEventListener('click', () => { initAudio(); startAmbientHum(); }, { once: true });
+
+// Barely audible forest ambience — filtered noise
+let ambientNode = null;
+function startAmbientHum() {
+  if (!audioCtx || ambientNode) return;
+  // Very soft ambient oscillator
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(80, audioCtx.currentTime);
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(200, audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.004, audioCtx.currentTime);
+  osc.connect(filter).connect(gain).connect(audioCtx.destination);
+  osc.start();
+  ambientNode = osc;
+}
+
+function playBoop(freq = 520, duration = 0.08, vol = 0.12, type = 'sine') {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(freq * 0.6, audioCtx.currentTime + duration);
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(freq * 2, audioCtx.currentTime);
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  osc.connect(filter).connect(gain).connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+// Musical icon scale — C major (organic/nature frequencies)
+const musicalScale = {
+  welcome:   { freq: 262, note: 'C4' },
+  projects:  { freq: 294, note: 'D4' },
+  terminal:  { freq: 330, note: 'E4' },
+  gallery:   { freq: 392, note: 'G4' },
+  currently: { freq: 440, note: 'A4' },
+  gc:        { freq: 523, note: 'C5' },
+  japan:     { freq: 587, note: 'D5' },
+  trash:     { freq: 659, note: 'E5' },
+};
+const scaleOrder = ['welcome','projects','terminal','gallery','currently','gc','japan','trash'];
+let scaleProgress = 0;
+let melodyUnlocked = false;
+
+function playScaleNote(appId) {
+  const note = musicalScale[appId];
+  if (!note) return;
+  playBoop(note.freq, 0.2, 0.07, 'sine');
+  if (scaleOrder[scaleProgress] === appId) {
+    scaleProgress++;
+    if (scaleProgress >= scaleOrder.length && !melodyUnlocked) {
+      melodyUnlocked = true;
+      triggerMelodyUnlocked();
+    }
+  } else if (scaleOrder[0] === appId) {
+    scaleProgress = 1;
+  } else {
+    scaleProgress = 0;
+  }
+}
+
+function triggerMelodyUnlocked() {
+  scaleOrder.forEach((id, i) => {
+    setTimeout(() => playBoop(musicalScale[id].freq, 0.25, 0.09, 'sine'), i * 100);
+  });
+  document.querySelectorAll('.desktop-icon').forEach(icon => {
+    const rect = icon.getBoundingClientRect();
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        const sp = document.createElement('div');
+        sp.className = 'sparkle';
+        sp.style.left = (rect.left + Math.random() * rect.width) + 'px';
+        sp.style.top = (rect.top + Math.random() * rect.height) + 'px';
+        sp.style.transform = `rotate(${Math.random()*360}deg)`;
+        document.body.appendChild(sp);
+        setTimeout(() => sp.remove(), 600);
+      }, i * 120);
+    }
+  });
+  const toast = document.createElement('div');
+  toast.className = 'melody-toast';
+  toast.textContent = 'forest symphony unlocked';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+const appBoops = {
+  welcome:   { freq: 262, type: 'sine' },
+  projects:  { freq: 294, type: 'triangle' },
+  terminal:  { freq: 330, type: 'square' },
+  gallery:   { freq: 392, type: 'sine' },
+  currently: { freq: 440, type: 'sine' },
+  gc:        { freq: 523, type: 'triangle' },
+  japan:     { freq: 587, type: 'sine' },
+  trash:     { freq: 659, type: 'triangle' },
+};
+
+function playWindowOpen() {
+  if (!audioCtx) return;
+  // Airy whoosh + glass clink
+  playBoop(800, 0.15, 0.06, 'sine');
+  setTimeout(() => playBoop(1200, 0.06, 0.04, 'sine'), 60);
+  // Noise burst for whoosh
+  const bufSize = audioCtx.sampleRate * 0.1;
+  const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i/bufSize);
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buf;
+  const nGain = audioCtx.createGain();
+  const nFilter = audioCtx.createBiquadFilter();
+  nFilter.type = 'bandpass'; nFilter.frequency.value = 2000; nFilter.Q.value = 2;
+  nGain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+  nGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+  noise.connect(nFilter).connect(nGain).connect(audioCtx.destination);
+  noise.start();
+}
+
+function playWindowClose() {
+  if (!audioCtx) return;
+  // Dome settling — soft thud
+  playBoop(180, 0.1, 0.06, 'sine');
+  setTimeout(() => playBoop(120, 0.12, 0.04, 'sine'), 40);
+}
+
+function playTypeBoop() {
+  if (!audioCtx) return;
+  // Scratching on bark
+  const bufSize = audioCtx.sampleRate * 0.02;
+  const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i/bufSize) * 0.3;
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buf;
+  const nGain = audioCtx.createGain();
+  const nFilter = audioCtx.createBiquadFilter();
+  nFilter.type = 'highpass'; nFilter.frequency.value = 3000 + Math.random() * 2000;
+  nGain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+  nGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.02);
+  noise.connect(nFilter).connect(nGain).connect(audioCtx.destination);
+  noise.start();
+}
+
+// Leaf rustle for hover
+function playLeafRustle() {
+  if (!audioCtx) return;
+  const bufSize = audioCtx.sampleRate * 0.05;
+  const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i/bufSize);
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buf;
+  const nGain = audioCtx.createGain();
+  const nFilter = audioCtx.createBiquadFilter();
+  nFilter.type = 'bandpass'; nFilter.frequency.value = 4000; nFilter.Q.value = 1;
+  nGain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+  nGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+  noise.connect(nFilter).connect(nGain).connect(audioCtx.destination);
+  noise.start();
+}
+
+// =================== I18N ===================
+const i18n = {
+  en: {
+    welcome_title: 'Welcome to Terrarium OS!',
+    welcome_body: `<p>Hey! I'm <strong>Rika Ciminieri</strong> — half-Japanese full-stack engineer at Eventbrite.</p>
+<p>Former microbiology student turned tech advocate. I pivoted from petri dishes to pixels because I realized I liked debugging code more than debugging cell cultures.</p>
+<p>I paint, build tiny book nooks, do pilates, have deeply researched One Piece theories, and rank grilled cheeses competitively. I go to Japan almost every year.</p>
+<p class="aside">Currently into: Bridgerton, The Traitors, Heated Rivalry, learning AI, Monopoly Deal, and learning how to sing.</p>
+<p class="aside">Pro tip: Press Cmd+K to open the command palette. Right-click anywhere for more options.</p>`,
+    about: 'About',
+    projects: 'Projects',
+    terminal: 'Terminal',
+    gallery: 'Gallery',
+    gc: 'Grilled Cheese',
+    trash: 'Compost',
+    currently: 'Currently',
+    japan: 'Japan',
+  },
+  jp: {
+    welcome_title: 'Terrarium OSへようこそ！',
+    welcome_body: `<p>こんにちは！<strong>Rika Ciminieri</strong>です。日米ハーフのフルスタックエンジニアで、Eventbriteで働いています。</p>
+<p>元微生物学の学生からテック業界へ転身。シャーレの培養よりコードのデバッグの方が好きだと気づきました。</p>
+<p>絵を描いたり、小さなブックヌックを作ったり、ピラティスをしたり、ワンピースの考察を深く研究したり、グリルドチーズのランキングも本気でやっています。</p>
+<p class="aside">ヒント: Cmd+Kでコマンドパレットを開けます。右クリックでメニューも。</p>`,
+    about: 'プロフィール',
+    projects: 'プロジェクト',
+    terminal: 'ターミナル',
+    gallery: 'ギャラリー',
+    gc: 'グリルドチーズ',
+    trash: 'コンポスト',
+    currently: '今ハマってる',
+    japan: '日本',
+  }
+};
+function t(key) { return i18n[lang][key] || i18n.en[key] || key; }
+
+// =================== CSS-ART ICON SVGs ===================
+const iconSVGs = {
+  // Welcome: Glass jar with tiny glowing crystal
+  welcome: `<svg viewBox="0 0 32 32" fill="none">
+    <rect x="9" y="6" width="14" height="20" rx="3" fill="rgba(255,255,255,0.06)" stroke="rgba(78,201,122,0.3)" stroke-width="1"/>
+    <rect x="10" y="4" width="12" height="3" rx="1" fill="rgba(78,201,122,0.2)" stroke="rgba(78,201,122,0.3)" stroke-width="0.5"/>
+    <polygon points="16,12 13,20 19,20" fill="rgba(78,201,122,0.5)" stroke="rgba(78,201,122,0.7)" stroke-width="0.5"/>
+    <polygon points="16,12 13,20 19,20" fill="rgba(78,201,122,0.3)">
+      <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite"/>
+    </polygon>
+    <line x1="16" y1="9" x2="16" y2="12" stroke="rgba(78,201,122,0.5)" stroke-width="0.5"/>
+    <line x1="14" y1="10" x2="16" y2="12" stroke="rgba(78,201,122,0.4)" stroke-width="0.5"/>
+    <line x1="18" y1="10" x2="16" y2="12" stroke="rgba(78,201,122,0.4)" stroke-width="0.5"/>
+    <ellipse cx="12" cy="8" rx="2" ry="1" fill="rgba(255,255,255,0.06)"/>
+  </svg>`,
+  // Projects: Jar with tiny gears made of twigs
+  projects: `<svg viewBox="0 0 32 32" fill="none">
+    <rect x="9" y="8" width="14" height="18" rx="2" fill="rgba(138,106,58,0.15)" stroke="rgba(138,106,58,0.4)" stroke-width="1"/>
+    <circle cx="16" cy="17" r="5" fill="none" stroke="rgba(138,106,58,0.5)" stroke-width="1.2"/>
+    <circle cx="16" cy="17" r="2" fill="rgba(138,106,58,0.3)"/>
+    <line x1="16" y1="11.5" x2="16" y2="13" stroke="rgba(138,106,58,0.4)" stroke-width="1.2"/>
+    <line x1="16" y1="21" x2="16" y2="22.5" stroke="rgba(138,106,58,0.4)" stroke-width="1.2"/>
+    <line x1="10.5" y1="17" x2="12" y2="17" stroke="rgba(138,106,58,0.4)" stroke-width="1.2"/>
+    <line x1="20" y1="17" x2="21.5" y2="17" stroke="rgba(138,106,58,0.4)" stroke-width="1.2"/>
+    <line x1="12.5" y1="13.5" x2="13.5" y2="14.5" stroke="rgba(138,106,58,0.35)" stroke-width="1"/>
+    <line x1="18.5" y1="19.5" x2="19.5" y2="20.5" stroke="rgba(138,106,58,0.35)" stroke-width="1"/>
+  </svg>`,
+  // Terminal: Log slice with lichen >_
+  terminal: `<svg viewBox="0 0 32 32" fill="none">
+    <ellipse cx="16" cy="16" rx="11" ry="10" fill="rgba(90,60,20,0.4)" stroke="rgba(138,106,58,0.4)" stroke-width="1"/>
+    <ellipse cx="16" cy="16" rx="8" ry="7" fill="none" stroke="rgba(138,106,58,0.2)" stroke-width="0.5"/>
+    <ellipse cx="16" cy="16" rx="5" ry="4.5" fill="none" stroke="rgba(138,106,58,0.15)" stroke-width="0.5"/>
+    <text x="11" y="19" font-family="monospace" font-size="10" font-weight="bold" fill="rgba(78,201,122,0.8)">&#x203A;_</text>
+    <circle cx="22" cy="10" r="2" fill="rgba(78,201,122,0.15)" filter="blur(1px)"/>
+    <rect x="22.5" y="18" width="1" height="6" rx="0.5" fill="rgba(78,201,122,0.4)">
+      <animate attributeName="opacity" values="1;0;1" dur="1.2s" repeatCount="indefinite"/>
+    </rect>
+  </svg>`,
+  // Gallery: Glass dome with pressed flower frames
+  gallery: `<svg viewBox="0 0 32 32" fill="none">
+    <path d="M6 24 Q16 2 26 24" fill="rgba(255,255,255,0.04)" stroke="rgba(212,138,138,0.3)" stroke-width="1"/>
+    <line x1="6" y1="24" x2="26" y2="24" stroke="rgba(212,138,138,0.3)" stroke-width="1"/>
+    <rect x="10" y="14" width="5" height="6" rx="0.5" fill="none" stroke="rgba(212,138,138,0.4)" stroke-width="0.6"/>
+    <circle cx="12.5" cy="16.5" r="1.5" fill="rgba(212,138,138,0.3)"/>
+    <rect x="17" y="12" width="5" height="7" rx="0.5" fill="none" stroke="rgba(196,164,58,0.4)" stroke-width="0.6"/>
+    <circle cx="19.5" cy="15" r="1.5" fill="rgba(196,164,58,0.3)"/>
+    <line x1="19.5" y1="16.5" x2="19.5" y2="18" stroke="rgba(78,201,122,0.3)" stroke-width="0.5"/>
+  </svg>`,
+  // Currently: Bark radio with musical vines
+  currently: `<svg viewBox="0 0 32 32" fill="none">
+    <rect x="7" y="10" width="18" height="14" rx="3" fill="rgba(90,60,20,0.3)" stroke="rgba(138,106,58,0.4)" stroke-width="1"/>
+    <circle cx="14" cy="18" r="3.5" fill="none" stroke="rgba(58,170,138,0.4)" stroke-width="0.8"/>
+    <circle cx="14" cy="18" r="1.5" fill="rgba(58,170,138,0.3)"/>
+    <rect x="19" y="13" width="3" height="1.5" rx="0.5" fill="rgba(58,170,138,0.3)"/>
+    <rect x="19" y="16" width="3" height="1.5" rx="0.5" fill="rgba(58,170,138,0.25)"/>
+    <path d="M22 8 Q24 5 26 7" fill="none" stroke="rgba(78,201,122,0.4)" stroke-width="0.8"/>
+    <circle cx="26.5" cy="6.5" r="1" fill="rgba(78,201,122,0.3)"/>
+    <path d="M24 6 Q25 3 27 5" fill="none" stroke="rgba(78,201,122,0.3)" stroke-width="0.5"/>
+  </svg>`,
+  // GC: Cheese wheel on wooden board with moss
+  gc: `<svg viewBox="0 0 32 32" fill="none">
+    <rect x="5" y="22" width="22" height="3" rx="1" fill="rgba(138,106,58,0.4)" stroke="rgba(138,106,58,0.5)" stroke-width="0.5"/>
+    <ellipse cx="16" cy="18" rx="8" ry="5" fill="rgba(196,164,58,0.35)" stroke="rgba(196,164,58,0.5)" stroke-width="0.8"/>
+    <path d="M16 13 L20 17 L16 18 Z" fill="rgba(196,164,58,0.5)" stroke="rgba(196,164,58,0.6)" stroke-width="0.5"/>
+    <circle cx="13" cy="17" r="0.8" fill="rgba(196,164,58,0.6)"/>
+    <circle cx="18" cy="19" r="0.6" fill="rgba(196,164,58,0.6)"/>
+    <circle cx="12" cy="19.5" r="0.5" fill="rgba(196,164,58,0.5)"/>
+    <ellipse cx="6" cy="22" rx="2" ry="1" fill="rgba(78,201,122,0.15)" filter="blur(1px)"/>
+    <ellipse cx="25" cy="23" rx="1.5" ry="0.8" fill="rgba(78,201,122,0.12)" filter="blur(1px)"/>
+  </svg>`,
+  // Japan: Miniature zen garden in jar
+  japan: `<svg viewBox="0 0 32 32" fill="none">
+    <rect x="8" y="8" width="16" height="18" rx="2" fill="rgba(255,255,255,0.04)" stroke="rgba(212,138,138,0.25)" stroke-width="0.8"/>
+    <rect x="10" y="22" width="12" height="4" fill="rgba(224,210,180,0.2)"/>
+    <line x1="10" y1="23" x2="22" y2="23" stroke="rgba(224,210,180,0.15)" stroke-width="0.4"/>
+    <line x1="10" y1="24" x2="22" y2="24" stroke="rgba(224,210,180,0.15)" stroke-width="0.4"/>
+    <path d="M11 23.5 Q13 22.5 15 23.5" fill="none" stroke="rgba(224,210,180,0.2)" stroke-width="0.4"/>
+    <ellipse cx="18" cy="22" rx="1.5" ry="1" fill="rgba(150,140,120,0.3)"/>
+    <line x1="14" y1="14" x2="14" y2="22" stroke="rgba(138,106,58,0.4)" stroke-width="1"/>
+    <circle cx="14" cy="13" r="3" fill="rgba(78,201,122,0.25)"/>
+    <circle cx="12" cy="14.5" r="2" fill="rgba(78,201,122,0.2)"/>
+    <circle cx="16" cy="14" r="2.2" fill="rgba(78,201,122,0.2)"/>
+    <circle cx="20" cy="10" r="2" fill="rgba(212,138,138,0.15)"/>
+  </svg>`,
+  // Trash: Compost bin with cute worms
+  trash: `<svg viewBox="0 0 32 32" fill="none">
+    <path d="M9 10 L8 26 Q8 27 9 27 L23 27 Q24 27 24 26 L23 10 Z" fill="rgba(138,106,58,0.2)" stroke="rgba(138,106,58,0.3)" stroke-width="0.8"/>
+    <rect x="7" y="8" width="18" height="3" rx="1" fill="rgba(138,106,58,0.25)" stroke="rgba(138,106,58,0.35)" stroke-width="0.5"/>
+    <path d="M12 18 Q14 15 16 18" fill="none" stroke="rgba(212,138,138,0.5)" stroke-width="1.2" stroke-linecap="round"/>
+    <circle cx="12" cy="18.5" r="0.8" fill="rgba(212,138,138,0.5)"/>
+    <path d="M17 21 Q19 18 21 21" fill="none" stroke="rgba(212,138,138,0.4)" stroke-width="1" stroke-linecap="round"/>
+    <circle cx="17" cy="21.5" r="0.6" fill="rgba(212,138,138,0.4)"/>
+    <circle cx="11" cy="14" r="1" fill="rgba(78,201,122,0.2)"/>
+    <circle cx="20" cy="13" r="0.8" fill="rgba(78,201,122,0.15)"/>
+    <circle cx="15" y="24" r="0.6" fill="rgba(196,164,58,0.2)"/>
+  </svg>`,
+};
+
+// =================== APPS ===================
+const apps = [
+  { id: 'welcome', iconCls: 'icon-welcome', iconText: '', label: () => t('about'), w: 520, h: 420 },
+  { id: 'projects', iconCls: 'icon-projects', iconText: '', label: () => t('projects'), w: 700, h: 500 },
+  { id: 'terminal', iconCls: 'icon-terminal', iconText: '', label: () => t('terminal'), w: 640, h: 420 },
+  { id: 'gallery', iconCls: 'icon-gallery', iconText: '', label: () => t('gallery'), w: 680, h: 460 },
+  { id: 'currently', iconCls: 'icon-currently', iconText: '', label: () => t('currently'), w: 480, h: 400 },
+  { id: 'gc', iconCls: 'icon-gc', iconText: '', label: () => t('gc'), w: 720, h: 520 },
+  { id: 'japan', iconCls: 'icon-japan', iconText: '', label: () => t('japan'), w: 520, h: 440 },
+  { id: 'trash', iconCls: 'icon-trash', iconText: '', label: () => t('trash'), w: 560, h: 420 },
+];
+
+// =================== BOOT ===================
+const bootMessages = [
+  { text: 'terrarium-os v1.0 — germinating kernel...', delay: 0 },
+  { text: 'mounting /dev/ecosystem...                    [OK]', cls: 'ok', delay: 200 },
+  { text: 'loading bilingual root system: en_US + ja_JP  [OK]', cls: 'ok', delay: 400 },
+  { text: 'seeding creative substrates...                [OK]', cls: 'ok', delay: 600 },
+  { text: 'calibrating photosynthesis...                 [OK]', cls: 'ok', delay: 900 },
+  { text: 'watering schedule — overdue by 3 days         [WARN]', cls: 'warn', delay: 1100 },
+  { text: 'checking soil pH: 6.2 (optimal for ferns)    [OK]', cls: 'ok', delay: 1300 },
+  { text: 'all organisms nominal. the garden awaits.', cls: 'ok', delay: 1600 },
+];
+
+function runBoot() {
+  const container = document.getElementById('bootLines');
+
+  // Pebbles pop in
+  const pebblesEl = document.getElementById('bootPebbles');
+  const pebbleColors = ['#8a6a3a', '#6a5030', '#9a7a4a', '#5a4020'];
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'boot-pebble';
+      p.style.width = (4 + Math.random() * 6) + 'px';
+      p.style.height = (3 + Math.random() * 5) + 'px';
+      p.style.background = pebbleColors[Math.floor(Math.random() * pebbleColors.length)];
+      p.style.bottom = (5 + Math.random() * 25) + '%';
+      p.style.left = (15 + Math.random() * 70) + '%';
+      p.style.animationDelay = '0s';
+      p.style.transform = 'scale(0)';
+      pebblesEl.appendChild(p);
+    }, 800 + i * 60);
+  }
+
+  // Moss grows
+  const mossEl = document.getElementById('bootMoss');
+  for (let i = 0; i < 4; i++) {
+    setTimeout(() => {
+      const m = document.createElement('div');
+      m.className = 'boot-moss';
+      m.style.width = (20 + Math.random() * 30) + 'px';
+      m.style.height = (15 + Math.random() * 20) + 'px';
+      m.style.bottom = (10 + Math.random() * 20) + '%';
+      m.style.left = (10 + Math.random() * 70) + '%';
+      m.style.animationDelay = '0s';
+      mossEl.appendChild(m);
+    }, 1100 + i * 80);
+  }
+
+  // Sprouts grow
+  const sproutsEl = document.getElementById('bootSprouts');
+  for (let i = 0; i < 3; i++) {
+    setTimeout(() => {
+      const s = document.createElement('div');
+      s.className = 'boot-sprout';
+      s.style.left = (25 + i * 25) + '%';
+      s.style.animationDelay = '0s';
+      sproutsEl.appendChild(s);
+    }, 1400 + i * 100);
+  }
+
+  bootMessages.forEach(msg => {
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.textContent = msg.text;
+      if (msg.cls) div.classList.add(msg.cls);
+      container.appendChild(div);
+    }, msg.delay);
+  });
+
+  setTimeout(() => {
+    document.getElementById('boot-screen').classList.add('done');
+    document.getElementById('desktop').classList.add('visible');
+    // Add content to screensaver
+    initScreensaver();
+    setTimeout(() => {
+      document.getElementById('boot-screen').style.display = 'none';
+      openApp('welcome');
+    }, 800);
+  }, 2600);
+}
+
+function initScreensaver() {
+  const ss = document.getElementById('screensaverContent');
+  // Add mushrooms
+  for (let i = 0; i < 8; i++) {
+    const m = document.createElement('div');
+    m.className = 'bio-mushroom';
+    m.style.left = (5 + Math.random() * 85) + '%';
+    m.style.bottom = (5 + Math.random() * 25) + '%';
+    m.style.animationDelay = (Math.random() * 3) + 's';
+    m.innerHTML = '<div class="cap"></div><div class="stem"></div>';
+    m.querySelector('.cap').style.animationDelay = (Math.random() * 3) + 's';
+    ss.appendChild(m);
+  }
+  // Add fireflies
+  for (let i = 0; i < 20; i++) {
+    const f = document.createElement('div');
+    f.className = 'screensaver-firefly';
+    f.style.left = Math.random() * 100 + '%';
+    f.style.top = (20 + Math.random() * 60) + '%';
+    f.style.animationDuration = (4 + Math.random() * 6) + 's';
+    f.style.animationDelay = Math.random() * 8 + 's';
+    ss.appendChild(f);
+  }
+}
+
+// =================== FLOATING PARTICLES (POLLEN) ===================
+function initParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = 2 + Math.random() * 4;
+    p.style.width = p.style.height = size + 'px';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.top = (50 + Math.random() * 50) + '%';
+    p.style.backgroundColor = Math.random() > 0.5 ? 'rgba(196,164,58,0.6)' : 'rgba(78,201,122,0.4)';
+    p.style.animationDuration = (12 + Math.random() * 18) + 's';
+    p.style.animationDelay = Math.random() * 15 + 's';
+    container.appendChild(p);
+  }
+}
+
+// =================== PEBBLES & CONDENSATION ===================
+function initDesktopDetails() {
+  // Pebbles
+  const pLayer = document.getElementById('pebblesLayer');
+  const pColors = ['rgba(138,106,58,0.15)', 'rgba(90,70,40,0.12)', 'rgba(160,130,70,0.1)', 'rgba(70,55,30,0.1)'];
+  for (let i = 0; i < 25; i++) {
+    const p = document.createElement('div');
+    p.className = 'pebble';
+    const size = 4 + Math.random() * 10;
+    p.style.width = size + 'px';
+    p.style.height = (size * 0.7 + Math.random() * size * 0.3) + 'px';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.top = Math.random() * 100 + '%';
+    p.style.background = pColors[Math.floor(Math.random() * pColors.length)];
+    p.style.transform = `rotate(${Math.random()*360}deg)`;
+    p.dataset.pebbleIdx = i;
+    pLayer.appendChild(p);
+  }
+
+  // Condensation
+  const cLayer = document.getElementById('condensationLayer');
+  for (let i = 0; i < 12; i++) {
+    const d = document.createElement('div');
+    d.className = 'condensation-drop';
+    const size = 3 + Math.random() * 6;
+    d.style.width = d.style.height = size + 'px';
+    // Mostly near edges (vignette area)
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 0.35 + Math.random() * 0.15;
+    d.style.left = (50 + Math.cos(angle) * dist * 100) + '%';
+    d.style.top = (50 + Math.sin(angle) * dist * 100) + '%';
+    d.style.animationDuration = (8 + Math.random() * 12) + 's';
+    d.style.animationDelay = Math.random() * 10 + 's';
+    cLayer.appendChild(d);
+  }
+}
+
+// =================== DESKTOP ICONS ===================
+function renderDesktopIcons() {
+  const container = document.getElementById('desktopIcons');
+  container.innerHTML = '';
+  apps.forEach(app => {
+    const el = document.createElement('div');
+    el.className = 'desktop-icon';
+    el.ondblclick = () => openApp(app.id);
+    el.onmouseenter = () => { playScaleNote(app.id); playLeafRustle(); };
+    el.innerHTML = `
+      <div class="icon-img ${app.iconCls}">${iconSVGs[app.id] || app.iconText}</div>
+      <div class="icon-label">${app.label()}</div>
+    `;
+    container.appendChild(el);
+  });
+}
+
+// =================== WINDOW MANAGER ===================
+function openApp(appId) {
+  const existing = windows.find(w => w.appId === appId && !w.minimized);
+  if (existing) { focusWindow(existing.id); return; }
+
+  const existingMin = windows.find(w => w.appId === appId && w.minimized);
+  if (existingMin) {
+    existingMin.minimized = false;
+    const el = document.getElementById(`win-${existingMin.id}`);
+    if (el) { el.classList.remove('minimized'); el.style.display = ''; }
+    focusWindow(existingMin.id);
+    updateTaskbar();
+    return;
+  }
+
+  const app = apps.find(a => a.id === appId);
+  if (!app) return;
+
+  const id = nextWinId++;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const winW = Math.min(app.w, vw - 40);
+  const winH = Math.min(app.h, vh - 100);
+  const openCount = windows.filter(w => !w.minimized).length;
+  const offsetX = Math.min(220 + openCount * 30, vw - winW - 20);
+  const offsetY = Math.min(30 + openCount * 25, vh - winH - 80);
+
+  const win = { id, appId, x: offsetX, y: offsetY, w: winW, h: winH, z: nextZ++, minimized: false };
+  windows.push(win);
+  renderWindow(win, app);
+  focusWindow(id);
+  updateTaskbar();
+
+  playWindowOpen();
+  const boop = appBoops[appId];
+  if (boop) setTimeout(() => playBoop(boop.freq, 0.1, 0.08, boop.type), 150);
+
+  setTimeout(() => {
+    const tbApp = document.querySelector(`.tb-app[data-app="${appId}"]`);
+    if (tbApp) {
+      tbApp.classList.add('bouncing');
+      playBoop(200, 0.06, 0.04, 'sine');
+      tbApp.addEventListener('animationend', () => tbApp.classList.remove('bouncing'), { once: true });
+    }
+  }, 350);
+}
+
+function renderWindow(win, app) {
+  const el = document.createElement('div');
+  el.className = 'window';
+  el.id = `win-${win.id}`;
+  el.style.left = win.x + 'px';
+  el.style.top = win.y + 'px';
+  el.style.width = win.w + 'px';
+  el.style.height = win.h + 'px';
+  el.style.zIndex = win.z;
+  el.onmousedown = () => focusWindow(win.id);
+  el.innerHTML = `
+    <div class="win-header" onmousedown="startDrag(event, ${win.id})">
+      <div class="win-dots">
+        <button class="win-dot close" onclick="closeWindow(${win.id})" title="close"></button>
+        <button class="win-dot minimize" onclick="minimizeWindow(${win.id})" title="minimize"></button>
+        <button class="win-dot maximize" onclick="maximizeWindow(${win.id})" title="maximize"></button>
+      </div>
+      <div class="win-title">${app.label()}</div>
+    </div>
+    <div class="win-body" id="win-body-${win.id}"></div>
+    <div class="win-resize" onmousedown="startResize(event, ${win.id})"></div>
+  `;
+  document.getElementById('windowContainer').appendChild(el);
+  renderAppContent(win.id, app.id);
+}
+
+function renderAppContent(winId, appId) {
+  const body = document.getElementById(`win-body-${winId}`);
+  if (!body) return;
+
+  switch (appId) {
+    case 'welcome':
+      body.innerHTML = `<div class="notepad-content"><h2>${t('welcome_title')}</h2>${t('welcome_body')}</div>`;
+      break;
+
+    case 'projects':
+      body.innerHTML = `<div class="projects-grid">
+        <div class="project-card">
+          <h3>This Portfolio</h3>
+          <p>A custom OS-style portfolio built from scratch. The site itself is the proof of competence — the code is the portfolio.</p>
+          <div class="tags"><span class="tag">React</span><span class="tag">Vite</span><span class="tag">Tailwind</span><span class="tag">TypeScript</span></div>
+        </div>
+        <div class="project-card">
+          <h3>Bilingual CMS</h3>
+          <p>Content management system with first-class EN/JP support. Vertical text, proper typography, and cultural sensitivity built in.</p>
+          <div class="tags"><span class="tag">Next.js</span><span class="tag">i18n</span><span class="tag">MDX</span></div>
+        </div>
+        <div class="project-card">
+          <h3>Event Platform</h3>
+          <p>Contributed to Eventbrite's core event discovery and ticketing. Search, recommendations, and checkout flows used by millions.</p>
+          <div class="tags"><span class="tag">React</span><span class="tag">Python</span><span class="tag">GraphQL</span></div>
+        </div>
+        <div class="project-card">
+          <h3>Lab Dashboard</h3>
+          <p>Real-time microbiology lab monitoring dashboard from my pre-tech days. Tracked cultures, experiments, and contamination alerts.</p>
+          <div class="tags"><span class="tag">D3.js</span><span class="tag">Flask</span><span class="tag">WebSockets</span></div>
+        </div>
+        <div class="project-card">
+          <h3>Grilled Cheese API</h3>
+          <p>A RESTful API for ranking grilled cheese sandwiches. Because someone had to bring rigor to this field.</p>
+          <div class="tags"><span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">PostgreSQL</span></div>
+        </div>
+        <div class="project-card">
+          <h3>AI Experiments</h3>
+          <p>Currently exploring AI-assisted development tools and agents. Building in public as I learn.</p>
+          <div class="tags"><span class="tag">Claude API</span><span class="tag">Python</span><span class="tag">LLMs</span></div>
+        </div>
+      </div>`;
+      break;
+
+    case 'terminal':
+      body.style.padding = '0';
+      body.innerHTML = `<div class="terminal" id="term-${winId}">
+        <div id="term-output-${winId}"><span class="output">Terrarium OS Field Log v1.0 — type "help" for commands\n\n</span></div>
+        <div class="term-input-line">
+          <span class="prompt">[field-log] rika ~ &#10095; </span>
+          <input class="term-input" id="term-input-${winId}" autofocus onkeydown="if(event.key==='Enter')execTermCmd(${winId}); else playTypeBoop();">
+        </div>
+      </div>`;
+      setTimeout(() => { const inp = document.getElementById(`term-input-${winId}`); if (inp) inp.focus(); }, 100);
+      break;
+
+    case 'gallery':
+      body.innerHTML = `<h3 style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:16px;">The Gallery</h3>
+      <div class="gallery-scroll">
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#ff9a56,#ff6b3d);">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="20" r="12" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/><path d="M16 36 Q24 28 32 36" fill="rgba(255,100,60,0.3)"/><circle cx="30" cy="12" r="4" fill="rgba(255,200,100,0.4)"/></svg>
+        </div><h4>Sunset Over Shibuya</h4><p>Paint-by-numbers, acrylic on canvas. Made for a friend who studied abroad in Tokyo.</p></div>
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#8b5e3c,#c4956a);">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="14" y="16" width="20" height="20" rx="3" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><circle cx="24" cy="22" r="3" fill="rgba(255,200,100,0.3)"/><rect x="20" y="26" width="8" height="6" rx="1" fill="rgba(255,255,255,0.1)"/></svg>
+        </div><h4>Hobbit Hole Book Nook</h4><p>My first book nook! Balsa wood, LED lights, and way too much hot glue.</p></div>
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#1a73e8,#4ecdc4);">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><path d="M8 30 Q16 18 24 28 Q32 16 40 28 L40 36 L8 36Z" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/></svg>
+        </div><h4>The Great Wave (Remix)</h4><p>Paint-by-numbers reinterpretation of Hokusai's classic. Took 3 weekends.</p></div>
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="12" y="10" width="24" height="28" rx="2" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><circle cx="24" cy="20" r="4" fill="rgba(255,200,100,0.3)"/><rect x="18" y="28" width="12" height="4" rx="1" fill="rgba(255,255,255,0.1)"/></svg>
+        </div><h4>Diagon Alley Nook</h4><p>Harry Potter-themed book nook with tiny shop windows that actually light up.</p></div>
+        <div class="gallery-item"><div class="gallery-thumb" style="background:linear-gradient(135deg,#ff8fa3,#ffb7c5);">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="18" cy="20" r="4" fill="rgba(255,255,255,0.2)"/><circle cx="28" cy="16" r="3" fill="rgba(255,255,255,0.15)"/><circle cx="24" cy="24" r="5" fill="rgba(255,255,255,0.2)"/><line x1="24" y1="28" x2="24" y2="38" stroke="rgba(100,200,100,0.4)" stroke-width="1.5"/></svg>
+        </div><h4>Cherry Blossom Garden</h4><p>After my last Kyoto trip. The pinks are slightly wrong and I love it.</p></div>
+      </div>`;
+      break;
+
+    case 'currently':
+      body.innerHTML = `
+        <h3 style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:16px;">What I'm Into Right Now</h3>
+        <div class="currently-grid">
+          <div class="currently-card">
+            <h4>Watching</h4>
+            <div class="item"><span class="item-dot" style="background:var(--pink);"></span> Bridgerton (rewatching... again)</div>
+            <div class="item"><span class="item-dot" style="background:var(--red);"></span> The Traitors</div>
+            <div class="item"><span class="item-dot" style="background:var(--amber);"></span> Terrace House</div>
+          </div>
+          <div class="currently-card">
+            <h4>Reading</h4>
+            <div class="item"><span class="item-dot" style="background:var(--accent);"></span> Heated Rivalry</div>
+            <div class="item"><span class="item-dot" style="background:var(--teal);"></span> One Piece (always)</div>
+          </div>
+          <div class="currently-card">
+            <h4>Playing</h4>
+            <div class="item"><span class="item-dot" style="background:var(--green);"></span> Monopoly Deal</div>
+            <div class="item"><span class="item-dot" style="background:var(--blue);"></span> Learning to sing</div>
+          </div>
+          <div class="currently-card">
+            <h4>Learning</h4>
+            <div class="item"><span class="item-dot" style="background:var(--amber);"></span> AI & LLMs</div>
+            <div class="item"><span class="item-dot" style="background:var(--pink);"></span> Building agents</div>
+            <div class="item"><span class="item-dot" style="background:var(--teal);"></span> Singing (badly)</div>
+          </div>
+          <div class="currently-card">
+            <h4>Listening</h4>
+            <div class="item"><span class="item-dot" style="background:var(--pink);"></span> Yoasobi — Idol</div>
+            <div class="item"><span class="item-dot" style="background:var(--accent);"></span> Dodo</div>
+            <div class="item"><span class="item-dot" style="background:var(--teal);"></span> City Pop playlists</div>
+          </div>
+          <div class="currently-card">
+            <h4>Hills I'll Die On</h4>
+            <div class="item"><span class="item-dot" style="background:var(--red);"></span> MJ is the king of pop</div>
+            <div class="item"><span class="item-dot" style="background:var(--amber);"></span> The Rock's Jumanji is good</div>
+            <div class="item"><span class="item-dot" style="background:var(--green);"></span> Health > everything</div>
+          </div>
+        </div>`;
+      break;
+
+    case 'japan':
+      body.innerHTML = `
+        <h3 style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:4px;">日本 — Japan</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Heritage, not decoration. I go almost every year.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <h4 style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;font-family:var(--mono);">Onsen Rankings</h4>
+            <div style="font-size:13px;line-height:2;">1. Kurokawa, Kumamoto<br>2. Hakone open-air<br>3. Kinosaki, Hyogo</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <h4 style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;font-family:var(--mono);">Konbini Tier List</h4>
+            <div style="font-size:13px;line-height:2;">S tier: 7-Eleven<br>A tier: FamilyMart<br>B tier: Lawson</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <h4 style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;font-family:var(--mono);">Drama Corner</h4>
+            <div style="font-size:13px;line-height:1.8;">Hana Yori Dango — GOAT<br>Terrace House — deeply formative<br>Currently: nothing tops these</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <h4 style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;font-family:var(--mono);">Now Playing</h4>
+            <div style="font-size:13px;line-height:1.8;">Yoasobi — Idol (on repeat)<br>Dodo<br>City Pop playlists at 2am</div>
+          </div>
+        </div>`;
+      break;
+
+    case 'gc':
+      body.innerHTML = `
+        <h3 style="font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:20px;">The Grilled Cheese Olympics</h3>
+        <div class="gc-podium">
+          <div class="gc-podium-item silver"><div class="gc-medal"><svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="rgba(122,138,122,0.3)" stroke="rgba(122,138,122,0.5)" stroke-width="1.5"/><text x="16" y="20" text-anchor="middle" font-size="12" fill="rgba(200,210,200,0.8)">2</text></svg></div><div class="gc-name">Truffle Melt</div><div class="gc-score">38/40</div></div>
+          <div class="gc-podium-item gold"><div class="gc-medal"><svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="rgba(196,164,58,0.3)" stroke="rgba(196,164,58,0.5)" stroke-width="1.5"/><text x="16" y="20" text-anchor="middle" font-size="12" fill="rgba(240,220,130,0.8)">1</text></svg></div><div class="gc-name">The Classic</div><div class="gc-score">39/40</div></div>
+          <div class="gc-podium-item bronze"><div class="gc-medal"><svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="rgba(138,106,58,0.3)" stroke="rgba(138,106,58,0.5)" stroke-width="1.5"/><text x="16" y="20" text-anchor="middle" font-size="12" fill="rgba(200,170,100,0.8)">3</text></svg></div><div class="gc-name">Brie & Fig</div><div class="gc-score">36/40</div></div>
+        </div>
+        <h4 style="font-size:14px;font-weight:600;margin-bottom:12px;">Tournament Bracket</h4>
+        <div class="gc-bracket">
+          <div class="gc-round">
+            <div class="gc-match"><div class="gc-matchup winner">The Classic</div><div class="gc-matchup">Caprese</div></div>
+            <div class="gc-match"><div class="gc-matchup winner">Truffle Melt</div><div class="gc-matchup">French Onion</div></div>
+            <div class="gc-match"><div class="gc-matchup winner">Brie & Fig</div><div class="gc-matchup">Jalapeno Popper</div></div>
+            <div class="gc-match"><div class="gc-matchup">Starbucks One</div><div class="gc-matchup winner">Kimchi GC</div></div>
+          </div>
+          <div class="gc-round">
+            <div class="gc-match"><div class="gc-matchup winner">The Classic</div><div class="gc-matchup">Truffle Melt</div></div>
+            <div class="gc-match"><div class="gc-matchup winner">Brie & Fig</div><div class="gc-matchup">Kimchi GC</div></div>
+          </div>
+          <div class="gc-round">
+            <div class="gc-match"><div class="gc-matchup winner">The Classic</div><div class="gc-matchup">Brie & Fig</div></div>
+          </div>
+        </div>`;
+      break;
+
+    case 'trash':
+      body.style.padding = '0';
+      body.innerHTML = `<div class="finder" id="finder-${winId}">
+        <div class="finder-toolbar">
+          <span class="finder-path">/terrarium/compost/definitely-not-important/</span>
+          <span style="font-family:var(--mono);font-size:10px;">12 items</span>
+        </div>
+        <div class="finder-list" id="finder-list-${winId}"></div>
+      </div>`;
+      renderFinderList(winId);
+      break;
+  }
+}
+
+// =================== FINDER (COMPOST) ===================
+const finderFiles = [
+  { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" fill="rgba(78,201,122,0.2)" stroke="rgba(78,201,122,0.4)" stroke-width="0.5"/><line x1="5" y1="5" x2="11" y2="5" stroke="rgba(78,201,122,0.3)" stroke-width="0.5"/><line x1="5" y1="7" x2="9" y2="7" stroke="rgba(78,201,122,0.3)" stroke-width="0.5"/></svg>', name: 'resume_final_FINAL_v3.docx', size: '847 KB', meta: 'Modified: way too many times', clickable: true,
+    content: { title: 'resume_final_FINAL_v3.docx', body: '<p>Wait, you actually opened this?</p><p>The real resume is the portfolio you\'re currently standing inside of. But nice try.</p><p style="margin-top:16px;font-style:italic;color:var(--text-muted);">— Rika, who has been through 47 versions of this document</p>' }},
+  { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" fill="rgba(196,164,58,0.2)" stroke="rgba(196,164,58,0.4)" stroke-width="0.5"/><line x1="5" y1="5" x2="11" y2="5" stroke="rgba(196,164,58,0.3)" stroke-width="0.5"/><line x1="5" y1="7" x2="8" y2="7" stroke="rgba(196,164,58,0.3)" stroke-width="0.5"/><line x1="5" y1="9" x2="10" y2="9" stroke="rgba(196,164,58,0.3)" stroke-width="0.5"/></svg>', name: 'grilled-cheese-spreadsheet-v47.xlsx', size: '2.1 MB', meta: 'The sacred texts', clickable: true,
+    content: { title: 'The Sacred Spreadsheet', body: '<p>This spreadsheet has 47 versions because grilled cheese ranking is an iterative science.</p><p>Columns include: Cheese Pull (x/10), Crunch Factor (x/10), Flavor (x/10), and Vibes (x/10).</p><p>The "Vibes" column was controversial. I stand by it.</p>' }},
+  { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="3" width="10" height="10" rx="1" fill="rgba(138,106,58,0.2)" stroke="rgba(138,106,58,0.3)" stroke-width="0.5"/><rect x="5" y="1" width="6" height="3" rx="0.5" fill="rgba(138,106,58,0.15)"/></svg>', name: 'photos-from-kyoto-2024/', size: '—', meta: 'Folder', disabled: true },
+  { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="rgba(58,170,138,0.2)" stroke="rgba(58,170,138,0.4)" stroke-width="0.5"/><path d="M6 8 L8 6 L10 8" fill="none" stroke="rgba(58,170,138,0.4)" stroke-width="0.5"/></svg>', name: 'yoasobi-idol-loop-3hr.mp3', size: '312 MB', meta: 'No regrets', clickable: true,
+    content: { title: 'yoasobi-idol-loop-3hr.mp3', body: '<p>Three hours of Idol by Yoasobi on loop.</p><p>This is what peak productivity sounds like.</p><p style="font-family:var(--mono);font-size:12px;margin-top:12px;color:var(--teal);">~ ~ ~ who-mo-ga me-wo u-ba-wa-re-te-i-ku... ~ ~ ~</p>' }},
+  { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" fill="rgba(212,138,138,0.2)" stroke="rgba(212,138,138,0.3)" stroke-width="0.5"/><text x="8" y="10" text-anchor="middle" font-size="6" fill="rgba(212,138,138,0.5)">?</text></svg>', name: 'one-piece-theories-too-unhinged.txt', size: '94 KB', meta: 'Classified', disabled: true },
+  { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="3" width="10" height="10" rx="1" fill="rgba(138,106,58,0.2)" stroke="rgba(138,106,58,0.3)" stroke-width="0.5"/><rect x="5" y="1" width="6" height="3" rx="0.5" fill="rgba(138,106,58,0.15)"/></svg>', name: 'book-nook-progress-shots/', size: '—', meta: 'Folder', disabled: true },
+  { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" fill="rgba(78,201,122,0.2)" stroke="rgba(78,201,122,0.4)" stroke-width="0.5"/><line x1="5" y1="5" x2="11" y2="5" stroke="rgba(78,201,122,0.3)" stroke-width="0.5"/><line x1="5" y1="7" x2="9" y2="7" stroke="rgba(78,201,122,0.3)" stroke-width="0.5"/></svg>', name: 'cover-letter-that-goes-too-hard.pdf', size: '156 KB', meta: 'They said "be authentic"', clickable: true,
+    content: { title: 'Cover Letter That Goes Too Hard', body: '<p>"Dear Hiring Manager,</p><p>I once spent 3 months building a grilled cheese ranking API. Not because anyone asked me to, but because I believe every passion deserves well-structured data.</p><p>I bring this same energy to everything I build. If you want someone who ships fast, cares deeply, and will definitely make your team laugh in standup — hi, I\'m Rika."</p>' }},
+  { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="3" width="10" height="10" rx="1" fill="rgba(138,106,58,0.2)" stroke="rgba(138,106,58,0.3)" stroke-width="0.5"/><rect x="5" y="1" width="6" height="3" rx="0.5" fill="rgba(138,106,58,0.15)"/></svg>', name: 'screenshots-of-bugs-i-fixed/', size: '—', meta: 'The trophy case', disabled: true },
+  { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" fill="rgba(78,201,122,0.2)" stroke="rgba(78,201,122,0.4)" stroke-width="0.5"/><line x1="5" y1="5" x2="11" y2="5" stroke="rgba(78,201,122,0.3)" stroke-width="0.5"/></svg>', name: 'things-i-will-learn-next.md', size: '12 KB', meta: 'Always growing', clickable: true,
+    content: { title: 'Things I Want to Learn Next', body: '<p>- Rust (because everyone says I should)<br>- WebGL / Three.js (for cooler portfolios)<br>- How to sing (seriously, I\'m taking lessons)<br>- Better Japanese kanji<br>- How to make the perfect croissant<br>- Prompt engineering (meta, I know)</p>' }},
+  { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="4" y="3" width="8" height="10" rx="1" fill="rgba(212,138,138,0.15)" stroke="rgba(212,138,138,0.3)" stroke-width="0.5"/><circle cx="8" cy="7" r="2" fill="rgba(212,138,138,0.2)"/></svg>', name: 'monopoly-deal-win-streak.log', size: '4 KB', meta: 'Undefeated (almost)', disabled: true },
+  { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" fill="rgba(212,138,138,0.2)" stroke="rgba(212,138,138,0.4)" stroke-width="0.5"/><line x1="5" y1="5" x2="11" y2="5" stroke="rgba(212,138,138,0.3)" stroke-width="0.5"/><line x1="5" y1="7" x2="9" y2="7" stroke="rgba(212,138,138,0.3)" stroke-width="0.5"/></svg>', name: 'bridgerton-hot-takes.txt', size: '28 KB', meta: 'Spoilers inside', clickable: true,
+    content: { title: 'Bridgerton Hot Takes', body: '<p>- Season 2 > Season 1 and I will not be taking questions<br>- The enemies-to-lovers tension was *chef\'s kiss*<br>- Anthony Bridgerton character development arc is elite<br>- Penelope\'s glow-up was everything<br>- I have rewatched the rain scene 14 times</p>' }},
+  { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="3" width="10" height="10" rx="1" fill="rgba(196,90,90,0.15)" stroke="rgba(196,90,90,0.3)" stroke-width="0.5"/><text x="8" y="10" text-anchor="middle" font-size="5" fill="rgba(196,90,90,0.4)">!</text></svg>', name: 'env-files-definitely-not-secrets/', size: '—', meta: 'Nice try, hacker', disabled: true },
+];
+
+let finderPreviewOpen = {};
+
+function renderFinderList(winId) {
+  const list = document.getElementById(`finder-list-${winId}`);
+  if (!list) return;
+  list.innerHTML = finderFiles.map((f, i) => `
+    <div class="finder-item ${f.disabled ? 'disabled' : ''}" ${f.clickable ? `onclick="openFinderFile(${winId}, ${i})"` : ''}>
+      <span class="fi-icon">${f.icon}</span>
+      <span class="fi-name">${f.name}</span>
+      <span class="fi-meta">${f.meta}</span>
+      <span class="fi-size">${f.size}</span>
+    </div>
+  `).join('');
+}
+
+function openFinderFile(winId, fileIdx) {
+  const file = finderFiles[fileIdx];
+  if (!file?.content) return;
+  const list = document.getElementById(`finder-list-${winId}`);
+  list.innerHTML = `
+    <div class="finder-preview">
+      <div class="finder-preview-back" onclick="renderFinderList(${winId})">&#8592; Back</div>
+      <h3>${file.content.title}</h3>
+      ${file.content.body}
+    </div>
+  `;
+}
+
+// =================== WINDOW MANAGEMENT ===================
+function focusWindow(id) {
+  focusedWinId = id;
+  const win = windows.find(w => w.id === id);
+  if (win) win.z = nextZ++;
+  document.querySelectorAll('.window').forEach(el => {
+    el.classList.remove('focused');
+    const wid = parseInt(el.id.replace('win-', ''));
+    const w = windows.find(x => x.id === wid);
+    if (w) el.style.zIndex = w.z;
+  });
+  const el = document.getElementById(`win-${id}`);
+  if (el) el.classList.add('focused');
+  updateTaskbar();
+}
+
+function closeWindow(id) {
+  playWindowClose();
+  const el = document.getElementById(`win-${id}`);
+  if (el) { el.style.transition = 'transform 0.3s, opacity 0.3s, border-radius 0.3s'; el.style.transform = 'scale(0.3)'; el.style.opacity = '0'; el.style.borderRadius = '50%'; setTimeout(() => el.remove(), 300); }
+  windows = windows.filter(w => w.id !== id);
+  if (focusedWinId === id) focusedWinId = null;
+  updateTaskbar();
+}
+
+function minimizeWindow(id) {
+  playBoop(200, 0.08, 0.05);
+  const win = windows.find(w => w.id === id);
+  if (win) win.minimized = true;
+  const el = document.getElementById(`win-${id}`);
+  if (el) el.classList.add('minimized');
+  if (focusedWinId === id) focusedWinId = null;
+  updateTaskbar();
+}
+
+function maximizeWindow(id) {
+  const el = document.getElementById(`win-${id}`);
+  if (!el) return;
+  const win = windows.find(w => w.id === id);
+  if (!win) return;
+  if (win._maximized) {
+    el.style.left = win._prevX + 'px'; el.style.top = win._prevY + 'px';
+    el.style.width = win._prevW + 'px'; el.style.height = win._prevH + 'px';
+    win._maximized = false;
+  } else {
+    win._prevX = win.x; win._prevY = win.y; win._prevW = win.w; win._prevH = win.h;
+    el.style.left = '0'; el.style.top = '0'; el.style.width = '100vw';
+    el.style.height = `calc(100vh - var(--taskbar-h))`;
+    win._maximized = true;
+  }
+  focusWindow(id);
+}
+
+// =================== DRAG & RESIZE ===================
+let dragState = null;
+function startDrag(e, winId) {
+  if (e.target.classList.contains('win-dot')) return;
+  e.preventDefault();
+  const el = document.getElementById(`win-${winId}`);
+  const rect = el.getBoundingClientRect();
+  dragState = { type: 'drag', winId, startX: e.clientX, startY: e.clientY, origX: rect.left, origY: rect.top };
+  focusWindow(winId);
+}
+function startResize(e, winId) {
+  e.preventDefault(); e.stopPropagation();
+  const el = document.getElementById(`win-${winId}`);
+  const rect = el.getBoundingClientRect();
+  dragState = { type: 'resize', winId, startX: e.clientX, startY: e.clientY, origW: rect.width, origH: rect.height };
+  focusWindow(winId);
+}
+
+// =================== WINDOW SNAP ===================
+let snapIndicator = null;
+let currentSnapSide = null;
+const SNAP_THRESHOLD = 20;
+
+function updateSnapIndicator(mx, my) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  let side = null;
+  if (mx < SNAP_THRESHOLD) side = 'left';
+  else if (mx > vw - SNAP_THRESHOLD) side = 'right';
+  if (side) {
+    if (!snapIndicator) { snapIndicator = document.createElement('div'); snapIndicator.className = 'snap-indicator'; document.body.appendChild(snapIndicator); }
+    if (side === 'left') snapIndicator.style.cssText = `left:4px;top:4px;width:${vw/2-8}px;height:${vh-100}px;`;
+    else snapIndicator.style.cssText = `left:${vw/2+4}px;top:4px;width:${vw/2-8}px;height:${vh-100}px;`;
+  } else { removeSnapIndicator(); }
+  return side;
+}
+function removeSnapIndicator() { if (snapIndicator) { snapIndicator.remove(); snapIndicator = null; } }
+function snapWindow(winId, side) {
+  const el = document.getElementById(`win-${winId}`); const win = windows.find(w => w.id === winId);
+  if (!el || !win) return;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  if (side === 'left') { el.style.left='4px'; el.style.top='4px'; el.style.width=(vw/2-8)+'px'; el.style.height=(vh-100)+'px'; }
+  else { el.style.left=(vw/2+4)+'px'; el.style.top='4px'; el.style.width=(vw/2-8)+'px'; el.style.height=(vh-100)+'px'; }
+  win.x=parseInt(el.style.left); win.y=parseInt(el.style.top); win.w=parseInt(el.style.width); win.h=parseInt(el.style.height);
+  playBoop(150, 0.05, 0.06, 'sine'); setTimeout(() => playBoop(180, 0.03, 0.04, 'sine'), 30);
+  removeSnapIndicator();
+}
+
+document.addEventListener('mousemove', e => {
+  if (!dragState) return;
+  const el = document.getElementById(`win-${dragState.winId}`);
+  if (!el) return;
+  const win = windows.find(w => w.id === dragState.winId);
+  if (dragState.type === 'drag') {
+    const nx = dragState.origX + (e.clientX - dragState.startX);
+    const ny = dragState.origY + (e.clientY - dragState.startY);
+    el.style.left = nx + 'px'; el.style.top = ny + 'px';
+    if (win) { win.x = nx; win.y = ny; win._maximized = false; }
+    currentSnapSide = updateSnapIndicator(e.clientX, e.clientY);
+  } else if (dragState.type === 'resize') {
+    const nw = Math.max(320, dragState.origW + (e.clientX - dragState.startX));
+    const nh = Math.max(200, dragState.origH + (e.clientY - dragState.startY));
+    el.style.width = nw + 'px'; el.style.height = nh + 'px';
+    if (win) { win.w = nw; win.h = nh; }
+  }
+});
+document.addEventListener('mouseup', () => {
+  if (dragState && currentSnapSide) { snapWindow(dragState.winId, currentSnapSide); currentSnapSide = null; }
+  removeSnapIndicator();
+  dragState = null;
+});
+
+// =================== TASKBAR ===================
+function updateTaskbar() {
+  const container = document.getElementById('tbApps');
+  container.innerHTML = '';
+  windows.forEach(win => {
+    const app = apps.find(a => a.id === win.appId);
+    if (!app) return;
+    const btn = document.createElement('button');
+    btn.className = 'tb-app' + (win.id === focusedWinId && !win.minimized ? ' active' : '');
+    btn.dataset.app = win.appId;
+    btn.innerHTML = `<span class="tb-app-dot"></span>${app.label()}`;
+    btn.onclick = () => {
+      if (win.minimized) { win.minimized = false; const el = document.getElementById(`win-${win.id}`); if (el) { el.classList.remove('minimized'); el.style.display = ''; } }
+      focusWindow(win.id);
+    };
+    container.appendChild(btn);
+  });
+}
+
+// =================== CLOCK ===================
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+}
+setInterval(updateClock, 1000); updateClock();
+
+// =================== TERMINAL ===================
+let termHistory = [];
+
+function execTermCmd(winId) {
+  const input = document.getElementById(`term-input-${winId}`);
+  const output = document.getElementById(`term-output-${winId}`);
+  if (!input || !output) return;
+  const cmd = input.value.trim(); input.value = '';
+  termHistory.push(cmd);
+  playTypeBoop();
+  output.innerHTML += `<span class="prompt">[field-log] rika ~ &#10095; </span><span class="cmd-text">${escHtml(cmd)}</span>\n`;
+  const result = processCmd(cmd);
+  if (result) output.innerHTML += `<span class="output">${result}</span>\n`;
+  output.innerHTML += '\n';
+  const term = document.getElementById(`term-${winId}`);
+  if (term) term.scrollTop = term.scrollHeight;
+}
+
+function processCmd(cmd) {
+  const parts = cmd.split(/\s+/);
+  const c = parts[0]?.toLowerCase();
+  switch (c) {
+    case '': return '';
+    case 'help': return `Field Log Commands:
+  <span class="highlight">help</span>        — field guide
+  <span class="highlight">whoami</span>      — specimen identification
+  <span class="highlight">ls</span>          — catalog organisms
+  <span class="highlight">cat</span> [file]  — examine specimen (try: about.md, skills.md, currently.md)
+  <span class="highlight">open</span> [app]  — open terrarium dome
+  <span class="highlight">clear</span>       — wipe the glass
+  <span class="highlight">neofetch</span>    — ecosystem status
+  <span class="highlight">fortune</span>     — wisdom from the garden
+  <span class="highlight">cowsay</span> [msg] — the garden speaks
+  <span class="highlight">grow</span>        — accelerate photosynthesis
+  <span class="highlight">history</span>     — field log entries
+  <span class="highlight">sudo</span>        — root access (pun intended)`;
+    case 'whoami': return `Specimen: Rika Ciminieri\nClassification: Full-stack engineer (Eventbrite)\nOrigin: Half-Japanese hybrid cultivar\nPrevious habitat: Microbiology lab\nNotable traits: Pilates flexibility, book nook construction, One Piece theory propagation\nFluent in: TypeScript, Python, Japanese, garden metaphors`;
+    case 'ls': return apps.map(a => `  ${a.label()}`).join('\n');
+    case 'cat':
+      const file = parts[1];
+      if (!file) return '<span class="error">usage: cat [filename]</span>';
+      if (file === 'about.md') return `# Rika Ciminieri\n\nHalf-Japanese full-stack engineer at Eventbrite.\nFormer microbiology student turned tech advocate.\n\nI build things that make people smile.\n\nCurrently into: Bridgerton, The Traitors, Heated Rivalry,\nlearning AI, Monopoly Deal, singing (badly), traveling.\n\nHills I'll die on:\n- Michael Jackson is the king of pop\n- The Rock's Jumanji is actually a good movie\n- Health and time with people you love matters most`;
+      if (file === 'skills.md') return `# Tech Stack\n\nFrontend:  React, TypeScript, Tailwind, Next.js, Vite\nBackend:   Python, Node.js, Express, FastAPI, GraphQL\nData:      PostgreSQL, Redis, MongoDB\nInfra:     AWS, Docker, CI/CD, Vercel\n\nAlso: i18n, a11y, spring animations, WebGL basics`;
+      if (file === 'currently.md') return `# Currently Into\n\nWatching: Bridgerton (again), The Traitors\nReading:  Heated Rivalry, One Piece\nPlaying:  Monopoly Deal (undefeated streak)\nLearning: AI/LLMs, how to sing\nListening: Yoasobi, Dodo, City Pop`;
+      return `<span class="error">cat: ${escHtml(file)}: No such specimen</span>\nTry: about.md, skills.md, currently.md`;
+    case 'open':
+      const appName = parts[1]?.replace('.app','');
+      if (appName && apps.find(a => a.id === appName)) { setTimeout(() => openApp(appName), 100); return `Opening dome: ${appName}...`; }
+      return `<span class="error">open: unknown organism</span>\nAvailable domes: ${apps.map(a => a.id).join(', ')}`;
+    case 'clear': setTimeout(() => { const w = windows.find(w => w.appId === 'terminal'); if (w) { const o = document.getElementById(`term-output-${w.id}`); if (o) o.innerHTML = ''; } }, 10); return '';
+    case 'neofetch': return `\n  <span class="highlight">     .--. </span>    rika@terrarium\n  <span class="highlight">    /    \\ </span>   ──────────────\n  <span class="highlight">   | (  ) | </span>  OS: Terrarium OS v1.0\n  <span class="highlight">   |  /\\  | </span>  Shell: field-log\n  <span class="highlight">    \\____/ </span>   Languages: EN, JP\n  <span class="highlight">     |  | </span>    Theme: deep-forest\n  <span class="highlight">    /|  |\\ </span>   Uptime: since 2024\n                Soil pH: 6.2\n                Humidity: optimal\n                Mood: photosynthesizing`;
+    case 'fortune':
+      const f = ['"A well-tended garden, like a well-tended codebase, grows in the direction of care." — Rika','"Sometimes the best debugging technique is to step outside and look at a real plant."','"Have you tried turning it off and watering it?"','"Growth requires patience, sunlight, and occasionally talking to your plants." — every engineer','"The best code, like moss, covers everything gracefully." — ancient proverb (that I just made up)'];
+      return f[Math.floor(Math.random()*f.length)];
+    case 'cowsay':
+      const msg = parts.slice(1).join(' ') || 'moo';
+      return ` ┌${'─'.repeat(msg.length+2)}┐\n │ ${escHtml(msg)} │\n └${'─'.repeat(msg.length+2)}┘\n        \\   ^__^\n         \\  (oo)\\_______\n            (__)\\       )\\/\\\n                ||----w |\n                ||     ||`;
+    case 'grow':
+      triggerGrowthBurst();
+      return '<span class="highlight">PHOTOSYNTHESIS ACCELERATED</span>\nAll organisms are growing at 200% capacity...\nFlowers blooming... butterflies multiplying...\n(reverting to normal growth in 10s)';
+    case 'sudo':
+      if (cmd.toLowerCase().includes('make me a sandwich') || cmd.toLowerCase().includes('make me a grilled cheese')) {
+        return `\n  <span class="highlight">    ┌─────────────────┐</span>\n  <span class="highlight">    │  ═══════════════  │</span>  <span class="output">&#8592; golden brioche</span>\n  <span class="highlight">    │ ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈ │</span>  <span class="output">&#8592; melted gruyere</span>\n  <span class="highlight">    │ ~~~~~~~~~~~~~~~~ │</span>  <span class="output">&#8592; caramelized onion</span>\n  <span class="highlight">    │ ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈ │</span>  <span class="output">&#8592; more cheese (always)</span>\n  <span class="highlight">    │  ═══════════════  │</span>  <span class="output">&#8592; toasted sourdough</span>\n  <span class="highlight">    └─────────────────┘</span>\n\n  <span class="output">Order up! Rika-approved.</span>`;
+      }
+      return '<span class="error">Nice try. No root access in this terrarium.</span>\n<span class="output">(pun fully intended)</span>';
+    case 'rm': return '<span class="error">Whoa. This is a living ecosystem, not a demolition site.</span>';
+    case 'exit': return 'Where would you even go? You\'re already home in the garden.';
+    case 'history':
+      return `  1  npm run germinate\n  2  git commit -m "add grilled cheese rankings"\n  3  curl -s "https://api.grilledcheese.rika.dev/v2/rankings"\n  4  python3 -c "import photosynthesis"\n  5  cat ~/.bridgerton-rewatch-count  # output: 14\n  6  ssh rika@japan-trip-planner.local\n  7  sudo make me a sandwich\n  8  git push origin main --force  # yolo\n  9  node -e "console.log('MJ is the king of pop')"\n 10  history`;
+    default: return `<span class="error">unknown organism: ${escHtml(c)}</span>\nType <span class="highlight">help</span> for field guide.`;
+  }
+}
+
+function escHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+// =================== COMMAND PALETTE ===================
+const cmdItems = [
+  { icon: '~', label: 'Open About', hint: 'welcome', action: () => openApp('welcome') },
+  { icon: '{}', label: 'Open Projects', hint: 'engineering', action: () => openApp('projects') },
+  { icon: '>_', label: 'Open Terminal', hint: 'field log', action: () => openApp('terminal') },
+  { icon: '**', label: 'Open Gallery', hint: 'art + nooks', action: () => openApp('gallery') },
+  { icon: '>>', label: 'Open Currently', hint: 'watching/reading', action: () => openApp('currently') },
+  { icon: 'GC', label: 'Open Grilled Cheese', hint: 'rankings', action: () => openApp('gc') },
+  { icon: 'JP', label: 'Open Japan', hint: 'heritage', action: () => openApp('japan') },
+  { icon: '[]', label: 'Open Compost', hint: 'files', action: () => openApp('trash') },
+  { icon: 'EN', label: 'Toggle Language', hint: 'EN / JP', action: () => toggleLang() },
+  { icon: 'xx', label: 'Close All Domes', hint: '', action: () => closeAllWindows() },
+];
+let cmdSelectedIdx = 0;
+function openCmdPalette() { document.getElementById('cmdOverlay').classList.add('open'); const inp = document.getElementById('cmdInput'); inp.value = ''; inp.focus(); cmdSelectedIdx = 0; filterCommands(); }
+function closeCmdPalette() { document.getElementById('cmdOverlay').classList.remove('open'); }
+function filterCommands() {
+  const q = document.getElementById('cmdInput').value.toLowerCase();
+  const filtered = cmdItems.filter(item => item.label.toLowerCase().includes(q) || item.hint.toLowerCase().includes(q));
+  const container = document.getElementById('cmdResults');
+  cmdSelectedIdx = Math.min(cmdSelectedIdx, filtered.length - 1);
+  container.innerHTML = filtered.map((item, i) => `
+    <div class="cmd-item ${i === cmdSelectedIdx ? 'selected' : ''}" onclick="cmdItems.find(c=>c.label==='${item.label}').action();closeCmdPalette();" onmouseenter="cmdSelectedIdx=${i};filterCommands();">
+      <span class="cmd-icon">${item.icon}</span>
+      <span class="cmd-label">${item.label}</span>
+      <span class="cmd-hint">${item.hint}</span>
+    </div>
+  `).join('');
+}
+function handleCmdKey(e) {
+  const items = document.getElementById('cmdResults').querySelectorAll('.cmd-item');
+  if (e.key === 'ArrowDown') { e.preventDefault(); cmdSelectedIdx = Math.min(cmdSelectedIdx + 1, items.length - 1); filterCommands(); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); cmdSelectedIdx = Math.max(cmdSelectedIdx - 1, 0); filterCommands(); }
+  if (e.key === 'Enter') { items[cmdSelectedIdx]?.click(); }
+  if (e.key === 'Escape') { closeCmdPalette(); }
+}
+
+// =================== CONTEXT MENU ===================
+document.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  const menu = document.getElementById('ctxMenu');
+  const items = [
+    { icon: '~', label: 'Open About', action: () => openApp('welcome') },
+    { icon: '{}', label: 'Open Projects', action: () => openApp('projects') },
+    { icon: '>_', label: 'Open Field Log', action: () => openApp('terminal') },
+    { sep: true },
+    { icon: 'EN', label: lang === 'en' ? 'Switch to Japanese' : 'Switch to English', action: () => toggleLang() },
+    { icon: 'Cmd', label: 'Command Palette', action: () => openCmdPalette() },
+  ];
+  menu.innerHTML = items.map(item => item.sep ? '<div class="ctx-sep"></div>' : `<div class="ctx-item"><span class="ctx-icon" style="font-family:var(--mono);font-size:11px;">${item.icon}</span>${item.label}</div>`).join('');
+  const ctxItems = menu.querySelectorAll('.ctx-item');
+  let idx = 0;
+  items.forEach(item => { if (item.sep) return; ctxItems[idx].onclick = () => { item.action(); menu.classList.remove('open'); }; idx++; });
+  menu.style.left = Math.min(e.clientX, window.innerWidth - 220) + 'px';
+  menu.style.top = Math.min(e.clientY, window.innerHeight - 300) + 'px';
+  menu.classList.add('open');
+});
+document.addEventListener('click', () => document.getElementById('ctxMenu').classList.remove('open'));
+
+// =================== LANGUAGE ===================
+function setLang(newLang) {
+  lang = newLang;
+  document.querySelectorAll('.lang-seg').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  renderDesktopIcons();
+  windows.forEach(win => {
+    const app = apps.find(a => a.id === win.appId);
+    if (app && win.appId !== 'terminal') {
+      const titleEl = document.querySelector(`#win-${win.id} .win-title`);
+      if (titleEl) titleEl.textContent = app.label();
+      renderAppContent(win.id, win.appId);
+    }
+  });
+  updateTaskbar();
+  updateWatermark();
+}
+function toggleLang() { setLang(lang === 'en' ? 'jp' : 'en'); }
+
+// =================== NIGHT MODE ===================
+function toggleNightMode() {
+  nightMode = !nightMode;
+  document.body.classList.toggle('night-mode', nightMode);
+  updateWatermark();
+
+  // Night mode fireflies
+  if (nightMode) {
+    const pContainer = document.getElementById('particles');
+    for (let i = 0; i < 8; i++) {
+      const f = document.createElement('div');
+      f.className = 'particle';
+      f.dataset.nightOnly = 'true';
+      const size = 3 + Math.random() * 3;
+      f.style.width = f.style.height = size + 'px';
+      f.style.left = Math.random() * 100 + '%';
+      f.style.top = (30 + Math.random() * 50) + '%';
+      f.style.backgroundColor = '#ffd54f';
+      f.style.boxShadow = '0 0 6px #ffd54f';
+      f.style.animationDuration = (10 + Math.random() * 12) + 's';
+      f.style.animationDelay = Math.random() * 5 + 's';
+      pContainer.appendChild(f);
+    }
+  } else {
+    document.querySelectorAll('[data-night-only]').forEach(el => el.remove());
+  }
+}
+
+// =================== KEYBOARD SHORTCUTS ===================
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); const o = document.getElementById('cmdOverlay'); o.classList.contains('open') ? closeCmdPalette() : openCmdPalette(); }
+  if (e.key === 'Escape') closeCmdPalette();
+  resetIdleTimer();
+});
+document.addEventListener('mousemove', resetIdleTimer);
+
+// =================== KONAMI CODE ===================
+const konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiIdx = 0;
+document.addEventListener('keydown', e => {
+  if (e.key === konamiCode[konamiIdx]) { konamiIdx++; if (konamiIdx === konamiCode.length) { konamiIdx = 0; cheeseRain(); } } else { konamiIdx = 0; }
+});
+function cheeseRain() {
+  const c = document.getElementById('cheeseRain');
+  for (let i = 0; i < 40; i++) {
+    const d = document.createElement('div');
+    d.className = 'cheese-drop';
+    // Use SVG cheese wedge instead of emoji
+    d.innerHTML = '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M6 24 L16 4 L26 24 Z" fill="rgba(196,164,58,0.8)" stroke="rgba(196,164,58,1)" stroke-width="0.5"/><circle cx="14" cy="18" r="1.5" fill="rgba(196,164,58,0.5)"/><circle cx="19" cy="20" r="1" fill="rgba(196,164,58,0.5)"/><circle cx="16" cy="14" r="1.2" fill="rgba(196,164,58,0.5)"/></svg>';
+    d.style.left = Math.random()*100+'vw';
+    d.style.animationDuration = (2+Math.random()*3)+'s';
+    d.style.animationDelay = Math.random()*2+'s';
+    c.appendChild(d);
+  }
+  setTimeout(() => { c.innerHTML = ''; }, 6000);
+}
+
+// =================== SCREENSAVER ===================
+function resetIdleTimer() { clearTimeout(idleTimer); hideScreensaver(); idleTimer = setTimeout(showScreensaver, IDLE_TIMEOUT); }
+function showScreensaver() {
+  document.getElementById('screensaver').classList.add('active');
+  if (audioCtx) {
+    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.type = 'sine'; osc.frequency.setValueAtTime(330, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 1);
+    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+    osc.connect(gain).connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 1);
+  }
+}
+function hideScreensaver() { document.getElementById('screensaver').classList.remove('active'); }
+
+// =================== HELPERS ===================
+function closeAllWindows() { [...windows].forEach(w => closeWindow(w.id)); }
+
+// =================== CURSOR TRAIL — leaf spores ===================
+let trailDots = [];
+const MAX_TRAIL = 10;
+let lastTrailTime = 0;
+document.addEventListener('mousemove', (e) => {
+  const now = Date.now();
+  if (now - lastTrailTime < 45) return;
+  lastTrailTime = now;
+  const dot = document.createElement('div');
+  dot.className = 'cursor-dot';
+  dot.style.left = (e.clientX - 4) + 'px';
+  dot.style.top = (e.clientY - 2) + 'px';
+  dot.style.transform = `rotate(${Math.random() * 360}deg)`;
+  document.body.appendChild(dot);
+  trailDots.push(dot);
+  requestAnimationFrame(() => dot.classList.add('fade'));
+  setTimeout(() => { dot.remove(); trailDots = trailDots.filter(d => d !== dot); }, 500);
+  while (trailDots.length > MAX_TRAIL) { const old = trailDots.shift(); old.remove(); }
+});
+
+// =================== CANVAS RIPPLE WATERMARK ===================
+const rippleCanvas = document.getElementById('watermarkCanvas');
+const rippleCtx = rippleCanvas.getContext('2d');
+let rippleW, rippleH;
+let rippleGrid, ripplePrevGrid, rippleRefImage;
+const RIPPLE_RES = 4;
+let rippleGridW, rippleGridH;
+const RIPPLE_DAMPING = 0.97;
+
+function initRippleCanvas() {
+  rippleW = window.innerWidth;
+  rippleH = window.innerHeight;
+  rippleCanvas.width = rippleW;
+  rippleCanvas.height = rippleH;
+  rippleGridW = Math.ceil(rippleW / RIPPLE_RES);
+  rippleGridH = Math.ceil(rippleH / RIPPLE_RES);
+  rippleGrid = new Float32Array(rippleGridW * rippleGridH);
+  ripplePrevGrid = new Float32Array(rippleGridW * rippleGridH);
+  renderWatermarkText();
+}
+
+function renderWatermarkText() {
+  rippleCtx.clearRect(0, 0, rippleW, rippleH);
+  const text = lang === 'jp' ? '莉香チミニエリ' : 'RIKA CIMINIERI';
+  const fontSize = lang === 'jp' ? 160 : 120;
+  const fontFamily = lang === 'jp' ? "'Noto Sans JP', sans-serif" : "'Space Grotesk', sans-serif";
+  rippleCtx.font = `800 ${fontSize}px ${fontFamily}`;
+  rippleCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#4ec97a';
+  rippleCtx.globalAlpha = 0.04;
+  rippleCtx.textAlign = 'right';
+  rippleCtx.textBaseline = 'bottom';
+  rippleCtx.fillText(text, rippleW - 60, rippleH - 80);
+  rippleCtx.globalAlpha = 1.0;
+  rippleRefImage = rippleCtx.getImageData(0, 0, rippleW, rippleH);
+  rippleGrid.fill(0);
+  ripplePrevGrid.fill(0);
+}
+
+function updateWatermark() { renderWatermarkText(); }
+
+let mouseRippleX = -1, mouseRippleY = -1;
+document.addEventListener('mousemove', e => {
+  mouseRippleX = Math.floor(e.clientX / RIPPLE_RES);
+  mouseRippleY = Math.floor(e.clientY / RIPPLE_RES);
+});
+
+function rippleFrame() {
+  if (mouseRippleX >= 1 && mouseRippleX < rippleGridW - 1 && mouseRippleY >= 1 && mouseRippleY < rippleGridH - 1) {
+    const idx = mouseRippleY * rippleGridW + mouseRippleX;
+    rippleGrid[idx] = 512;
+  }
+  const newGrid = new Float32Array(rippleGridW * rippleGridH);
+  for (let y = 1; y < rippleGridH - 1; y++) {
+    for (let x = 1; x < rippleGridW - 1; x++) {
+      const idx = y * rippleGridW + x;
+      newGrid[idx] = (rippleGrid[idx - 1] + rippleGrid[idx + 1] + rippleGrid[idx - rippleGridW] + rippleGrid[idx + rippleGridW]) / 2 - ripplePrevGrid[idx];
+      newGrid[idx] *= RIPPLE_DAMPING;
+    }
+  }
+  ripplePrevGrid = rippleGrid;
+  rippleGrid = newGrid;
+  if (!rippleRefImage) return requestAnimationFrame(rippleFrame);
+  const imgData = new ImageData(new Uint8ClampedArray(rippleRefImage.data), rippleW, rippleH);
+  const pixels = imgData.data;
+  for (let y = 1; y < rippleGridH - 1; y++) {
+    for (let x = 1; x < rippleGridW - 1; x++) {
+      const idx = y * rippleGridW + x;
+      const displacement = rippleGrid[idx];
+      if (Math.abs(displacement) < 0.5) continue;
+      const offsetX = Math.round((rippleGrid[idx - 1] - rippleGrid[idx + 1]) * 0.5);
+      const offsetY = Math.round((rippleGrid[idx - rippleGridW] - rippleGrid[idx + rippleGridW]) * 0.5);
+      for (let py = 0; py < RIPPLE_RES; py++) {
+        for (let px = 0; px < RIPPLE_RES; px++) {
+          const destX = x * RIPPLE_RES + px;
+          const destY = y * RIPPLE_RES + py;
+          const srcX = Math.min(Math.max(destX + offsetX, 0), rippleW - 1);
+          const srcY = Math.min(Math.max(destY + offsetY, 0), rippleH - 1);
+          const destIdx = (destY * rippleW + destX) * 4;
+          const srcIdx = (srcY * rippleW + srcX) * 4;
+          pixels[destIdx] = rippleRefImage.data[srcIdx];
+          pixels[destIdx + 1] = rippleRefImage.data[srcIdx + 1];
+          pixels[destIdx + 2] = rippleRefImage.data[srcIdx + 2];
+          pixels[destIdx + 3] = rippleRefImage.data[srcIdx + 3];
+          const absDisp = Math.abs(displacement);
+          if (absDisp > 3) {
+            const bloom = Math.min(absDisp / 25, 1);
+            pixels[destIdx] = Math.min(255, pixels[destIdx] + bloom * 20);
+            pixels[destIdx + 1] = Math.min(255, pixels[destIdx + 1] + bloom * 80);
+            pixels[destIdx + 2] = Math.min(255, pixels[destIdx + 2] + bloom * 40);
+            pixels[destIdx + 3] = Math.min(255, pixels[destIdx + 3] + bloom * 100);
+          }
+        }
+      }
+    }
+  }
+  rippleCtx.putImageData(imgData, 0, 0);
+  requestAnimationFrame(rippleFrame);
+}
+
+window.addEventListener('resize', () => { initRippleCanvas(); });
+
+// =================== EASTER EGG: CLOCK TOOLTIP ===================
+let clockHoverTimer = null;
+let clockTooltip = null;
+const clockFacts = [
+  "Checking soil moisture levels...",
+  "The ferns are growing at 102%",
+  "A beetle was spotted near the pebbles",
+  "The moss is spreading nicely",
+  "Humidity: optimal for grilled cheese",
+  "Missing Japan right now",
+  "The garden needs more One Piece theories",
+  "Rewatching Bridgerton... again"
+];
+document.getElementById('clock').addEventListener('mouseenter', () => {
+  clockHoverTimer = setTimeout(() => {
+    if (clockTooltip) clockTooltip.remove();
+    clockTooltip = document.createElement('div');
+    clockTooltip.className = 'clock-tooltip';
+    clockTooltip.textContent = clockFacts[Math.floor(Math.random() * clockFacts.length)];
+    document.body.appendChild(clockTooltip);
+  }, 3000);
+});
+document.getElementById('clock').addEventListener('mouseleave', () => {
+  clearTimeout(clockHoverTimer);
+  if (clockTooltip) { clockTooltip.remove(); clockTooltip = null; }
+});
+
+// =================== EASTER EGG: TRIPLE-CLICK GRILLED CHEESE WALLPAPER ===================
+let desktopClickCount = 0;
+let desktopClickTimer = null;
+document.getElementById('desktop').addEventListener('click', (e) => {
+  if (e.target.closest('.desktop-icon, .window, .taskbar')) return;
+  desktopClickCount++;
+  clearTimeout(desktopClickTimer);
+  desktopClickTimer = setTimeout(() => { desktopClickCount = 0; }, 500);
+  if (desktopClickCount >= 3) {
+    desktopClickCount = 0;
+    const wp = document.getElementById('gcWallpaper');
+    wp.classList.add('show');
+    setTimeout(() => wp.classList.remove('show'), 3000);
+  }
+});
+
+// =================== DESKTOP TOY (DOUBLE-CLICK EMPTY SPACE) — seed bounces ===================
+document.getElementById('desktop').addEventListener('dblclick', (e) => {
+  if (e.target.closest('.desktop-icon, .window, .taskbar')) return;
+  spawnDesktopToy(e.clientX, e.clientY);
+});
+
+function spawnDesktopToy(x, y) {
+  const toy = document.createElement('div');
+  toy.className = 'desktop-toy';
+  toy.style.left = x + 'px'; toy.style.top = y + 'px';
+  document.body.appendChild(toy);
+  playBoop(400, 0.05, 0.05, 'sine');
+  let vx = (Math.random() - 0.5) * 8, vy = -8 - Math.random() * 4;
+  const gravity = 0.3, bounce = 0.55, friction = 0.99;
+  let px = x, py = y, life = 0;
+  function animate() {
+    vy += gravity; vx *= friction; px += vx; py += vy;
+    const floor = window.innerHeight - 100;
+    if (py > floor) { py = floor; vy = -vy * bounce; if (Math.abs(vy) < 1) vy = 0; playBoop(120 + Math.random() * 80, 0.02, 0.03, 'sine'); }
+    if (px < 0 || px > window.innerWidth - 14) { vx = -vx; px = Math.max(0, Math.min(px, window.innerWidth - 14)); }
+    toy.style.left = px + 'px'; toy.style.top = py + 'px';
+    life++;
+    if (life < 200 && (Math.abs(vx) > 0.1 || Math.abs(vy) > 0.5 || py < floor)) { requestAnimationFrame(animate); }
+    else {
+      // Seed settles and sprouts!
+      toy.style.transition = 'all 0.8s';
+      toy.style.background = 'var(--accent)';
+      toy.style.borderRadius = '50% 50% 50% 0';
+      toy.style.width = '6px'; toy.style.height = '10px';
+      setTimeout(() => { toy.style.opacity = '0'; setTimeout(() => toy.remove(), 500); }, 1500);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+// =================== EASTER EGG: GOLDEN BEETLE (click 3 pebbles) ===================
+let pebbleClicks = 0;
+let pebbleTimer = null;
+document.getElementById('pebblesLayer').addEventListener('click', (e) => {
+  if (e.target.classList.contains('pebble')) {
+    pebbleClicks++;
+    clearTimeout(pebbleTimer);
+    pebbleTimer = setTimeout(() => { pebbleClicks = 0; }, 2000);
+    // Visual feedback — pebble brightens
+    e.target.style.opacity = '0.4';
+    setTimeout(() => { e.target.style.opacity = ''; }, 500);
+    if (pebbleClicks >= 3) {
+      pebbleClicks = 0;
+      spawnGoldenBeetle();
+    }
+  }
+});
+// Make pebbles clickable
+document.getElementById('pebblesLayer').style.pointerEvents = 'auto';
+document.querySelectorAll('.pebble').forEach(p => p.style.pointerEvents = 'auto');
+
+function spawnGoldenBeetle() {
+  const beetle = document.createElement('div');
+  beetle.className = 'golden-beetle';
+  beetle.innerHTML = `<div class="beetle-body">
+    <div class="beetle-leg" style="top:2px;left:-4px;"></div>
+    <div class="beetle-leg" style="top:5px;left:-4px;"></div>
+    <div class="beetle-leg" style="top:8px;left:-4px;"></div>
+    <div class="beetle-leg" style="top:2px;right:-4px;transform:scaleX(-1);"></div>
+    <div class="beetle-leg" style="top:5px;right:-4px;transform:scaleX(-1);"></div>
+    <div class="beetle-leg" style="top:8px;right:-4px;transform:scaleX(-1);"></div>
+  </div>`;
+  document.body.appendChild(beetle);
+  playBoop(880, 0.1, 0.05, 'sine');
+  setTimeout(() => playBoop(1100, 0.08, 0.04, 'sine'), 200);
+  setTimeout(() => beetle.remove(), 3200);
+}
+
+// =================== EASTER EGG: GROWTH BURST (terminal "grow" command) ===================
+function triggerGrowthBurst() {
+  // Scale up particles, add flowers
+  document.querySelectorAll('.particle').forEach(p => {
+    p.style.transition = 'transform 0.5s';
+    p.style.transform = 'scale(2)';
+  });
+  // Add extra butterflies
+  for (let i = 0; i < 3; i++) {
+    const b = document.createElement('div');
+    b.className = 'butterfly';
+    b.style.animationDuration = (15 + Math.random() * 10) + 's';
+    b.style.animationDelay = (i * 0.5) + 's';
+    b.dataset.temp = 'true';
+    document.getElementById('desktop').appendChild(b);
+  }
+  // Revert after 10s
+  setTimeout(() => {
+    document.querySelectorAll('.particle').forEach(p => {
+      p.style.transform = '';
+    });
+    document.querySelectorAll('[data-temp]').forEach(el => el.remove());
+  }, 10000);
+}
+
+// =================== EASTER EGG: RAIN (shake mouse rapidly) ===================
+let mousePositions = [];
+let rainActive = false;
+document.addEventListener('mousemove', (e) => {
+  mousePositions.push({ x: e.clientX, y: e.clientY, t: Date.now() });
+  if (mousePositions.length > 20) mousePositions.shift();
+  if (mousePositions.length >= 10 && !rainActive) {
+    const recent = mousePositions.slice(-10);
+    let totalDist = 0;
+    for (let i = 1; i < recent.length; i++) {
+      totalDist += Math.hypot(recent[i].x - recent[i-1].x, recent[i].y - recent[i-1].y);
+    }
+    const timeSpan = recent[recent.length - 1].t - recent[0].t;
+    if (timeSpan < 300 && totalDist > 800) {
+      triggerRain();
+    }
+  }
+});
+
+function triggerRain() {
+  if (rainActive) return;
+  rainActive = true;
+  playBoop(200, 0.3, 0.04, 'sine');
+  const interval = setInterval(() => {
+    for (let i = 0; i < 5; i++) {
+      const drop = document.createElement('div');
+      drop.className = 'rain-drop';
+      drop.style.left = Math.random() * 100 + 'vw';
+      drop.style.top = '-20px';
+      drop.style.height = (10 + Math.random() * 20) + 'px';
+      drop.style.animationDuration = (0.4 + Math.random() * 0.3) + 's';
+      document.body.appendChild(drop);
+      setTimeout(() => drop.remove(), 700);
+    }
+  }, 50);
+  setTimeout(() => {
+    clearInterval(interval);
+    rainActive = false;
+  }, 5000);
+}
+
+// =================== INIT ===================
+renderDesktopIcons();
+resetIdleTimer();
+initRippleCanvas();
+requestAnimationFrame(rippleFrame);
+initParticles();
+initDesktopDetails();
+
+const skipBoot = window.location.hash === '#skipboot';
+if (skipBoot) {
+  document.getElementById('boot-screen').style.display = 'none';
+  document.getElementById('desktop').classList.add('visible');
+  initScreensaver();
+  openApp('welcome');
+} else {
+  runBoot();
+}
+</script>
+</body>
+</html>

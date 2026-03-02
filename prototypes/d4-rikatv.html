@@ -1045,6 +1045,153 @@ body {
   .card-title { font-size: 12px; }
   .card-meta { display: none; }
 }
+
+/* ============================================
+   TOP PICKS FEATURED ROW
+   ============================================ */
+.top-picks-card {
+  flex: 0 0 auto;
+  width: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  background: #1a1a1a;
+}
+.top-picks-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  z-index: 10;
+}
+.top-picks-poster {
+  width: 100%; aspect-ratio: 16/9;
+  position: relative; overflow: hidden;
+}
+.top-picks-poster-bg {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 56px;
+}
+.top-picks-poster-gradient {
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg, #1a1a1a 0%, transparent 50%);
+}
+.top-picks-info {
+  padding: 14px 18px 20px;
+}
+.top-picks-info .tp-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px; font-weight: 700;
+  margin-bottom: 4px;
+}
+.top-picks-info .tp-meta {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; margin-bottom: 8px;
+}
+.top-picks-info .tp-meta .card-match { color: #46d369; font-weight: 600; }
+.top-picks-info .tp-desc {
+  font-size: 13px; color: rgba(255,255,255,0.6);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .top-picks-card { width: 300px; }
+}
+@media (max-width: 480px) {
+  .top-picks-card { width: 260px; }
+}
+
+/* ============================================
+   BILLBOARD PREVIEW STRIPS
+   ============================================ */
+.billboard-preview {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.preview-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(4px);
+  padding: 4px 10px; border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,0.8);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.preview-chip .chip-icon { font-size: 14px; }
+.preview-counter {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 700;
+  color: rgba(255,255,255,0.7);
+}
+.preview-mini-rank {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: rgba(255,255,255,0.7);
+}
+
+/* ============================================
+   EXPANDED HOVER CARDS
+   ============================================ */
+.content-card .card-expanded {
+  display: none;
+  background: #181818;
+  padding: 12px 14px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.content-card.expanded {
+  position: absolute;
+  width: 350px;
+  z-index: 20;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.8);
+  border-radius: 6px;
+  transform: scale(1);
+}
+.content-card.expanded .card-expanded { display: block; }
+.content-card.expanded:hover { transform: scale(1); }
+
+.card-expanded-desc {
+  font-size: 12px; color: rgba(255,255,255,0.6);
+  line-height: 1.5; margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card-expanded-tags {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.card-expanded-tag {
+  font-size: 10px; color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.06);
+  padding: 2px 8px; border-radius: 3px;
+}
+.card-expanded-actions {
+  display: flex; align-items: center; gap: 6px;
+}
+.card-expanded-actions .exp-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(20,20,20,0.8);
+  color: #fff; font-size: 14px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.2s;
+}
+.card-expanded-actions .exp-btn:hover { border-color: #fff; }
+.card-expanded-actions .exp-btn.play-btn {
+  background: #fff; color: #000; border-color: #fff;
+}
+.card-expanded-match {
+  margin-left: auto;
+  font-size: 12px; color: #46d369; font-weight: 600;
+}
 </style>
 </head>
 <body>
@@ -1132,6 +1279,13 @@ body {
         <button class="btn-play" onclick="openDetail('portfolio')"><span class="play-icon">&#9654;</span> Play</button>
         <button class="btn-more-info" onclick="openDetail('portfolio')">&#9432; More Info</button>
       </div>
+      <div class="billboard-preview">
+        <span class="preview-chip"><span class="chip-icon">&#9883;&#65039;</span> React</span>
+        <span class="preview-chip"><span class="chip-icon">&#127912;</span> Tailwind</span>
+        <span class="preview-chip"><span class="chip-icon">&#9889;</span> Vite</span>
+        <span class="preview-chip"><span class="chip-icon">&#128311;</span> TypeScript</span>
+        <span class="preview-counter">6 projects · 4 languages</span>
+      </div>
     </div>
   </div>
 
@@ -1154,6 +1308,11 @@ body {
         <button class="btn-play" onclick="openDetail('grilledcheese')"><span class="play-icon">&#9654;</span> Play</button>
         <button class="btn-more-info" onclick="openDetail('grilledcheese')">&#9432; More Info</button>
       </div>
+      <div class="billboard-preview">
+        <span class="preview-mini-rank">&#129351; The Classic (39/40)</span>
+        <span class="preview-mini-rank">&#129352; Truffle Melt (38/40)</span>
+        <span class="preview-mini-rank">&#129353; Brie &amp; Fig (36/40)</span>
+      </div>
     </div>
   </div>
 
@@ -1175,6 +1334,12 @@ body {
       <div class="billboard-actions">
         <button class="btn-play" onclick="openDetail('career')"><span class="play-icon">&#9654;</span> Play</button>
         <button class="btn-more-info" onclick="openDetail('career')">&#9432; More Info</button>
+      </div>
+      <div class="billboard-preview">
+        <span class="preview-chip"><span class="chip-icon">&#128300;</span> Microbiology</span>
+        <span class="preview-chip"><span class="chip-icon">&rarr;</span> Pivot</span>
+        <span class="preview-chip"><span class="chip-icon">&#128187;</span> Full-Stack</span>
+        <span class="preview-counter">The origin story</span>
       </div>
     </div>
   </div>
@@ -1200,6 +1365,12 @@ body {
         <button class="btn-play" onclick="openDetail('japan-diaries')"><span class="play-icon">&#9654;</span> Play</button>
         <button class="btn-more-info" onclick="openDetail('japan-diaries')">&#9432; More Info</button>
       </div>
+      <div class="billboard-preview">
+        <span class="preview-chip"><span class="chip-icon">&#128250;</span> Terrace House</span>
+        <span class="preview-chip"><span class="chip-icon">&#127925;</span> Yoasobi</span>
+        <span class="preview-chip"><span class="chip-icon">&#9832;&#65039;</span> Onsen Hunter</span>
+        <span class="preview-counter">Annual trips · 2 languages</span>
+      </div>
     </div>
   </div>
 
@@ -1221,6 +1392,69 @@ body {
      ============================================ -->
 <div class="content-section">
 
+  <!-- ROW: Top Picks for You -->
+  <div class="row-section" id="row-top-picks">
+    <div class="row-header">
+      <h2 class="row-title">Top Picks for You</h2>
+      <span class="row-see-all" style="font-style:italic;color:rgba(255,255,255,0.3);font-size:12px;">Based on the fact that you clicked on this site</span>
+    </div>
+    <div class="row-scroll-wrap">
+      <button class="row-arrow left" onclick="scrollRow(this, -1)">&#10094;</button>
+      <div class="row-scroll">
+
+        <div class="top-picks-card" onclick="openDetail('about')">
+          <div class="top-picks-poster">
+            <div class="top-picks-poster-bg" style="background: linear-gradient(135deg, #ff6b9d, #c44dff);">&#128587;&#8205;&#9792;&#65039;</div>
+            <div class="top-picks-poster-gradient"></div>
+          </div>
+          <div class="top-picks-info">
+            <div class="tp-title">About Rika</div>
+            <div class="tp-meta"><span class="card-match">97%</span><span class="card-year">Origin Story</span><span class="card-rating">HD</span></div>
+            <div class="tp-desc">Half-Japanese full-stack engineer at Eventbrite. Former microbiology student who realized she liked debugging code more than debugging cell cultures. Builder of book nooks, ranker of grilled cheeses, defender of The Rock's Jumanji.</div>
+          </div>
+        </div>
+
+        <div class="top-picks-card" onclick="openDetail('grilledcheese')">
+          <div class="top-picks-poster">
+            <div class="top-picks-poster-bg" style="background: linear-gradient(135deg, #ff6600, #ff3300);">&#129472;</div>
+            <div class="top-picks-poster-gradient"></div>
+          </div>
+          <div class="top-picks-info">
+            <div class="tp-title">Grilled Cheese Olympics</div>
+            <div class="tp-meta"><span class="card-match">95%</span><span class="card-year">Season 3</span><span class="card-rating">TV-14</span></div>
+            <div class="tp-desc">A bracket-style tournament ranking grilled cheese sandwiches with scientific rigor. Categories include Cheese Pull (x/10), Crunch Factor (x/10), Flavor (x/10), and the controversial "Vibes" column. Current champion: The Classic.</div>
+          </div>
+        </div>
+
+        <div class="top-picks-card" onclick="openDetail('one-piece')">
+          <div class="top-picks-poster">
+            <div class="top-picks-poster-bg" style="background: linear-gradient(135deg, #ff6b35, #cc4400);">&#9760;&#65039;</div>
+            <div class="top-picks-poster-gradient"></div>
+          </div>
+          <div class="top-picks-info">
+            <div class="tp-title">Grand Line Files</div>
+            <div class="tp-meta"><span class="card-match">99%</span><span class="card-year">Ongoing</span><span class="card-rating">TV-MA</span></div>
+            <div class="tp-desc">Deep-dive theories about One Piece that are either brilliant or unhinged (the line is thin). Features the Void Century, Joy Boy connections, Devil Fruit taxonomy, and evidence that Oda planned everything from chapter 1.</div>
+          </div>
+        </div>
+
+        <div class="top-picks-card" onclick="openDetail('building-public')">
+          <div class="top-picks-poster">
+            <div class="top-picks-poster-bg" style="background: linear-gradient(135deg, #2a0a2a, #4a1a4a);">&#128296;</div>
+            <div class="top-picks-poster-gradient"></div>
+          </div>
+          <div class="top-picks-info">
+            <div class="tp-title">Building in Public</div>
+            <div class="tp-meta"><span class="card-match">95%</span><span class="card-year">New</span><span class="card-rating">HD</span></div>
+            <div class="tp-desc">Follow along as Rika explores AI-assisted development, builds agents, and ships projects in real-time. Currently: building this very portfolio with Claude. Meta? Absolutely. Cool? Also yes.</div>
+          </div>
+        </div>
+
+      </div>
+      <button class="row-arrow right" onclick="scrollRow(this, 1)">&#10095;</button>
+    </div>
+  </div>
+
   <!-- ROW: Continue Watching -->
   <div class="row-section" id="row-continue">
     <div class="row-header">
@@ -1230,7 +1464,7 @@ body {
       <button class="row-arrow left" onclick="scrollRow(this, -1)">&#10094;</button>
       <div class="row-scroll">
 
-        <div class="content-card" onclick="openDetail('about')">
+        <div class="content-card" data-key="about" onclick="openDetail('about')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #ff6b9d, #c44dff);">&#128587;&#8205;&#9792;&#65039;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1243,9 +1477,19 @@ body {
               <span class="card-year">S1 E1</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('currently-into')">
+        <div class="content-card" data-key="currently-into" onclick="openDetail('currently-into')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #2a1a4a, #4a2a6a);">&#128250;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1258,9 +1502,19 @@ body {
               <span class="card-year">Updated daily</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('hills')">
+        <div class="content-card" data-key="hills" onclick="openDetail('hills')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #1a3a5a, #0a2a4a);">&#9968;&#65039;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1273,9 +1527,19 @@ body {
               <span class="card-year">Special</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('wheel')">
+        <div class="content-card" data-key="wheel" onclick="openDetail('wheel')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #4a1a4a, #6a2a2a);">&#127921;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1286,6 +1550,16 @@ body {
             <div class="card-meta">
               <span class="card-match">100%</span>
               <span class="card-year">Interactive</span>
+            </div>
+          </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
             </div>
           </div>
         </div>
@@ -1305,7 +1579,7 @@ body {
       <button class="row-arrow left" onclick="scrollRow(this, -1)">&#10094;</button>
       <div class="row-scroll">
 
-        <div class="content-card" onclick="openDetail('portfolio')">
+        <div class="content-card" data-key="portfolio" onclick="openDetail('portfolio')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #1a0a2e, #4a1942);">&#128640;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1324,9 +1598,19 @@ body {
               <span class="card-genre-tag">Tailwind</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('bilingual-cms')">
+        <div class="content-card" data-key="bilingual-cms" onclick="openDetail('bilingual-cms')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #0a2a3a, #1a4a5a);">&#127760;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1342,9 +1626,19 @@ body {
               <span class="card-genre-tag">i18n</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('event-platform')">
+        <div class="content-card" data-key="event-platform" onclick="openDetail('event-platform')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #2a1a0a, #4a3a1a);">&#127915;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1360,9 +1654,19 @@ body {
               <span class="card-genre-tag">React</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('lab-dashboard')">
+        <div class="content-card" data-key="lab-dashboard" onclick="openDetail('lab-dashboard')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #1a2a1a, #2a4a2a);">&#128300;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1378,9 +1682,19 @@ body {
               <span class="card-genre-tag">Flask</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('ai-experiments')">
+        <div class="content-card" data-key="ai-experiments" onclick="openDetail('ai-experiments')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #2a0a3a, #4a1a5a);">&#129302;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1395,6 +1709,16 @@ body {
             <div class="card-genre-tags">
               <span class="card-genre-tag">Claude</span>
               <span class="card-genre-tag">AI</span>
+            </div>
+          </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
             </div>
           </div>
         </div>
@@ -1414,7 +1738,7 @@ body {
       <button class="row-arrow left" onclick="scrollRow(this, -1)">&#10094;</button>
       <div class="row-scroll">
 
-        <div class="content-card" onclick="openDetail('career')">
+        <div class="content-card" data-key="career" onclick="openDetail('career')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #0a2a1a, #1a4a2a);">&#129516;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1426,9 +1750,19 @@ body {
               <span class="card-year">Origin Story</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('pivot')">
+        <div class="content-card" data-key="pivot" onclick="openDetail('pivot')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #3a1a0a, #5a2a1a);">&#128187;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1440,9 +1774,19 @@ body {
               <span class="card-year">The Pivot</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('eventbrite')">
+        <div class="content-card" data-key="eventbrite" onclick="openDetail('eventbrite')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #1a1a3a, #2a2a5a);">&#127914;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1454,9 +1798,19 @@ body {
               <span class="card-year">Current</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('building-public')">
+        <div class="content-card" data-key="building-public" onclick="openDetail('building-public')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #2a0a2a, #4a1a4a);">&#128296;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1467,6 +1821,16 @@ body {
             <div class="card-meta">
               <span class="card-match">95%</span>
               <span class="card-year">Ongoing</span>
+            </div>
+          </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
             </div>
           </div>
         </div>
@@ -1485,7 +1849,7 @@ body {
       <button class="row-arrow left" onclick="scrollRow(this, -1)">&#10094;</button>
       <div class="row-scroll">
 
-        <div class="content-card" onclick="openDetail('japan-diaries')">
+        <div class="content-card" data-key="japan-diaries" onclick="openDetail('japan-diaries')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #3a0a0a, #5a1a1a);">&#9961;&#65039;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1497,9 +1861,19 @@ body {
               <span class="card-year">Travel</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('drama-reviews')">
+        <div class="content-card" data-key="drama-reviews" onclick="openDetail('drama-reviews')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #2a1a2a, #4a2a4a);">&#127909;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1511,9 +1885,19 @@ body {
               <span class="card-year">Ongoing</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('now-playing')">
+        <div class="content-card" data-key="now-playing" onclick="openDetail('now-playing')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #0a0a2a, #1a1a4a);">&#127925;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1525,9 +1909,19 @@ body {
               <span class="card-year">Music</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('language-home')">
+        <div class="content-card" data-key="language-home" onclick="openDetail('language-home')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #1a2a1a, #2a4a2a);">&#12354;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1537,6 +1931,16 @@ body {
             <div class="card-meta">
               <span class="card-match">98%</span>
               <span class="card-year">Essay</span>
+            </div>
+          </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
             </div>
           </div>
         </div>
@@ -1555,7 +1959,7 @@ body {
       <button class="row-arrow left" onclick="scrollRow(this, -1)">&#10094;</button>
       <div class="row-scroll">
 
-        <div class="content-card" onclick="openDetail('grilledcheese')">
+        <div class="content-card" data-key="grilledcheese" onclick="openDetail('grilledcheese')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #ff6600, #cc2200);">&#129472;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1568,9 +1972,19 @@ body {
               <span class="card-year">S3</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('booknooks')">
+        <div class="content-card" data-key="booknooks" onclick="openDetail('booknooks')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #3a2a1a, #5a4a2a);">&#128218;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1582,9 +1996,19 @@ body {
               <span class="card-year">Crafting</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('painting')">
+        <div class="content-card" data-key="painting" onclick="openDetail('painting')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #2a3a4a, #4a5a6a);">&#127912;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1596,9 +2020,19 @@ body {
               <span class="card-year">Art</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('pilates')">
+        <div class="content-card" data-key="pilates" onclick="openDetail('pilates')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #1a3a2a, #2a5a4a);">&#129336;&#8205;&#9792;&#65039;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1610,9 +2044,19 @@ body {
               <span class="card-year">Fitness</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('traitors')">
+        <div class="content-card" data-key="traitors" onclick="openDetail('traitors')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #2a0a0a, #4a1a1a);">&#128373;&#65039;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1622,6 +2066,16 @@ body {
             <div class="card-meta">
               <span class="card-match">94%</span>
               <span class="card-year">Reviews</span>
+            </div>
+          </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
             </div>
           </div>
         </div>
@@ -1640,7 +2094,7 @@ body {
       <button class="row-arrow left" onclick="scrollRow(this, -1)">&#10094;</button>
       <div class="row-scroll">
 
-        <div class="content-card" onclick="openDetail('grand-line')">
+        <div class="content-card" data-key="one-piece" onclick="openDetail('grand-line')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #1a0808, #3a1a1a);">&#9876;&#65039;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1652,9 +2106,19 @@ body {
               <span class="card-year">Theories</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('void-century')">
+        <div class="content-card" data-key="void-century" onclick="openDetail('void-century')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #0a0a1a, #1a1a3a);">&#128065;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1666,9 +2130,19 @@ body {
               <span class="card-year">Deep Dive</span>
             </div>
           </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="content-card" onclick="openDetail('joyboy')">
+        <div class="content-card" data-key="joyboy" onclick="openDetail('joyboy')">
           <div class="card-poster">
             <div class="card-poster-bg" style="background: linear-gradient(135deg, #2a1a0a, #4a3a1a);">&#10067;</div>
             <div class="card-poster-overlay"><button class="card-play-btn">&#9654;</button></div>
@@ -1678,6 +2152,16 @@ body {
             <div class="card-meta">
               <span class="card-match">95%</span>
               <span class="card-year">Mystery</span>
+            </div>
+          </div>
+          <div class="card-expanded">
+            <div class="card-expanded-desc"></div>
+            <div class="card-expanded-tags"></div>
+            <div class="card-expanded-actions">
+              <button class="exp-btn play-btn">&#9654;</button>
+              <button class="exp-btn">+</button>
+              <button class="exp-btn">&#128077;</button>
+              <span class="card-expanded-match"></span>
             </div>
           </div>
         </div>
@@ -1815,6 +2299,32 @@ body {
 </div>
 
 <script>
+// ============================================
+// EASTER EGG: Intro chime (sessionStorage gated)
+// ============================================
+if (!sessionStorage.getItem('rikaChimePlayed')) {
+  sessionStorage.setItem('rikaChimePlayed', '1');
+  setTimeout(() => {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const playNote = (freq, start, dur) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime + start);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + start + dur);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + start);
+        osc.stop(audioCtx.currentTime + start + dur);
+      };
+      playNote(523.25, 0, 0.3);     // C5
+      playNote(659.25, 0.15, 0.4);  // E5
+    } catch(e) {}
+  }, 500);
+}
+
 // ============================================
 // DATA: All content items
 // ============================================
@@ -2272,6 +2782,14 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Secret search items for easter egg queries
+const secretSearchItems = [
+  { icon: '&#128302;', title: 'Secret Page: What I Really Think', desc: 'My unfiltered thoughts (just kidding... or am I?)' },
+  { icon: '&#129472;', title: 'The Grilled Cheese Vault', desc: 'Unreleased rankings too controversial to publish' },
+  { icon: '&#127988;&#8205;&#9760;&#65039;', title: 'One Piece Endgame Prediction', desc: 'SPOILER: I actually figured it out (maybe)' },
+  { icon: '&#127908;', title: "Rika's Singing Debut", desc: 'Please do not click this (the neighbors already suffer)' },
+];
+
 document.getElementById('searchInput').addEventListener('input', (e) => {
   const q = e.target.value.toLowerCase().trim();
   const results = document.getElementById('searchResults');
@@ -2289,17 +2807,36 @@ document.getElementById('searchInput').addEventListener('input', (e) => {
     return;
   }
 
+  // Secret search easter egg
+  const isSecretQuery = q === 'konami' || q === 'secret menu';
+
   const matches = searchIndex.filter(item =>
     item.title.toLowerCase().includes(q) ||
     item.genres.toLowerCase().includes(q)
   );
 
-  if (matches.length === 0) {
+  let html = '';
+
+  if (isSecretQuery) {
+    html += `<div style="padding: 12px 14px; font-size: 13px; font-weight: 600; color: #46d369;">&#128274; Secret Menu Unlocked</div>`;
+    html += secretSearchItems.map(s => `
+      <div class="search-result-item" style="border-left: 2px solid #46d369;">
+        <div class="result-icon" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a);">${s.icon}</div>
+        <div class="result-info">
+          <h4>${s.title}</h4>
+          <p>${s.desc}</p>
+        </div>
+        <span class="result-tag">&#128274;</span>
+      </div>
+    `).join('');
+  }
+
+  if (matches.length === 0 && !isSecretQuery) {
     results.innerHTML = `<div style="padding: 24px; text-align: center; color: rgba(255,255,255,0.4); font-size: 14px;">No results for "${e.target.value}". Try another search?</div>`;
     return;
   }
 
-  results.innerHTML = matches.map(m => `
+  html += matches.map(m => `
     <div class="search-result-item" onclick="toggleSearch(); openDetail('${m.key}');">
       <div class="result-icon" style="background: ${m.bg};">${m.emoji}</div>
       <div class="result-info">
@@ -2308,6 +2845,8 @@ document.getElementById('searchInput').addEventListener('input', (e) => {
       </div>
     </div>
   `).join('');
+
+  results.innerHTML = html;
 });
 
 function renderTrendingSearches() {
@@ -2944,9 +3483,130 @@ function openSecretAdmin() {
 }
 
 // ============================================
+// EXPANDED HOVER CARD DATA & LOGIC
+// ============================================
+const cardExpandedData = {
+  'about': { desc: 'Half-Japanese full-stack engineer who pivoted from microbiology to tech.', tags: ['Personal', 'Origin Story', 'Bilingual'], match: '97%' },
+  'currently-into': { desc: 'What Rika is watching, reading, playing, and learning right now.', tags: ['Lifestyle', 'Updated Daily'], match: '95%' },
+  'hills': { desc: 'MJ is the king of pop. The Rock\'s Jumanji is good. These are non-negotiable.', tags: ['Hot Takes', 'Comedy'], match: '99%' },
+  'wheel': { desc: 'Interactive spin-the-wheel game to discover random Rika facts.', tags: ['Interactive', 'Game', 'Fun'], match: '100%' },
+  'portfolio': { desc: 'A custom portfolio built from scratch \u2014 the site IS the project.', tags: ['React', 'Vite', 'Tailwind', 'TypeScript'], match: '98%' },
+  'bilingual-cms': { desc: 'Content management with first-class EN/JP support and vertical text.', tags: ['Next.js', 'i18n', 'MDX'], match: '94%' },
+  'event-platform': { desc: 'Core event discovery and ticketing flows used by millions at Eventbrite.', tags: ['React', 'Python', 'GraphQL'], match: '93%' },
+  'lab-dashboard': { desc: 'Real-time microbiology lab monitoring from the pre-tech era.', tags: ['D3.js', 'Flask', 'WebSockets'], match: '91%' },
+  'ai-experiments': { desc: 'Exploring AI-assisted development tools and building agents.', tags: ['Claude API', 'Python', 'LLMs'], match: '96%' },
+  'career': { desc: 'From petri dishes to pixels \u2014 the origin story of a career pivot.', tags: ['Documentary', 'Inspirational'], match: '97%' },
+  'pivot': { desc: 'The bootcamp days, the first bugs, the first deploys.', tags: ['Documentary', 'Coding'], match: '96%' },
+  'eventbrite': { desc: 'Life at Eventbrite \u2014 the culture, the code, the events.', tags: ['Documentary', 'Work Life'], match: '94%' },
+  'building-public': { desc: 'Follow along as Rika builds with AI and ships in real-time.', tags: ['New', 'AI', 'Dev Log'], match: '95%' },
+  'grilledcheese': { desc: 'Bracket-style tournament ranking grilled cheeses with scientific rigor.', tags: ['Competition', 'Food', 'Rankings'], match: '95%' },
+  'japan-diaries': { desc: 'Annual pilgrimages home \u2014 onsens, konbini tier lists, and two languages.', tags: ['Travel', 'Culture', 'Bilingual'], match: '96%' },
+  'one-piece': { desc: 'Deep-dive theories that are either brilliant or unhinged.', tags: ['Anime', 'Theories', 'Nerd'], match: '99%' },
+  'drama-reviews': { desc: 'Honest reviews of Japanese dramas from someone who grew up watching them.', tags: ['Reviews', 'J-Drama', 'Culture'], match: '93%' },
+  'now-playing': { desc: 'Yoasobi on repeat, Dodo discoveries, and coding playlist vibes.', tags: ['Music', 'J-Pop', 'Vibes'], match: '92%' },
+  'language-home': { desc: 'What it means to be bilingual when one language is your heritage.', tags: ['Essay', 'Identity', 'Heritage'], match: '98%' },
+  'booknooks': { desc: 'Tiny worlds between books \u2014 miniature scenes that take 20-40 hours each.', tags: ['Crafting', 'Art', 'Cozy'], match: '92%' },
+  'painting': { desc: 'Paint-by-numbers as gifts for friends. Bob Ross energy with tiny numbered squares.', tags: ['Art', 'Gallery', 'Gifts'], match: '90%' },
+  'pilates': { desc: 'The ongoing saga of undoing the damage of sitting at a desk all day.', tags: ['Fitness', 'Wellness', 'Comedy'], match: '88%' },
+  'traitors': { desc: 'Who should have been banished. Why the roundtable is a graph theory problem.', tags: ['Reviews', 'Reality TV', 'Strategy'], match: '94%' },
+  'void-century': { desc: '800 years of erased history. Poneglyphs. A cover-up with footnotes.', tags: ['One Piece', 'Theory', 'Deep Dive'], match: '96%' },
+  'joyboy': { desc: 'Who was Joy Boy? A theory that is either brilliant or completely wrong.', tags: ['One Piece', 'Theory', 'Speculation'], match: '95%' },
+};
+
+let expandedCard = null;
+let hoverTimer = null;
+
+function initExpandedCards() {
+  document.querySelectorAll('.content-card:not(.coming-soon)').forEach(card => {
+    const key = card.getAttribute('data-key');
+    if (!key || !cardExpandedData[key]) return;
+
+    card.addEventListener('mouseenter', () => {
+      hoverTimer = setTimeout(() => expandCard(card, key), 300);
+    });
+    card.addEventListener('mouseleave', () => {
+      clearTimeout(hoverTimer);
+      collapseCard();
+    });
+  });
+}
+
+function expandCard(card, key) {
+  collapseCard();
+  const data = cardExpandedData[key];
+  if (!data) return;
+
+  const expandedEl = card.querySelector('.card-expanded');
+  if (!expandedEl) return;
+
+  expandedEl.querySelector('.card-expanded-desc').textContent = data.desc;
+  expandedEl.querySelector('.card-expanded-tags').innerHTML = data.tags.map(t => `<span class="card-expanded-tag">${t}</span>`).join('');
+  expandedEl.querySelector('.card-expanded-match').textContent = data.match + ' Match';
+
+  // Position: get card's rect and make absolute
+  const rect = card.getBoundingClientRect();
+  const scrollParent = card.closest('.row-scroll');
+  const scrollRect = scrollParent.getBoundingClientRect();
+
+  card.classList.add('expanded');
+  card.style.top = (rect.top + window.scrollY) + 'px';
+  card.style.left = Math.max(scrollRect.left, Math.min(rect.left, window.innerWidth - 360)) + 'px';
+
+  expandedCard = card;
+}
+
+function collapseCard() {
+  if (expandedCard) {
+    expandedCard.classList.remove('expanded');
+    expandedCard.style.top = '';
+    expandedCard.style.left = '';
+    expandedCard = null;
+  }
+}
+
+// ============================================
+// EASTER EGG: Profile avatar emoji spin
+// ============================================
+let profileHoverTimer = null;
+const profileEmojis = ['\u{1F60A}', '\u{1F913}', '\u{1F9C0}', '\u{1F3F4}\u200D\u2620\uFE0F', '\u{1F1EF}\u{1F1F5}', '\u{1F4BB}', '\u{1F3A8}', '\u{1F634}'];
+const profileEl = document.querySelector('.nav-profile');
+let profileEmojiInterval = null;
+
+profileEl.addEventListener('mouseenter', () => {
+  profileHoverTimer = setTimeout(() => {
+    let idx = 0;
+    profileEl.style.transition = 'transform 0.2s';
+    profileEmojiInterval = setInterval(() => {
+      profileEl.textContent = profileEmojis[idx % profileEmojis.length];
+      profileEl.style.transform = `rotate(${idx * 45}deg)`;
+      idx++;
+    }, 200);
+    setTimeout(() => {
+      clearInterval(profileEmojiInterval);
+      profileEmojiInterval = null;
+      profileEl.textContent = 'R';
+      profileEl.style.transform = '';
+      // Re-add the dropdown
+      profileEl.appendChild(document.getElementById('profileDD'));
+    }, 3000);
+  }, 5000);
+});
+profileEl.addEventListener('mouseleave', () => {
+  clearTimeout(profileHoverTimer);
+  if (profileEmojiInterval) {
+    clearInterval(profileEmojiInterval);
+    profileEmojiInterval = null;
+    profileEl.textContent = 'R';
+    profileEl.style.transform = '';
+    profileEl.appendChild(document.getElementById('profileDD'));
+  }
+});
+
+// ============================================
 // INIT
 // ============================================
 resetBillboardTimer();
+initExpandedCards();
 </script>
 </body>
 </html>

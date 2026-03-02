@@ -10,26 +10,51 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg: #0f1117;
-  --surface: #181a20;
-  --surface-2: #1e2028;
-  --border: #2a2d3a;
-  --text: #e8eaf0;
-  --text-muted: #8b8fa3;
-  --accent: #5b9cf6;
-  --accent-glow: rgba(91, 156, 246, 0.2);
-  --pink: #e879a8;
-  --green: #5bc784;
-  --amber: #e8b84a;
-  --red: #e85454;
-  --blue: #5b9cf6;
-  --teal: #4ecdc4;
-  --taskbar-h: 48px;
-  --radius: 10px;
-  --win-header: 38px;
+  --bg: #fdf6f3;
+  --surface: #ffffff;
+  --surface-2: #fef1ed;
+  --border: #f0ddd8;
+  --text: #3d2c3e;
+  --text-muted: #9a8a9c;
+  --accent: #f4a0b5;
+  --accent-glow: rgba(244, 160, 181, 0.25);
+  --pink: #e88fc0;
+  --green: #7ecba3;
+  --amber: #f5c97e;
+  --red: #f07070;
+  --blue: #97b8f0;
+  --teal: #7ec9c0;
+  --lavender: #c4b0e8;
+  --peach: #f8c4a4;
+  --taskbar-h: 88px;
+  --radius: 16px;
+  --win-header: 40px;
   --font: 'Inter', 'Noto Sans JP', sans-serif;
   --mono: 'JetBrains Mono', monospace;
   --display: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+}
+
+body.night-mode {
+  --bg: #1e1525;
+  --surface: #2a1f30;
+  --surface-2: #322838;
+  --border: #443a4c;
+  --text: #f5eff8;
+  --text-muted: #a89ab0;
+  --accent: #f4a0b5;
+  --accent-glow: rgba(244, 160, 181, 0.25);
+}
+
+body.night-mode .taskbar {
+  background: rgba(30, 21, 37, 0.85);
+  border-color: rgba(244,160,181,0.15);
+}
+body.night-mode .boot-screen-wrap {
+  background: #0a0810;
+}
+body.night-mode .desktop-bg::after {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
 }
 
 html, body { height: 100%; overflow: hidden; font-family: var(--font); background: var(--bg); color: var(--text); }
@@ -37,7 +62,7 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
 /* =================== BOOT SEQUENCE =================== */
 #boot-screen {
   position: fixed; inset: 0; z-index: 99999;
-  background: #08090c;
+  background: #3d2c3e;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   font-family: var(--mono);
   transition: opacity 0.6s;
@@ -47,7 +72,7 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
 .boot-logo {
   font-family: var(--display);
   font-size: 48px; font-weight: 800;
-  background: linear-gradient(135deg, var(--accent), var(--teal));
+  background: linear-gradient(135deg, #f4a0b5, #f8c4a4);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   margin-bottom: 32px;
   letter-spacing: -0.03em;
@@ -55,12 +80,12 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
 
 .boot-lines { font-size: 12px; color: #555; text-align: left; width: 400px; max-width: 90vw; }
 .boot-lines div { opacity: 0; animation: bootFade 0.3s forwards; }
-.boot-lines .ok { color: var(--green); }
-.boot-lines .warn { color: var(--amber); }
+.boot-lines .ok { color: #7ecba3; }
+.boot-lines .warn { color: #f5c97e; }
 @keyframes bootFade { to { opacity: 1; } }
 
 .boot-bar { width: 400px; max-width: 90vw; height: 3px; background: #222; border-radius: 2px; margin-top: 24px; overflow: hidden; }
-.boot-bar-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--teal)); border-radius: 2px; animation: bootFill 2s ease-in-out forwards; }
+.boot-bar-fill { height: 100%; width: 0; background: linear-gradient(90deg, #f4a0b5, #f8c4a4); border-radius: 2px; animation: bootFill 2s ease-in-out forwards; }
 @keyframes bootFill { to { width: 100%; } }
 
 /* =================== DESKTOP =================== */
@@ -86,10 +111,10 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
   width: 150%; height: 150%;
   top: -25%; left: -25%;
   background:
-    radial-gradient(ellipse 600px 400px at 25% 35%, rgba(91,156,246,0.07) 0%, transparent 70%),
-    radial-gradient(ellipse 500px 500px at 75% 25%, rgba(78,205,196,0.06) 0%, transparent 70%),
-    radial-gradient(ellipse 400px 600px at 60% 75%, rgba(232,121,168,0.05) 0%, transparent 70%),
-    radial-gradient(ellipse 500px 300px at 15% 80%, rgba(91,199,132,0.04) 0%, transparent 70%);
+    radial-gradient(ellipse 600px 400px at 25% 35%, rgba(244,160,181,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 500px at 75% 25%, rgba(196,176,232,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 600px at 60% 75%, rgba(126,203,163,0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 300px at 15% 80%, rgba(248,196,164,0.04) 0%, transparent 70%);
   animation: meshDrift 20s ease-in-out infinite alternate;
 }
 @keyframes meshDrift {
@@ -99,26 +124,37 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
   100% { transform: translate(10px, -10px) rotate(0.5deg); }
 }
 
-/* Subtle grid lines */
+/* Soft dot pattern */
 .desktop-bg::after {
   content: '';
   position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-  background-size: 60px 60px;
+  background-image: radial-gradient(circle, rgba(244,160,181,0.08) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
 }
 
-/* Kanji watermark */
-.watermark {
+/* Canvas watermark */
+.watermark-canvas {
   position: fixed;
-  right: 60px; bottom: 80px;
-  font-family: 'Noto Sans JP', sans-serif;
-  font-size: 200px; font-weight: 700;
-  color: rgba(91,156,246,0.03);
+  right: 0; bottom: 0;
   pointer-events: none;
-  user-select: none;
-  line-height: 1;
+  z-index: 0;
+}
+
+/* Floating particles */
+.floating-particles {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+}
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  animation: particleFloat linear infinite;
+}
+@keyframes particleFloat {
+  0% { opacity: 0; transform: translateY(100vh) scale(0); }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { opacity: 0; transform: translateY(-10vh) scale(1); }
 }
 
 /* =================== DESKTOP ICONS =================== */
@@ -142,38 +178,48 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
   transition: all 0.15s;
   user-select: none;
 }
-.desktop-icon:hover { background: rgba(91,156,246,0.08); }
+.desktop-icon:hover { background: rgba(244,160,181,0.08); }
 .desktop-icon:active { transform: scale(0.95); }
 
 .desktop-icon .icon-img {
-  width: 48px; height: 48px;
-  border-radius: 14px;
+  width: 52px; height: 52px;
+  border-radius: 16px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
+  font-size: 26px;
   font-weight: 700;
   font-family: var(--display);
   color: white;
   position: relative;
   overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.desktop-icon:hover .icon-img {
+  animation: iconWobble 0.5s ease-in-out;
+  transform: scale(1.1);
+}
+@keyframes iconWobble {
+  0% { transform: scale(1) rotate(0deg); }
+  20% { transform: scale(1.12) rotate(-6deg); }
+  40% { transform: scale(1.08) rotate(5deg); }
+  60% { transform: scale(1.11) rotate(-3deg); }
+  80% { transform: scale(1.09) rotate(2deg); }
+  100% { transform: scale(1.1) rotate(0deg); }
 }
 
 /* Unique icon styles per app */
-.icon-welcome { background: linear-gradient(135deg, #5b9cf6, #4ecdc4); }
-.icon-projects { background: linear-gradient(135deg, #e879a8, #f6a05b); }
-.icon-terminal { background: #1a1a1a; border: 1px solid #333; font-family: var(--mono) !important; font-size: 14px !important; color: var(--green) !important; }
-.icon-gallery { background: linear-gradient(135deg, #a78bfa, #e879a8); }
-.icon-gc { background: linear-gradient(135deg, #f6c95b, #e88a4a); }
+.icon-welcome { background: linear-gradient(135deg, #f4a0b5, #f8c4a4); }
+.icon-projects { background: linear-gradient(135deg, #c4b0e8, #97b8f0); }
+.icon-terminal { background: #2a2035; border: 1px solid #443a4c; font-family: var(--mono) !important; font-size: 14px !important; color: var(--green) !important; }
+.icon-gallery { background: linear-gradient(135deg, #e88fc0, #c4b0e8); }
+.icon-gc { background: linear-gradient(135deg, #f5c97e, #f8c4a4); }
 .icon-trash { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted) !important; font-size: 20px !important; }
-.icon-currently { background: linear-gradient(135deg, #4ecdc4, #5bc784); }
-.icon-japan { background: linear-gradient(135deg, #ff8fa3, #ff6b6b); }
+.icon-currently { background: linear-gradient(135deg, #7ec9c0, #7ecba3); }
+.icon-japan { background: linear-gradient(135deg, #f4a0b5, #f07070); }
 
 /* Icon inner decoration */
-.icon-terminal::before {
-  content: '>_';
-  font-family: var(--mono);
-  font-size: 16px;
-  color: var(--green);
-}
+/* terminal icon art is now SVG-based */
 .icon-projects::after {
   content: '';
   position: absolute;
@@ -206,18 +252,22 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(91,156,246,0.05);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.08), 0 0 0 1px rgba(244,160,181,0.08);
   display: flex; flex-direction: column;
   min-width: 320px; min-height: 200px;
   overflow: hidden;
-  animation: winOpen 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: winOpen 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-@keyframes winOpen { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes winOpen {
+  from { transform: scale(0.8) translateY(20px); opacity: 0; }
+  60% { transform: scale(1.03) translateY(-3px); opacity: 1; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
 
 .window.minimized { animation: winMin 0.2s forwards; pointer-events: none; }
 @keyframes winMin { to { transform: scale(0.5) translateY(100vh); opacity: 0; } }
 
-.window.focused { box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(91,156,246,0.15), 0 0 30px var(--accent-glow); }
+.window.focused { box-shadow: 0 16px 48px rgba(0,0,0,0.1), 0 0 0 1px rgba(244,160,181,0.2), 0 0 24px var(--accent-glow); }
 
 .win-header {
   height: var(--win-header);
@@ -228,12 +278,13 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
   cursor: grab;
   user-select: none;
   flex-shrink: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
 }
 .win-header:active { cursor: grabbing; }
 
 .win-dots { display: flex; gap: 7px; }
-.win-dot { width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer; transition: transform 0.15s; }
-.win-dot:hover { transform: scale(1.2); }
+.win-dot { width: 13px; height: 13px; border-radius: 50%; border: none; cursor: pointer; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.win-dot:hover { transform: scale(1.3); }
 .win-dot.close { background: var(--red); }
 .win-dot.minimize { background: var(--amber); }
 .win-dot.maximize { background: var(--green); }
@@ -243,83 +294,108 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
 .win-body { flex: 1; overflow: auto; padding: 20px; }
 .win-body::-webkit-scrollbar { width: 6px; }
 .win-body::-webkit-scrollbar-track { background: transparent; }
-.win-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.win-body::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; opacity: 0.5; }
 
 .win-resize { position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; cursor: nwse-resize; }
 
-/* =================== TASKBAR =================== */
+/* =================== TASKBAR (DOCK STYLE) =================== */
 .taskbar {
-  height: var(--taskbar-h);
-  background: rgba(15, 17, 23, 0.85);
-  backdrop-filter: blur(20px);
-  border-top: 1px solid var(--border);
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: auto;
+  width: auto;
+  max-width: 90vw;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid rgba(244,160,181,0.2);
+  border-radius: 22px;
   display: flex; align-items: center;
-  padding: 0 12px;
+  padding: 8px 16px;
   z-index: 9000;
   gap: 4px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(244,160,181,0.1);
 }
 
 .tb-start {
-  width: 36px; height: 36px;
-  border-radius: 10px;
+  width: 40px; height: 40px;
+  border-radius: 14px;
   border: none;
-  background: linear-gradient(135deg, var(--accent), var(--teal));
+  background: linear-gradient(135deg, #f4a0b5, #f8c4a4);
   color: white;
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: transform 0.15s;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   font-weight: 700;
   font-family: var(--display);
 }
-.tb-start:hover { transform: scale(1.08); }
+.tb-start:hover { transform: scale(1.15) rotate(-5deg); }
 
 .tb-divider { width: 1px; height: 28px; background: var(--border); margin: 0 8px; }
 
 .tb-apps { display: flex; gap: 3px; flex: 1; overflow-x: auto; }
 
 .tb-app {
-  padding: 4px 14px; border-radius: 8px; border: none;
+  padding: 6px 14px; border-radius: 12px; border: none;
   background: transparent; color: var(--text-muted);
   font-family: var(--font); font-size: 12px;
-  cursor: pointer; white-space: nowrap; transition: all 0.15s;
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   display: flex; align-items: center; gap: 6px;
 }
-.tb-app:hover { background: rgba(91,156,246,0.08); color: var(--text); }
-.tb-app.active { background: rgba(91,156,246,0.12); color: var(--text); }
+.tb-app:hover { background: rgba(244,160,181,0.12); color: var(--text); transform: translateY(-2px); }
+.tb-app.active { background: rgba(244,160,181,0.18); color: var(--text); }
 .tb-app .tb-app-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
 
 .tb-tray { display: flex; align-items: center; gap: 12px; margin-left: auto; font-size: 12px; color: var(--text-muted); }
 .tb-tray-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 12px; font-family: var(--mono); transition: color 0.15s; padding: 4px 8px; border-radius: 6px; }
-.tb-tray-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.tb-tray-btn:hover { color: var(--accent); background: rgba(244,160,181,0.08); }
 #clock { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
 
+/* Language segmented control */
+.lang-toggle-seg {
+  display: flex; border-radius: 6px; overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.lang-seg {
+  padding: 3px 10px; border: none; background: transparent;
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+}
+.lang-seg.active {
+  background: var(--accent); color: #fff;
+}
+.lang-seg:hover:not(.active) { background: rgba(244,160,181,0.1); }
+
 /* =================== COMMAND PALETTE =================== */
-.cmd-overlay { position: fixed; inset: 0; background: rgba(8,9,12,0.6); backdrop-filter: blur(8px); z-index: 50000; display: none; align-items: flex-start; justify-content: center; padding-top: 20vh; }
+.cmd-overlay { position: fixed; inset: 0; background: rgba(42,32,48,0.5); backdrop-filter: blur(8px); z-index: 50000; display: none; align-items: flex-start; justify-content: center; padding-top: 20vh; }
 .cmd-overlay.open { display: flex; }
-.cmd-box { width: 560px; max-width: 90vw; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 30px 80px rgba(0,0,0,0.5); overflow: hidden; animation: cmdOpen 0.15s ease-out; }
-@keyframes cmdOpen { from { transform: scale(0.96) translateY(-8px); opacity: 0; } }
+.cmd-box { width: 560px; max-width: 90vw; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.5); overflow: hidden; animation: cmdOpen 0.15s ease-out; }
+@keyframes cmdOpen { from { transform: scale(0.94) translateY(-12px); opacity: 0; } }
 .cmd-input { width: 100%; padding: 16px 20px; background: transparent; border: none; outline: none; color: var(--text); font-family: var(--font); font-size: 16px; border-bottom: 1px solid var(--border); }
 .cmd-input::placeholder { color: var(--text-muted); }
 .cmd-results { max-height: 320px; overflow-y: auto; }
 .cmd-item { padding: 10px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background 0.1s; font-size: 14px; }
-.cmd-item:hover, .cmd-item.selected { background: rgba(91,156,246,0.1); }
+.cmd-item:hover, .cmd-item.selected { background: rgba(244,160,181,0.1); }
 .cmd-item .cmd-icon { font-size: 18px; width: 28px; text-align: center; }
 .cmd-item .cmd-label { flex: 1; }
 .cmd-item .cmd-hint { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
 
 /* =================== CONTEXT MENU =================== */
-.ctx-menu { position: fixed; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 6px; min-width: 200px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); z-index: 60000; display: none; animation: ctxOpen 0.12s ease-out; }
+.ctx-menu { position: fixed; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 6px; min-width: 200px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); z-index: 60000; display: none; animation: ctxOpen 0.12s ease-out; }
 @keyframes ctxOpen { from { transform: scale(0.95); opacity: 0; } }
 .ctx-menu.open { display: block; }
 .ctx-item { padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 10px; transition: background 0.1s; color: var(--text); }
-.ctx-item:hover { background: rgba(91,156,246,0.12); }
+.ctx-item:hover { background: rgba(244,160,181,0.12); }
 .ctx-item .ctx-icon { width: 20px; text-align: center; }
 .ctx-sep { height: 1px; background: var(--border); margin: 4px 8px; }
 
 /* =================== APP: WELCOME NOTEPAD =================== */
 .notepad-content { font-family: var(--font); font-size: 14px; line-height: 1.8; color: var(--text); }
-.notepad-content h2 { font-family: var(--display); font-size: 22px; font-weight: 700; margin-bottom: 12px; background: linear-gradient(135deg, var(--accent), var(--teal)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.notepad-content h2 { font-family: var(--display); font-size: 22px; font-weight: 700; margin-bottom: 12px; background: linear-gradient(135deg, #f4a0b5, #f8c4a4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .notepad-content p { margin-bottom: 12px; }
 .notepad-content .aside { color: var(--text-muted); font-style: italic; font-size: 13px; }
 
@@ -340,7 +416,7 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
 .project-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
 .project-card p { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
 .project-card .tags { display: flex; gap: 6px; flex-wrap: wrap; }
-.project-card .tag { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 6px; background: rgba(91,156,246,0.1); color: var(--accent); }
+.project-card .tag { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 6px; background: rgba(244,160,181,0.1); color: var(--accent); }
 
 /* =================== APP: GALLERY =================== */
 .gallery-scroll { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 16px; scroll-snap-type: x mandatory; }
@@ -380,7 +456,7 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
   transition: background 0.1s;
   font-size: 13px;
 }
-.finder-item:hover { background: rgba(91,156,246,0.06); }
+.finder-item:hover { background: rgba(244,160,181,0.06); }
 .finder-item.disabled { opacity: 0.35; cursor: not-allowed; }
 .finder-item.disabled:hover { background: transparent; }
 .finder-item .fi-icon { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
@@ -405,12 +481,26 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
 .currently-card .item { font-size: 13px; padding: 4px 0; display: flex; align-items: center; gap: 8px; }
 .currently-card .item-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
+/* =================== CURSOR TRAIL =================== */
+.cursor-dot {
+  position: fixed;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  pointer-events: none;
+  z-index: 99998;
+  opacity: 0.5;
+  transition: opacity 0.4s, transform 0.4s;
+}
+.cursor-dot.fade { opacity: 0; transform: scale(0); }
+
 /* =================== MOBILE =================== */
 @media (max-width: 768px) {
   .desktop-icons { flex-direction: row; flex-wrap: wrap; max-width: 100%; justify-content: center; padding: 16px; }
   .window { position: fixed !important; inset: 0 !important; width: 100vw !important; height: calc(100vh - var(--taskbar-h)) !important; border-radius: 0 !important; min-width: unset !important; min-height: unset !important; }
-  .watermark { display: none; }
+  .watermark-canvas { display: none; }
   .cmd-box { border-radius: 0; }
+  .taskbar { left: 8px; right: 8px; transform: none; width: auto; max-width: none; border-radius: 16px; bottom: 8px; padding: 6px 12px; }
 }
 
 /* =================== SCREENSAVER =================== */
@@ -423,15 +513,15 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
   opacity: 0.6;
 }
 .aurora-layer:nth-child(1) {
-  background: linear-gradient(180deg, transparent 30%, rgba(91,156,246,0.15) 50%, rgba(78,205,196,0.1) 65%, transparent 80%);
+  background: linear-gradient(180deg, transparent 30%, rgba(244,160,181,0.15) 50%, rgba(248,196,164,0.1) 65%, transparent 80%);
   animation: aurora1 8s ease-in-out infinite alternate;
 }
 .aurora-layer:nth-child(2) {
-  background: linear-gradient(180deg, transparent 35%, rgba(232,121,168,0.1) 55%, rgba(91,156,246,0.08) 70%, transparent 85%);
+  background: linear-gradient(180deg, transparent 35%, rgba(232,143,192,0.1) 55%, rgba(244,160,181,0.08) 70%, transparent 85%);
   animation: aurora2 12s ease-in-out infinite alternate;
 }
 .aurora-layer:nth-child(3) {
-  background: linear-gradient(180deg, transparent 25%, rgba(78,205,196,0.12) 45%, rgba(167,139,250,0.06) 60%, transparent 75%);
+  background: linear-gradient(180deg, transparent 25%, rgba(126,201,192,0.12) 45%, rgba(196,176,232,0.06) 60%, transparent 75%);
   animation: aurora3 10s ease-in-out infinite alternate;
 }
 @keyframes aurora1 { 0% { transform: translateX(-10%) scaleY(1); } 100% { transform: translateX(10%) scaleY(1.3); } }
@@ -463,6 +553,108 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
 .cheese-rain { position: fixed; inset: 0; pointer-events: none; z-index: 90000; }
 .cheese-drop { position: absolute; font-size: 32px; animation: cheeseFall linear forwards; }
 @keyframes cheeseFall { from { transform: translateY(-50px) rotate(0deg); } to { transform: translateY(110vh) rotate(360deg); } }
+
+/* =================== EASTER EGG: CLOCK TOOLTIP =================== */
+.clock-tooltip {
+  position: absolute; bottom: calc(var(--taskbar-h) + 8px); right: 12px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 14px; font-size: 12px; color: var(--text);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  white-space: nowrap; pointer-events: none;
+  animation: tooltipFade 0.2s ease-out;
+  z-index: 9999;
+}
+@keyframes tooltipFade { from { opacity: 0; transform: translateY(4px); } }
+
+/* =================== EASTER EGG: GRILLED CHEESE WALLPAPER =================== */
+.gc-wallpaper {
+  position: fixed; inset: 0; z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ctext x='10' y='35' font-size='24'%3E🧀%3C/text%3E%3C/svg%3E");
+  background-size: 60px 60px;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.gc-wallpaper.show { opacity: 0.15; }
+
+/* =================== CSS-ART ICON ENHANCEMENTS =================== */
+.icon-img svg { width: 28px; height: 28px; display: block; }
+
+/* Cheese drip animation for GC icon */
+@keyframes cheeseDrip {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(1.5px); }
+}
+
+/* =================== MUSICAL SCALE TOAST =================== */
+.melody-toast {
+  position: fixed;
+  top: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 13px;
+  color: var(--accent);
+  font-family: var(--font);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  z-index: 99999;
+  animation: toastIn 0.3s ease-out, toastOut 0.3s ease-in 2.5s forwards;
+  pointer-events: none;
+}
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
+@keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
+
+/* =================== DOCK BOUNCE =================== */
+@keyframes dockBounce {
+  0% { transform: translateY(0); }
+  20% { transform: translateY(-10px); }
+  40% { transform: translateY(0); }
+  55% { transform: translateY(-6px); }
+  70% { transform: translateY(0); }
+  85% { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}
+.tb-app.bouncing { animation: dockBounce 0.6s ease-out; }
+
+/* =================== WINDOW SNAP INDICATOR =================== */
+.snap-indicator {
+  position: fixed;
+  background: rgba(244, 160, 181, 0.12);
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius);
+  z-index: 50;
+  pointer-events: none;
+  transition: all 0.15s ease-out;
+}
+
+/* =================== DESKTOP TOY =================== */
+.desktop-toy {
+  position: fixed;
+  pointer-events: none;
+  z-index: 5;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--accent), var(--pink));
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 -2px 4px rgba(0,0,0,0.1);
+}
+
+/* =================== SPARKLE =================== */
+@keyframes sparkle {
+  0% { transform: scale(0) rotate(0deg); opacity: 1; }
+  50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+.sparkle {
+  position: fixed; width: 8px; height: 8px;
+  pointer-events: none; z-index: 99999;
+  animation: sparkle 0.6s ease-out forwards;
+}
+.sparkle::before, .sparkle::after {
+  content: ''; position: absolute; background: var(--accent); border-radius: 1px;
+}
+.sparkle::before { width: 100%; height: 2px; top: 50%; left: 0; transform: translateY(-50%); }
+.sparkle::after { width: 2px; height: 100%; left: 50%; top: 0; transform: translateX(-50%); }
 </style>
 </head>
 <body>
@@ -477,17 +669,23 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
 <!-- DESKTOP -->
 <div id="desktop">
   <div class="desktop-bg"></div>
-  <div class="watermark">莉香</div>
+  <div class="floating-particles" id="particles"></div>
+  <div class="gc-wallpaper" id="gcWallpaper"></div>
+  <canvas class="watermark-canvas" id="watermarkCanvas"></canvas>
   <div class="desktop-icons" id="desktopIcons"></div>
   <div id="windowContainer"></div>
 
-  <!-- Taskbar -->
+  <!-- Taskbar / Dock -->
   <div class="taskbar">
     <button class="tb-start" title="Start">R</button>
     <div class="tb-divider"></div>
     <div class="tb-apps" id="tbApps"></div>
     <div class="tb-tray">
-      <button class="tb-tray-btn" id="langToggle" onclick="toggleLang()">EN</button>
+      <button class="tb-tray-btn" id="nightToggle" onclick="toggleNightMode()" title="Toggle night mode">☀️</button>
+      <div class="lang-toggle-seg" id="langToggle">
+        <button class="lang-seg active" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-seg" data-lang="jp" onclick="setLang('jp')">JP</button>
+      </div>
       <span id="clock"></span>
     </div>
   </div>
@@ -524,6 +722,128 @@ let nextWinId = 1;
 let focusedWinId = null;
 let idleTimer = null;
 const IDLE_TIMEOUT = 120000;
+let nightMode = false;
+
+// =================== SOUND SYSTEM ===================
+let audioCtx = null;
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+document.addEventListener('click', () => { initAudio(); startAmbientHum(); }, { once: true });
+
+// Subtle ambient pad (barely audible warm hum)
+let ambientNode = null;
+function startAmbientHum() {
+  if (!audioCtx || ambientNode) return;
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  osc.type = 'sine'; osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.006, audioCtx.currentTime);
+  osc.connect(gain).connect(audioCtx.destination); osc.start();
+  ambientNode = osc;
+}
+
+function playBoop(freq = 520, duration = 0.08, vol = 0.12, type = 'sine') {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(freq * 0.6, audioCtx.currentTime + duration);
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+// Musical icon scale — C major pentatonic
+const musicalScale = {
+  welcome:   { freq: 523.25, note: 'C5' },
+  projects:  { freq: 587.33, note: 'D5' },
+  terminal:  { freq: 659.25, note: 'E5' },
+  gallery:   { freq: 783.99, note: 'G5' },
+  currently: { freq: 880.00, note: 'A5' },
+  gc:        { freq: 1046.50, note: 'C6' },
+  japan:     { freq: 1174.66, note: 'D6' },
+  trash:     { freq: 1318.51, note: 'E6' },
+};
+const scaleOrder = ['welcome','projects','terminal','gallery','currently','gc','japan','trash'];
+let scaleProgress = 0;
+let melodyUnlocked = false;
+
+function playScaleNote(appId) {
+  const note = musicalScale[appId];
+  if (!note) return;
+  playBoop(note.freq, 0.15, 0.08, 'sine');
+  if (scaleOrder[scaleProgress] === appId) {
+    scaleProgress++;
+    if (scaleProgress >= scaleOrder.length && !melodyUnlocked) {
+      melodyUnlocked = true;
+      triggerMelodyUnlocked();
+    }
+  } else if (scaleOrder[0] === appId) {
+    scaleProgress = 1;
+  } else {
+    scaleProgress = 0;
+  }
+}
+
+function triggerMelodyUnlocked() {
+  scaleOrder.forEach((id, i) => {
+    setTimeout(() => playBoop(musicalScale[id].freq, 0.2, 0.1, 'sine'), i * 80);
+  });
+  document.querySelectorAll('.desktop-icon').forEach(icon => {
+    const rect = icon.getBoundingClientRect();
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        const sp = document.createElement('div');
+        sp.className = 'sparkle';
+        sp.style.left = (rect.left + Math.random() * rect.width) + 'px';
+        sp.style.top = (rect.top + Math.random() * rect.height) + 'px';
+        document.body.appendChild(sp);
+        setTimeout(() => sp.remove(), 600);
+      }, i * 100);
+    }
+  });
+  const toast = document.createElement('div');
+  toast.className = 'melody-toast';
+  toast.textContent = '♪ melody unlocked ♪';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// Legacy boop lookup for non-icon usage
+const appBoops = {
+  welcome: { freq: 523, type: 'sine' },
+  projects: { freq: 587, type: 'triangle' },
+  terminal: { freq: 659, type: 'square' },
+  gallery: { freq: 784, type: 'sine' },
+  currently: { freq: 880, type: 'sine' },
+  gc: { freq: 1047, type: 'triangle' },
+  japan: { freq: 1175, type: 'sine' },
+  trash: { freq: 1319, type: 'triangle' },
+};
+
+function playWindowOpen() {
+  if (!audioCtx) return;
+  // Two-note ascending chime
+  playBoop(523, 0.1, 0.1);
+  setTimeout(() => playBoop(659, 0.12, 0.08), 80);
+}
+
+function playWindowClose() {
+  if (!audioCtx) return;
+  // Descending soft thud
+  playBoop(440, 0.06, 0.08);
+  setTimeout(() => playBoop(330, 0.1, 0.06), 50);
+}
+
+function playTypeBoop() {
+  if (!audioCtx) return;
+  const freq = 600 + Math.random() * 200;
+  playBoop(freq, 0.03, 0.04, 'sine');
+}
 
 // =================== I18N ===================
 const i18n = {
@@ -539,7 +859,7 @@ const i18n = {
     terminal: 'Terminal',
     gallery: 'Gallery',
     gc: 'Grilled Cheese',
-    trash: 'Finder',
+    trash: 'Trash',
     currently: 'Currently',
     japan: 'Japan',
   },
@@ -554,23 +874,35 @@ const i18n = {
     terminal: 'ターミナル',
     gallery: 'ギャラリー',
     gc: 'グリルドチーズ',
-    trash: 'ファインダー',
+    trash: 'ゴミ箱',
     currently: '今ハマってる',
     japan: '日本',
   }
 };
 function t(key) { return i18n[lang][key] || i18n.en[key] || key; }
 
+// =================== CSS-ART ICON SVGs ===================
+const iconSVGs = {
+  welcome: '<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="14" r="10" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/><circle cx="12.5" cy="12" r="1.8" fill="rgba(255,255,255,0.8)"/><circle cx="19.5" cy="12" r="1.8" fill="rgba(255,255,255,0.8)"/><path d="M13 17Q16 20 19 17" stroke="rgba(255,255,255,0.7)" stroke-width="1.3" fill="none" stroke-linecap="round"/><circle cx="9" cy="15" r="2.8" fill="rgba(255,180,200,0.35)"/><circle cx="23" cy="15" r="2.8" fill="rgba(255,180,200,0.35)"/><path d="M24 5l1.5-3M27.5 6.5l3-1M26 9l1.5 2.5" stroke="rgba(255,255,255,0.5)" stroke-width="1.2" stroke-linecap="round"/></svg>',
+  projects: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.3" stroke-linecap="round"><rect x="5" y="8" width="22" height="15" rx="2" fill="rgba(255,255,255,0.1)"/><path d="M3 25h26" stroke-width="1.5"/><line x1="9" y1="13" x2="18" y2="13"/><line x1="9" y1="16.5" x2="23" y2="16.5" opacity="0.5"/><line x1="9" y1="19.5" x2="15" y2="19.5" opacity="0.5"/></svg>',
+  terminal: '<svg viewBox="0 0 32 32" fill="none" stroke-linecap="round"><rect x="4" y="6" width="24" height="20" rx="3" fill="rgba(0,0,0,0.3)" stroke="rgba(126,203,163,0.5)" stroke-width="1"/><text x="10" y="20" font-family="monospace" font-size="12" font-weight="bold" fill="rgba(126,203,163,0.9)">›_</text><rect x="21" y="15" width="1.5" height="8" rx="0.5" fill="rgba(126,203,163,0.6)"><animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/></rect></svg>',
+  gallery: '<svg viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="17" rx="12" ry="10" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/><circle cx="11" cy="14" r="2.5" fill="#ff9bb5"/><circle cx="18" cy="11" r="2" fill="#c4b0e8"/><circle cx="23" cy="16" r="2" fill="#7ecba3"/><circle cx="14" cy="21" r="1.8" fill="#f5c97e"/><circle cx="8.5" cy="19" r="3.5" fill="rgba(255,255,255,0.15)"/></svg>',
+  currently: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"><path d="M8 19C8 11 24 11 24 19"/><rect x="5.5" y="18" width="5" height="7" rx="2.5" fill="rgba(255,255,255,0.2)" stroke-width="1.2"/><rect x="21.5" y="18" width="5" height="7" rx="2.5" fill="rgba(255,255,255,0.2)" stroke-width="1.2"/><text x="27" y="10" font-size="9" fill="rgba(255,255,255,0.5)" stroke="none">♪</text></svg>',
+  gc: '<svg viewBox="0 0 32 32" fill="none"><rect x="7" y="8" width="18" height="4.5" rx="2" fill="rgba(255,255,255,0.35)" stroke="rgba(255,255,255,0.5)" stroke-width="0.8"/><path d="M7 12.5Q11.5 17 16 12.5Q20.5 17 25 12.5" fill="rgba(255,210,120,0.45)" stroke="rgba(255,210,120,0.6)" stroke-width="0.8"/><rect x="7" y="15" width="18" height="4.5" rx="2" fill="rgba(255,255,255,0.3)" stroke="rgba(255,255,255,0.45)" stroke-width="0.8"/><path d="M12 19.5q.5 3 1 0M19 19.5q.5 2.5 1 0" stroke="rgba(255,210,120,0.55)" stroke-width="1.5" stroke-linecap="round"><animate attributeName="d" values="M12 19.5q.5 3 1 0M19 19.5q.5 2.5 1 0;M12 19.5q.5 4 1 0M19 19.5q.5 3.5 1 0;M12 19.5q.5 3 1 0M19 19.5q.5 2.5 1 0" dur="2s" repeatCount="indefinite"/></path></svg>',
+  japan: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round"><line x1="10" y1="12" x2="10" y2="28"/><line x1="22" y1="12" x2="22" y2="28"/><path d="M6 12Q16 8 26 12" stroke-width="2.2"/><line x1="8" y1="16" x2="24" y2="16" stroke-width="1.3"/><circle cx="26" cy="7" r="2.2" fill="rgba(255,180,200,0.5)" stroke="none"/><circle cx="29" cy="9.5" r="1.5" fill="rgba(255,180,200,0.35)" stroke="none"/></svg>',
+  trash: '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(150,138,156,0.7)" stroke-width="1.2" stroke-linecap="round"><rect x="9" y="11" width="14" height="16" rx="2" fill="rgba(150,138,156,0.15)"/><path d="M7 9h18"/><path d="M13 7h6" stroke-width="1.5"/><circle cx="13.5" cy="18" r="1.4" fill="rgba(150,138,156,0.6)" stroke="none"/><circle cx="18.5" cy="18" r="1.4" fill="rgba(150,138,156,0.6)" stroke="none"/><path d="M13.5 22Q16 24 18.5 22" stroke-width="1.1"/></svg>',
+};
+
 // =================== APPS ===================
 const apps = [
-  { id: 'welcome', iconCls: 'icon-welcome', iconText: 'Hi', label: () => t('about'), w: 520, h: 420 },
-  { id: 'projects', iconCls: 'icon-projects', iconText: '{ }', label: () => t('projects'), w: 700, h: 500 },
+  { id: 'welcome', iconCls: 'icon-welcome', iconText: '', label: () => t('about'), w: 520, h: 420 },
+  { id: 'projects', iconCls: 'icon-projects', iconText: '', label: () => t('projects'), w: 700, h: 500 },
   { id: 'terminal', iconCls: 'icon-terminal', iconText: '', label: () => t('terminal'), w: 640, h: 420 },
   { id: 'gallery', iconCls: 'icon-gallery', iconText: '', label: () => t('gallery'), w: 680, h: 460 },
-  { id: 'currently', iconCls: 'icon-currently', iconText: '▶', label: () => t('currently'), w: 480, h: 400 },
-  { id: 'gc', iconCls: 'icon-gc', iconText: 'GC', label: () => t('gc'), w: 720, h: 520 },
-  { id: 'japan', iconCls: 'icon-japan', iconText: '日', label: () => t('japan'), w: 520, h: 440 },
-  { id: 'trash', iconCls: 'icon-trash', iconText: '📁', label: () => t('trash'), w: 560, h: 420 },
+  { id: 'currently', iconCls: 'icon-currently', iconText: '', label: () => t('currently'), w: 480, h: 400 },
+  { id: 'gc', iconCls: 'icon-gc', iconText: '', label: () => t('gc'), w: 720, h: 520 },
+  { id: 'japan', iconCls: 'icon-japan', iconText: '', label: () => t('japan'), w: 520, h: 440 },
+  { id: 'trash', iconCls: 'icon-trash', iconText: '', label: () => t('trash'), w: 560, h: 420 },
 ];
 
 // =================== BOOT ===================
@@ -617,6 +949,23 @@ function runBoot() {
   }, 2400);
 }
 
+// =================== FLOATING PARTICLES ===================
+function initParticles() {
+  const container = document.getElementById('particles');
+  const colors = ['var(--accent)', 'var(--lavender)', 'var(--peach)', 'var(--green)', 'var(--teal)', 'var(--pink)'];
+  for (let i = 0; i < 15; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = 4 + Math.random() * 6;
+    p.style.width = p.style.height = size + 'px';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    p.style.animationDuration = (15 + Math.random() * 15) + 's';
+    p.style.animationDelay = Math.random() * 20 + 's';
+    container.appendChild(p);
+  }
+}
+
 // =================== DESKTOP ICONS ===================
 function renderDesktopIcons() {
   const container = document.getElementById('desktopIcons');
@@ -625,8 +974,9 @@ function renderDesktopIcons() {
     const el = document.createElement('div');
     el.className = 'desktop-icon';
     el.ondblclick = () => openApp(app.id);
+    el.onmouseenter = () => playScaleNote(app.id);
     el.innerHTML = `
-      <div class="icon-img ${app.iconCls}">${app.iconText}</div>
+      <div class="icon-img ${app.iconCls}">${iconSVGs[app.id] || app.iconText}</div>
       <div class="icon-label">${app.label()}</div>
     `;
     container.appendChild(el);
@@ -667,6 +1017,21 @@ function openApp(appId) {
   renderWindow(win, app);
   focusWindow(id);
   updateTaskbar();
+
+  // Sound effects
+  playWindowOpen();
+  const boop = appBoops[appId];
+  if (boop) setTimeout(() => playBoop(boop.freq, 0.1, 0.1, boop.type), 150);
+
+  // Dock bounce after app loads
+  setTimeout(() => {
+    const tbApp = document.querySelector(`.tb-app[data-app="${appId}"]`);
+    if (tbApp) {
+      tbApp.classList.add('bouncing');
+      playBoop(440, 0.06, 0.06, 'sine');
+      tbApp.addEventListener('animationend', () => tbApp.classList.remove('bouncing'), { once: true });
+    }
+  }, 350);
 }
 
 function renderWindow(win, app) {
@@ -745,7 +1110,7 @@ function renderAppContent(winId, appId) {
         <div id="term-output-${winId}"><span class="output">RikaOS Terminal v2.1 — type "help" for commands\n\n</span></div>
         <div class="term-input-line">
           <span class="prompt">rika@portfolio ~ % </span>
-          <input class="term-input" id="term-input-${winId}" autofocus onkeydown="if(event.key==='Enter')execTermCmd(${winId})">
+          <input class="term-input" id="term-input-${winId}" autofocus onkeydown="if(event.key==='Enter')execTermCmd(${winId}); else playTypeBoop();">
         </div>
       </div>`;
       setTimeout(() => { const inp = document.getElementById(`term-input-${winId}`); if (inp) inp.focus(); }, 100);
@@ -934,6 +1299,7 @@ function focusWindow(id) {
 }
 
 function closeWindow(id) {
+  playWindowClose();
   const el = document.getElementById(`win-${id}`);
   if (el) { el.style.transition = 'transform 0.2s, opacity 0.2s'; el.style.transform = 'scale(0.9)'; el.style.opacity = '0'; setTimeout(() => el.remove(), 200); }
   windows = windows.filter(w => w.id !== id);
@@ -942,6 +1308,7 @@ function closeWindow(id) {
 }
 
 function minimizeWindow(id) {
+  playBoop(350, 0.08, 0.06);
   const win = windows.find(w => w.id === id);
   if (win) win.minimized = true;
   const el = document.getElementById(`win-${id}`);
@@ -985,6 +1352,36 @@ function startResize(e, winId) {
   dragState = { type: 'resize', winId, startX: e.clientX, startY: e.clientY, origW: rect.width, origH: rect.height };
   focusWindow(winId);
 }
+// =================== WINDOW SNAP ===================
+let snapIndicator = null;
+let currentSnapSide = null;
+const SNAP_THRESHOLD = 20;
+
+function updateSnapIndicator(mx, my) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  let side = null;
+  if (mx < SNAP_THRESHOLD) side = 'left';
+  else if (mx > vw - SNAP_THRESHOLD) side = 'right';
+  if (side) {
+    if (!snapIndicator) { snapIndicator = document.createElement('div'); snapIndicator.className = 'snap-indicator'; document.body.appendChild(snapIndicator); }
+    if (side === 'left') snapIndicator.style.cssText = `left:4px;top:4px;width:${vw/2-8}px;height:${vh-100}px;`;
+    else snapIndicator.style.cssText = `left:${vw/2+4}px;top:4px;width:${vw/2-8}px;height:${vh-100}px;`;
+  } else { removeSnapIndicator(); }
+  return side;
+}
+function removeSnapIndicator() { if (snapIndicator) { snapIndicator.remove(); snapIndicator = null; } }
+function snapWindow(winId, side) {
+  const el = document.getElementById(`win-${winId}`); const win = windows.find(w => w.id === winId);
+  if (!el || !win) return;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  if (side === 'left') { el.style.left='4px'; el.style.top='4px'; el.style.width=(vw/2-8)+'px'; el.style.height=(vh-100)+'px'; }
+  else { el.style.left=(vw/2+4)+'px'; el.style.top='4px'; el.style.width=(vw/2-8)+'px'; el.style.height=(vh-100)+'px'; }
+  win.x=parseInt(el.style.left); win.y=parseInt(el.style.top); win.w=parseInt(el.style.width); win.h=parseInt(el.style.height);
+  playBoop(200, 0.05, 0.08, 'square'); setTimeout(() => playBoop(250, 0.03, 0.06, 'square'), 30);
+  removeSnapIndicator();
+}
+
 document.addEventListener('mousemove', e => {
   if (!dragState) return;
   const el = document.getElementById(`win-${dragState.winId}`);
@@ -995,6 +1392,7 @@ document.addEventListener('mousemove', e => {
     const ny = dragState.origY + (e.clientY - dragState.startY);
     el.style.left = nx + 'px'; el.style.top = ny + 'px';
     if (win) { win.x = nx; win.y = ny; win._maximized = false; }
+    currentSnapSide = updateSnapIndicator(e.clientX, e.clientY);
   } else if (dragState.type === 'resize') {
     const nw = Math.max(320, dragState.origW + (e.clientX - dragState.startX));
     const nh = Math.max(200, dragState.origH + (e.clientY - dragState.startY));
@@ -1002,7 +1400,11 @@ document.addEventListener('mousemove', e => {
     if (win) { win.w = nw; win.h = nh; }
   }
 });
-document.addEventListener('mouseup', () => { dragState = null; });
+document.addEventListener('mouseup', () => {
+  if (dragState && currentSnapSide) { snapWindow(dragState.winId, currentSnapSide); currentSnapSide = null; }
+  removeSnapIndicator();
+  dragState = null;
+});
 
 // =================== TASKBAR ===================
 function updateTaskbar() {
@@ -1013,6 +1415,7 @@ function updateTaskbar() {
     if (!app) return;
     const btn = document.createElement('button');
     btn.className = 'tb-app' + (win.id === focusedWinId && !win.minimized ? ' active' : '');
+    btn.dataset.app = win.appId;
     btn.innerHTML = `<span class="tb-app-dot"></span>${app.label()}`;
     btn.onclick = () => {
       if (win.minimized) { win.minimized = false; const el = document.getElementById(`win-${win.id}`); if (el) { el.classList.remove('minimized'); el.style.display = ''; } }
@@ -1035,6 +1438,7 @@ function execTermCmd(winId) {
   const output = document.getElementById(`term-output-${winId}`);
   if (!input || !output) return;
   const cmd = input.value.trim(); input.value = '';
+  playTypeBoop();
   output.innerHTML += `<span class="prompt">rika@portfolio ~ % </span><span class="cmd-text">${escHtml(cmd)}</span>\n`;
   const result = processCmd(cmd);
   if (result) output.innerHTML += `<span class="output">${result}</span>\n`;
@@ -1057,7 +1461,8 @@ function processCmd(cmd) {
   <span class="highlight">clear</span>       — clear terminal
   <span class="highlight">neofetch</span>    — system info
   <span class="highlight">fortune</span>     — random fortune
-  <span class="highlight">cowsay</span> [msg] — moo`;
+  <span class="highlight">cowsay</span> [msg] — moo
+  <span class="highlight">history</span>     — command history`;
     case 'whoami': return `Rika Ciminieri\nHalf-Japanese full-stack engineer @ Eventbrite\nFormer microbiology student · Pilates enthusiast · Book nook builder\nFluent in: TypeScript, Python, Japanese, sarcasm`;
     case 'ls': return apps.map(a => `  ${a.label()}`).join('\n');
     case 'cat':
@@ -1072,16 +1477,22 @@ function processCmd(cmd) {
       if (appName && apps.find(a => a.id === appName)) { setTimeout(() => openApp(appName), 100); return `Opening ${appName}...`; }
       return `<span class="error">open: unknown app</span>\nAvailable: ${apps.map(a => a.id).join(', ')}`;
     case 'clear': setTimeout(() => { const w = windows.find(w => w.appId === 'terminal'); if (w) { const o = document.getElementById(`term-output-${w.id}`); if (o) o.innerHTML = ''; } }, 10); return '';
-    case 'neofetch': return `\n  <span class="highlight">     ██████╗  </span>   rika@portfolio\n  <span class="highlight">    ██╔══██╗ </span>   ──────────────\n  <span class="highlight">    ██████╔╝ </span>   OS: RikaOS v2.1\n  <span class="highlight">    ██╔══██╗ </span>   Shell: rika-terminal\n  <span class="highlight">    ██║  ██║ </span>   Languages: EN, JP\n  <span class="highlight">    ╚═╝  ╚═╝ </span>   Theme: midnight-teal\n                  Uptime: since 2024\n                  Mood: good vibes`;
+    case 'neofetch': return `\n  <span class="highlight">     ██████╗  </span>   rika@portfolio\n  <span class="highlight">    ██╔══██╗ </span>   ──────────────\n  <span class="highlight">    ██████╔╝ </span>   OS: RikaOS v2.1\n  <span class="highlight">    ██╔══██╗ </span>   Shell: rika-terminal\n  <span class="highlight">    ██║  ██║ </span>   Languages: EN, JP\n  <span class="highlight">    ╚═╝  ╚═╝ </span>   Theme: warm-light\n                  Uptime: since 2024\n                  Mood: good vibes`;
     case 'fortune':
       const f = ['"A well-organized codebase is worth a thousand comments." — Rika, probably','"Sometimes the real treasure is the bugs we fixed along the way."','"Have you tried turning it off and making a grilled cheese?"','"If you can\'t explain it simply, you don\'t understand it well enough." — Einstein, probably debugging','"The best code is no code at all." — Senior dev energy'];
       return f[Math.floor(Math.random()*f.length)];
     case 'cowsay':
       const msg = parts.slice(1).join(' ') || 'moo';
       return ` ┌${'─'.repeat(msg.length+2)}┐\n │ ${escHtml(msg)} │\n └${'─'.repeat(msg.length+2)}┘\n        \\   ^__^\n         \\  (oo)\\_______\n            (__)\\       )\\/\\\n                ||----w |\n                ||     ||`;
-    case 'sudo': return '<span class="error">Nice try. No sudo on RikaOS.</span>';
+    case 'sudo':
+      if (cmd.toLowerCase().includes('make me a sandwich') || cmd.toLowerCase().includes('make me a grilled cheese')) {
+        return `\n  <span class="highlight">    ┌─────────────────┐</span>\n  <span class="highlight">    │  ═══════════════  │</span>  <span class="output">← golden brioche</span>\n  <span class="highlight">    │ ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈ │</span>  <span class="output">← melted gruyère</span>\n  <span class="highlight">    │ ~~~~~~~~~~~~~~~~ │</span>  <span class="output">← caramelized onion</span>\n  <span class="highlight">    │ ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈ │</span>  <span class="output">← more cheese (always)</span>\n  <span class="highlight">    │  ═══════════════  │</span>  <span class="output">← toasted sourdough</span>\n  <span class="highlight">    └─────────────────┘</span>\n\n  <span class="output">Order up! 🧀 Rika-approved.</span>`;
+      }
+      return '<span class="error">Nice try. No sudo on RikaOS.</span>';
     case 'rm': return '<span class="error">Whoa. This is a portfolio, not a demolition site.</span>';
     case 'exit': return 'Where would you even go? You\'re already home.';
+    case 'history':
+      return `  1  npm run dev\n  2  git commit -m "add grilled cheese rankings"\n  3  curl -s "https://api.grilledcheese.rika.dev/v2/rankings"\n  4  python3 -c "import antigravity"\n  5  cat ~/.bridgerton-rewatch-count  # output: 14\n  6  ssh rika@japan-trip-planner.local\n  7  sudo make me a sandwich\n  8  git push origin main --force  # yolo\n  9  node -e "console.log('MJ is the king of pop')"\n 10  history`;
     default: return `<span class="error">command not found: ${escHtml(c)}</span>\nType <span class="highlight">help</span> for available commands.`;
   }
 }
@@ -1097,7 +1508,7 @@ const cmdItems = [
   { icon: '▶', label: 'Open Currently', hint: 'watching/reading', action: () => openApp('currently') },
   { icon: 'GC', label: 'Open Grilled Cheese', hint: 'rankings', action: () => openApp('gc') },
   { icon: '日', label: 'Open Japan', hint: 'heritage', action: () => openApp('japan') },
-  { icon: '📁', label: 'Open Finder', hint: 'files', action: () => openApp('trash') },
+  { icon: '📁', label: 'Open Trash', hint: 'files', action: () => openApp('trash') },
   { icon: '🌐', label: 'Toggle Language', hint: 'EN ↔ JP', action: () => toggleLang() },
   { icon: '✕', label: 'Close All Windows', hint: '', action: () => closeAllWindows() },
 ];
@@ -1148,9 +1559,11 @@ document.addEventListener('contextmenu', e => {
 document.addEventListener('click', () => document.getElementById('ctxMenu').classList.remove('open'));
 
 // =================== LANGUAGE ===================
-function toggleLang() {
-  lang = lang === 'en' ? 'jp' : 'en';
-  document.getElementById('langToggle').textContent = lang.toUpperCase();
+function setLang(newLang) {
+  lang = newLang;
+  document.querySelectorAll('.lang-seg').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
   renderDesktopIcons();
   windows.forEach(win => {
     const app = apps.find(a => a.id === win.appId);
@@ -1161,6 +1574,19 @@ function toggleLang() {
     }
   });
   updateTaskbar();
+  // Update watermark
+  updateWatermark();
+}
+
+function toggleLang() { setLang(lang === 'en' ? 'jp' : 'en'); }
+
+// =================== NIGHT MODE ===================
+function toggleNightMode() {
+  nightMode = !nightMode;
+  document.body.classList.toggle('night-mode', nightMode);
+  document.getElementById('nightToggle').textContent = nightMode ? '🌙' : '☀️';
+  // Re-render the watermark with updated accent color
+  updateWatermark();
 }
 
 // =================== KEYBOARD SHORTCUTS ===================
@@ -1185,15 +1611,243 @@ function cheeseRain() {
 
 // =================== SCREENSAVER ===================
 function resetIdleTimer() { clearTimeout(idleTimer); hideScreensaver(); idleTimer = setTimeout(showScreensaver, IDLE_TIMEOUT); }
-function showScreensaver() { document.getElementById('screensaver').classList.add('active'); }
+function showScreensaver() {
+  document.getElementById('screensaver').classList.add('active');
+  // Gentle wind-down tone
+  if (audioCtx) {
+    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.type = 'sine'; osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.8);
+    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+    osc.connect(gain).connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.8);
+  }
+}
 function hideScreensaver() { document.getElementById('screensaver').classList.remove('active'); }
 
 // =================== HELPERS ===================
 function closeAllWindows() { [...windows].forEach(w => closeWindow(w.id)); }
 
+// =================== CURSOR TRAIL ===================
+let trailDots = [];
+const MAX_TRAIL = 8;
+let lastTrailTime = 0;
+document.addEventListener('mousemove', (e) => {
+  const now = Date.now();
+  if (now - lastTrailTime < 50) return;
+  lastTrailTime = now;
+  const dot = document.createElement('div');
+  dot.className = 'cursor-dot';
+  dot.style.left = (e.clientX - 3) + 'px';
+  dot.style.top = (e.clientY - 3) + 'px';
+  document.body.appendChild(dot);
+  trailDots.push(dot);
+  requestAnimationFrame(() => dot.classList.add('fade'));
+  setTimeout(() => { dot.remove(); trailDots = trailDots.filter(d => d !== dot); }, 400);
+  while (trailDots.length > MAX_TRAIL) { const old = trailDots.shift(); old.remove(); }
+});
+
+// =================== CANVAS RIPPLE WATERMARK ===================
+const rippleCanvas = document.getElementById('watermarkCanvas');
+const rippleCtx = rippleCanvas.getContext('2d');
+let rippleW, rippleH;
+let rippleGrid, ripplePrevGrid, rippleRefImage;
+const RIPPLE_RES = 4; // pixel resolution (4 = every 4th pixel)
+let rippleGridW, rippleGridH;
+const RIPPLE_DAMPING = 0.97;
+
+function initRippleCanvas() {
+  rippleW = window.innerWidth;
+  rippleH = window.innerHeight;
+  rippleCanvas.width = rippleW;
+  rippleCanvas.height = rippleH;
+  rippleGridW = Math.ceil(rippleW / RIPPLE_RES);
+  rippleGridH = Math.ceil(rippleH / RIPPLE_RES);
+  rippleGrid = new Float32Array(rippleGridW * rippleGridH);
+  ripplePrevGrid = new Float32Array(rippleGridW * rippleGridH);
+  renderWatermarkText();
+}
+
+function renderWatermarkText() {
+  rippleCtx.clearRect(0, 0, rippleW, rippleH);
+  const text = lang === 'jp' ? '莉香チミニエリ' : 'RIKA CIMINIERI';
+  const fontSize = lang === 'jp' ? 160 : 120;
+  const fontFamily = lang === 'jp' ? "'Noto Sans JP', sans-serif" : "'Space Grotesk', sans-serif";
+  rippleCtx.font = `800 ${fontSize}px ${fontFamily}`;
+  rippleCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#f4a0b5';
+  rippleCtx.globalAlpha = 0.06;
+  rippleCtx.textAlign = 'right';
+  rippleCtx.textBaseline = 'bottom';
+  rippleCtx.fillText(text, rippleW - 60, rippleH - 80);
+  rippleCtx.globalAlpha = 1.0;
+  rippleRefImage = rippleCtx.getImageData(0, 0, rippleW, rippleH);
+  // Reset grids
+  rippleGrid.fill(0);
+  ripplePrevGrid.fill(0);
+}
+
+function updateWatermark() {
+  renderWatermarkText();
+}
+
+let mouseRippleX = -1, mouseRippleY = -1;
+document.addEventListener('mousemove', e => {
+  mouseRippleX = Math.floor(e.clientX / RIPPLE_RES);
+  mouseRippleY = Math.floor(e.clientY / RIPPLE_RES);
+});
+
+function rippleFrame() {
+  // Apply disturbance at mouse position
+  if (mouseRippleX >= 1 && mouseRippleX < rippleGridW - 1 && mouseRippleY >= 1 && mouseRippleY < rippleGridH - 1) {
+    const idx = mouseRippleY * rippleGridW + mouseRippleX;
+    rippleGrid[idx] = 512;
+  }
+
+  // Propagate wave
+  const newGrid = new Float32Array(rippleGridW * rippleGridH);
+  for (let y = 1; y < rippleGridH - 1; y++) {
+    for (let x = 1; x < rippleGridW - 1; x++) {
+      const idx = y * rippleGridW + x;
+      newGrid[idx] = (
+        rippleGrid[idx - 1] + rippleGrid[idx + 1] +
+        rippleGrid[idx - rippleGridW] + rippleGrid[idx + rippleGridW]
+      ) / 2 - ripplePrevGrid[idx];
+      newGrid[idx] *= RIPPLE_DAMPING;
+    }
+  }
+  ripplePrevGrid = rippleGrid;
+  rippleGrid = newGrid;
+
+  // Render
+  if (!rippleRefImage) return requestAnimationFrame(rippleFrame);
+  const imgData = new ImageData(
+    new Uint8ClampedArray(rippleRefImage.data),
+    rippleW, rippleH
+  );
+  const pixels = imgData.data;
+
+  for (let y = 1; y < rippleGridH - 1; y++) {
+    for (let x = 1; x < rippleGridW - 1; x++) {
+      const idx = y * rippleGridW + x;
+      const displacement = rippleGrid[idx];
+      if (Math.abs(displacement) < 0.5) continue;
+
+      const offsetX = Math.round((rippleGrid[idx - 1] - rippleGrid[idx + 1]) * 0.5);
+      const offsetY = Math.round((rippleGrid[idx - rippleGridW] - rippleGrid[idx + rippleGridW]) * 0.5);
+
+      for (let py = 0; py < RIPPLE_RES; py++) {
+        for (let px = 0; px < RIPPLE_RES; px++) {
+          const destX = x * RIPPLE_RES + px;
+          const destY = y * RIPPLE_RES + py;
+          const srcX = Math.min(Math.max(destX + offsetX, 0), rippleW - 1);
+          const srcY = Math.min(Math.max(destY + offsetY, 0), rippleH - 1);
+
+          const destIdx = (destY * rippleW + destX) * 4;
+          const srcIdx = (srcY * rippleW + srcX) * 4;
+
+          pixels[destIdx] = rippleRefImage.data[srcIdx];
+          pixels[destIdx + 1] = rippleRefImage.data[srcIdx + 1];
+          pixels[destIdx + 2] = rippleRefImage.data[srcIdx + 2];
+          pixels[destIdx + 3] = rippleRefImage.data[srcIdx + 3];
+          // Color bloom — ripple areas brighten toward accent
+          const absDisp = Math.abs(displacement);
+          if (absDisp > 3) {
+            const bloom = Math.min(absDisp / 25, 1);
+            pixels[destIdx] = Math.min(255, pixels[destIdx] + bloom * 80);
+            pixels[destIdx + 1] = Math.min(255, pixels[destIdx + 1] + bloom * 20);
+            pixels[destIdx + 2] = Math.min(255, pixels[destIdx + 2] + bloom * 50);
+            pixels[destIdx + 3] = Math.min(255, pixels[destIdx + 3] + bloom * 100);
+          }
+        }
+      }
+    }
+  }
+
+  rippleCtx.putImageData(imgData, 0, 0);
+  requestAnimationFrame(rippleFrame);
+}
+
+window.addEventListener('resize', () => {
+  initRippleCanvas();
+});
+
+// =================== EASTER EGG: CLOCK TOOLTIP ===================
+let clockHoverTimer = null;
+let clockTooltip = null;
+const clockFacts = [
+  "Currently thinking about grilled cheese",
+  "Wondering if Luffy is Joy Boy",
+  "Practicing singing (neighbors sorry)",
+  "Debugging something... always",
+  "Ranking sandwiches in my head",
+  "Missing Japan right now",
+  "Building something cool with AI",
+  "Rewatching Bridgerton... again"
+];
+document.getElementById('clock').addEventListener('mouseenter', () => {
+  clockHoverTimer = setTimeout(() => {
+    if (clockTooltip) clockTooltip.remove();
+    clockTooltip = document.createElement('div');
+    clockTooltip.className = 'clock-tooltip';
+    clockTooltip.textContent = clockFacts[Math.floor(Math.random() * clockFacts.length)];
+    document.body.appendChild(clockTooltip);
+  }, 3000);
+});
+document.getElementById('clock').addEventListener('mouseleave', () => {
+  clearTimeout(clockHoverTimer);
+  if (clockTooltip) { clockTooltip.remove(); clockTooltip = null; }
+});
+
+// =================== EASTER EGG: TRIPLE-CLICK GRILLED CHEESE WALLPAPER ===================
+let desktopClickCount = 0;
+let desktopClickTimer = null;
+document.getElementById('desktop').addEventListener('click', (e) => {
+  if (e.target.closest('.desktop-icon, .window, .taskbar')) return;
+  desktopClickCount++;
+  clearTimeout(desktopClickTimer);
+  desktopClickTimer = setTimeout(() => { desktopClickCount = 0; }, 500);
+  if (desktopClickCount >= 3) {
+    desktopClickCount = 0;
+    const wp = document.getElementById('gcWallpaper');
+    wp.classList.add('show');
+    setTimeout(() => wp.classList.remove('show'), 3000);
+  }
+});
+
+// =================== DESKTOP TOY (DOUBLE-CLICK EMPTY SPACE) ===================
+document.getElementById('desktop').addEventListener('dblclick', (e) => {
+  if (e.target.closest('.desktop-icon, .window, .taskbar')) return;
+  spawnDesktopToy(e.clientX, e.clientY);
+});
+
+function spawnDesktopToy(x, y) {
+  const toy = document.createElement('div');
+  toy.className = 'desktop-toy';
+  toy.style.left = x + 'px'; toy.style.top = y + 'px';
+  document.body.appendChild(toy);
+  playBoop(600, 0.05, 0.06, 'sine');
+  let vx = (Math.random() - 0.5) * 8, vy = -8 - Math.random() * 4;
+  const gravity = 0.3, bounce = 0.6, friction = 0.99;
+  let px = x, py = y, life = 0;
+  function animate() {
+    vy += gravity; vx *= friction; px += vx; py += vy;
+    const floor = window.innerHeight - 100;
+    if (py > floor) { py = floor; vy = -vy * bounce; if (Math.abs(vy) < 1) vy = 0; playBoop(180 + Math.random() * 120, 0.02, 0.03, 'sine'); }
+    if (px < 0 || px > window.innerWidth - 18) { vx = -vx; px = Math.max(0, Math.min(px, window.innerWidth - 18)); }
+    toy.style.left = px + 'px'; toy.style.top = py + 'px';
+    life++;
+    if (life < 200 && (Math.abs(vx) > 0.1 || Math.abs(vy) > 0.5 || py < floor)) { requestAnimationFrame(animate); }
+    else { toy.style.transition = 'opacity 0.5s'; toy.style.opacity = '0'; setTimeout(() => toy.remove(), 500); }
+  }
+  requestAnimationFrame(animate);
+}
+
 // =================== INIT ===================
 renderDesktopIcons();
 resetIdleTimer();
+initRippleCanvas();
+requestAnimationFrame(rippleFrame);
+initParticles();
 
 const skipBoot = window.location.hash === '#skipboot';
 if (skipBoot) {
