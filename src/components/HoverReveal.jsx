@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import { useState, useCallback, useRef, useEffect } from "react";
-import { decorationStyles } from "../definitions/reusableStyles";
 import { useEmojiSpring } from "../hooks/useEmojiSpring";
 import { EmojiSpringRenderer } from "./EmojiSpringRenderer";
 import { onePieceEmojis } from "../definitions/onePiece";
@@ -32,7 +31,6 @@ export default function HoverReveal({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Initialize audio
   useEffect(() => {
     if (audioSrc) {
       audioRef.current = new Audio(audioSrc);
@@ -49,7 +47,6 @@ export default function HoverReveal({
 
   const handleMouseEnter = useCallback(
     (event) => {
-      // If content is already displayed, close it (toggle behavior)
       if (displayedContent) {
         if (audioRef.current) {
           audioRef.current.pause();
@@ -67,13 +64,11 @@ export default function HoverReveal({
         clearTimeout(timeoutRef.current);
       }
 
-      // Play audio
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
         audioRef.current.play().catch(() => {});
       }
 
-      // Get the trigger element's position for emoji spawn
       if (event?.target) {
         const rect = event.target.getBoundingClientRect();
         const x = rect.left + rect.width / 2;
@@ -103,13 +98,10 @@ export default function HoverReveal({
   );
 
   const handleMouseLeave = useCallback(() => {
-    // Stop audio
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-
-    // Clear text and stop typing animation
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
@@ -117,45 +109,33 @@ export default function HoverReveal({
     setIsTyping(false);
   }, []);
 
-  const getVariantStyles = () => {
-    return "bg-white dark:bg-black rounded-lg shadow-lg";
-  };
-
   return (
     <>
       <span
-        className="inline relative"
+        className="hover-reveal-trigger"
         onMouseEnter={!isMobile ? handleMouseEnter : undefined}
         onMouseLeave={!isMobile ? handleMouseLeave : undefined}
         onClick={isMobile ? handleMouseEnter : undefined}
       >
-        <span
-          className={`cursor-pointer ${decorationStyles.underline} ${className}`}
-        >
+        <span className={`hover-reveal-text ${className}`}>
           {triggerText}
         </span>
         {displayedContent && (
-          <div
-            className={`${
-              isMobile
-                ? "fixed left-1/2 top-1/2 -translate-y-1/2 w-[85%] max-w-[500px] max-h-[70vh] overflow-y-auto mx-auto"
-                : "absolute left-1/2 top-full mt-2 w-auto min-w-[250px] max-w-[600px]"
-            } z-50 animate-reveal-pop ${getVariantStyles()}`}
-          >
-            <div className={`relative z-10 ${isMobile ? "p-5" : "p-4"}`}>
+          <div className={`hover-reveal-popup ${isMobile ? 'mobile' : 'desktop'}`}>
+            <div className="hover-reveal-inner">
               {isMobile && (
                 <button
                   onClick={handleMouseLeave}
-                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl font-bold leading-none z-20 w-8 h-8 flex items-center justify-center"
+                  className="hover-reveal-close"
                   aria-label="Close"
                 >
                   ×
                 </button>
               )}
-              <div className={isMobile ? "pr-10" : ""}>
-                <span className="opacity-0 animate-text-reveal inline-block text-black dark:text-white break-words">
+              <div className={isMobile ? 'hover-reveal-padded' : ''}>
+                <span className="hover-reveal-content">
                   {displayedContent}
-                  {isTyping && <span className="animate-blink">|</span>}
+                  {isTyping && <span className="hover-reveal-cursor">|</span>}
                 </span>
               </div>
             </div>
