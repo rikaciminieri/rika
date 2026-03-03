@@ -2,7 +2,7 @@ export function EmojiSpringRenderer({ emojis }) {
   return emojis.map((emoji) => (
     <div
       key={emoji.id}
-      className="fixed pointer-events-none"
+      className="emoji-spring-particle"
       style={{
         left: `${emoji.x}px`,
         top: `${emoji.y}px`,
