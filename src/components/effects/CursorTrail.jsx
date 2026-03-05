@@ -5,16 +5,26 @@ export default function CursorTrail() {
   const { theme } = useTheme();
   const dotsRef = useRef([]);
   const lastTimeRef = useRef(0);
+  const indexRef = useRef(0);
 
   useEffect(() => {
+    // Kawaii uses glow painting in WatermarkCanvas — no DOM dots needed
+    if (theme.id === 'kawaii') return;
+
     const throttle = theme.cursorThrottle || 50;
     const maxDots = theme.cursorMax || 8;
     const dotStyle = theme.cursorDotStyle || {};
+    const trailColors = theme.cursorTrailColors;
 
     const handleMouseMove = (e) => {
       const now = Date.now();
       if (now - lastTimeRef.current < throttle) return;
       lastTimeRef.current = now;
+
+      const colorOverride = trailColors
+        ? { background: trailColors[indexRef.current % trailColors.length] }
+        : {};
+      indexRef.current++;
 
       const dot = document.createElement('div');
       dot.className = 'cursor-dot';
@@ -22,6 +32,7 @@ export default function CursorTrail() {
         left: `${e.clientX - 3}px`,
         top: `${e.clientY - 3}px`,
         ...dotStyle,
+        ...colorOverride,
       });
       document.body.appendChild(dot);
       dotsRef.current.push(dot);

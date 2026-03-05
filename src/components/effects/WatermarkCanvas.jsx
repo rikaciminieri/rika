@@ -2,136 +2,133 @@ import { useEffect, useRef } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-const RIPPLE_RES = 4;
-const RIPPLE_DAMPING = 0.97;
+function hexToRgba(hex, alpha) {
+  const n = parseInt(hex.replace('#', ''), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
+}
 
 export default function WatermarkCanvas() {
   const canvasRef = useRef(null);
   const { theme } = useTheme();
   const { lang, t } = useLanguage();
   const stateRef = useRef({
-    grid: null,
-    prevGrid: null,
-    refImage: null,
-    gridW: 0,
-    gridH: 0,
+    marks: [],
+    lastMarkX: -Infinity,
+    lastMarkY: -Infinity,
+    colorIndex: 0,
+    animId: null,
     w: 0,
     h: 0,
-    mouseX: -1,
-    mouseY: -1,
-    animId: null,
+    textImageData: null,
   });
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const ctx = canvas.getContext('2d');
     const s = stateRef.current;
+
+    const colors = theme.cursorTrailColors || ['#f4a0b5', '#c4b0e8', '#f8c4a4', '#e88fc0'];
+    const glow = theme.glowPaint || {};
+    const glowRadius = glow.radius || 40;
+    const glowOpacity = glow.opacity || 0.12;
+    const glowNightOpacity = glow.nightOpacity || 0.15;
+    const fadeTime = glow.fadeTime || 3000;
+    const minDist = glow.minDistance || 20;
+    const maxMarks = glow.maxMarks || 60;
 
     function init() {
       s.w = window.innerWidth;
       s.h = window.innerHeight;
-      canvas.width = s.w;
-      canvas.height = s.h;
-      s.gridW = Math.ceil(s.w / RIPPLE_RES);
-      s.gridH = Math.ceil(s.h / RIPPLE_RES);
-      s.grid = new Float32Array(s.gridW * s.gridH);
-      s.prevGrid = new Float32Array(s.gridW * s.gridH);
-      renderText(ctx, s);
-    }
+      canvas.width = s.w * devicePixelRatio;
+      canvas.height = s.h * devicePixelRatio;
+      canvas.style.width = s.w + 'px';
+      canvas.style.height = s.h + 'px';
+      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
 
-    function renderText(ctx2d, state) {
-      ctx2d.clearRect(0, 0, state.w, state.h);
+      // Pre-render watermark text to an offscreen canvas
+      const offscreen = document.createElement('canvas');
+      offscreen.width = s.w * devicePixelRatio;
+      offscreen.height = s.h * devicePixelRatio;
+      const offCtx = offscreen.getContext('2d');
+      offCtx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+
       const text = t('watermark.text');
       const fontSize = lang === 'jp' ? 160 : 120;
       const fontFamily = lang === 'jp'
         ? "'Noto Sans JP', sans-serif"
         : "'Space Grotesk', var(--display), sans-serif";
-      ctx2d.font = `800 ${fontSize}px ${fontFamily}`;
+      offCtx.font = `800 ${fontSize}px ${fontFamily}`;
       const accent = getComputedStyle(document.documentElement)
         .getPropertyValue('--accent').trim() || '#f4a0b5';
-      ctx2d.fillStyle = accent;
-      ctx2d.globalAlpha = 0.06;
-      ctx2d.textAlign = 'right';
-      ctx2d.textBaseline = 'bottom';
-      ctx2d.fillText(text, state.w - 60, state.h - 80);
-      ctx2d.globalAlpha = 1.0;
-      state.refImage = ctx2d.getImageData(0, 0, state.w, state.h);
-      state.grid.fill(0);
-      state.prevGrid.fill(0);
+      offCtx.fillStyle = accent;
+      offCtx.globalAlpha = 0.06;
+      offCtx.textAlign = 'right';
+      offCtx.textBaseline = 'bottom';
+      offCtx.fillText(text, s.w - 60, s.h - 80);
+
+      s.textImageData = offscreen;
     }
 
     function frame() {
-      const { grid, prevGrid, refImage, gridW, gridH, w, h, mouseX, mouseY } = s;
-      if (!refImage) { s.animId = requestAnimationFrame(frame); return; }
-
-      // Add ripple at mouse position
-      if (mouseX >= 1 && mouseX < gridW - 1 && mouseY >= 1 && mouseY < gridH - 1) {
-        grid[mouseY * gridW + mouseX] = 512;
-      }
-
-      // Wave propagation
-      const newGrid = new Float32Array(gridW * gridH);
-      for (let y = 1; y < gridH - 1; y++) {
-        for (let x = 1; x < gridW - 1; x++) {
-          const idx = y * gridW + x;
-          newGrid[idx] = (
-            grid[idx - 1] + grid[idx + 1] +
-            grid[idx - gridW] + grid[idx + gridW]
-          ) / 2 - prevGrid[idx];
-          newGrid[idx] *= RIPPLE_DAMPING;
-        }
-      }
-      s.prevGrid = s.grid;
-      s.grid = newGrid;
-
-      // Render displaced pixels
-      const imgData = new ImageData(new Uint8ClampedArray(refImage.data), w, h);
-      const pixels = imgData.data;
-
-      for (let y = 1; y < gridH - 1; y++) {
-        for (let x = 1; x < gridW - 1; x++) {
-          const idx = y * gridW + x;
-          const displacement = newGrid[idx];
-          if (Math.abs(displacement) < 0.5) continue;
-
-          const offsetX = Math.round((newGrid[idx - 1] - newGrid[idx + 1]) * 0.5);
-          const offsetY = Math.round((newGrid[idx - gridW] - newGrid[idx + gridW]) * 0.5);
-
-          for (let py = 0; py < RIPPLE_RES; py++) {
-            for (let px = 0; px < RIPPLE_RES; px++) {
-              const destX = x * RIPPLE_RES + px;
-              const destY = y * RIPPLE_RES + py;
-              const srcX = Math.min(Math.max(destX + offsetX, 0), w - 1);
-              const srcY = Math.min(Math.max(destY + offsetY, 0), h - 1);
-              const destIdx = (destY * w + destX) * 4;
-              const srcIdx = (srcY * w + srcX) * 4;
-
-              pixels[destIdx] = refImage.data[srcIdx];
-              pixels[destIdx + 1] = refImage.data[srcIdx + 1];
-              pixels[destIdx + 2] = refImage.data[srcIdx + 2];
-              pixels[destIdx + 3] = refImage.data[srcIdx + 3];
-
-              const absDisp = Math.abs(displacement);
-              if (absDisp > 3) {
-                const bloom = Math.min(absDisp / 25, 1);
-                pixels[destIdx] = Math.min(255, pixels[destIdx] + bloom * 80);
-                pixels[destIdx + 1] = Math.min(255, pixels[destIdx + 1] + bloom * 20);
-                pixels[destIdx + 2] = Math.min(255, pixels[destIdx + 2] + bloom * 50);
-                pixels[destIdx + 3] = Math.min(255, pixels[destIdx + 3] + bloom * 100);
-              }
-            }
-          }
-        }
-      }
-
-      ctx.putImageData(imgData, 0, 0);
       s.animId = requestAnimationFrame(frame);
+      if (document.hidden) return;
+
+      const now = Date.now();
+      const isNight = document.body.classList.contains(theme.nightModeClass || 'night-mode');
+      const baseOpacity = isNight ? glowNightOpacity : glowOpacity;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, s.w, s.h);
+
+      // Draw static watermark text
+      if (s.textImageData) {
+        ctx.drawImage(s.textImageData, 0, 0, s.w, s.h);
+      }
+
+      // Draw glow marks
+      const marks = s.marks;
+      let writeIdx = 0;
+      for (let i = 0; i < marks.length; i++) {
+        const mark = marks[i];
+        const age = now - mark.t;
+        if (age >= fadeTime) continue; // expired
+
+        const alpha = baseOpacity * (1 - age / fadeTime);
+        const grad = ctx.createRadialGradient(mark.x, mark.y, 0, mark.x, mark.y, glowRadius);
+        grad.addColorStop(0, hexToRgba(mark.color, alpha));
+        grad.addColorStop(1, hexToRgba(mark.color, 0));
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(mark.x, mark.y, glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Compact — keep alive marks at front
+        marks[writeIdx++] = mark;
+      }
+      marks.length = writeIdx;
     }
 
     const handleMouseMove = (e) => {
-      s.mouseX = Math.floor(e.clientX / RIPPLE_RES);
-      s.mouseY = Math.floor(e.clientY / RIPPLE_RES);
+      const dx = e.clientX - s.lastMarkX;
+      const dy = e.clientY - s.lastMarkY;
+      if (dx * dx + dy * dy < minDist * minDist) return;
+
+      s.lastMarkX = e.clientX;
+      s.lastMarkY = e.clientY;
+
+      s.marks.push({
+        x: e.clientX,
+        y: e.clientY,
+        t: Date.now(),
+        color: colors[s.colorIndex % colors.length],
+      });
+      s.colorIndex++;
+
+      // Ring buffer cap
+      if (s.marks.length > maxMarks) {
+        s.marks.shift();
+      }
     };
 
     const handleResize = () => init();
@@ -145,6 +142,10 @@ export default function WatermarkCanvas() {
       cancelAnimationFrame(s.animId);
       document.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
+      s.marks = [];
+      s.lastMarkX = -Infinity;
+      s.lastMarkY = -Infinity;
+      s.colorIndex = 0;
     };
   }, [theme, lang]);
 
