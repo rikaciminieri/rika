@@ -111,37 +111,109 @@ export const kawaii = {
   },
   finderPath: '/Users/rika/Desktop/definitely-not-important/',
   cursorDotStyle: {
-    width: 6,
-    height: 6,
-    borderRadius: '50%',
+    width: 8,
+    height: 8,
+    borderRadius: 0,
     background: 'var(--accent)',
     opacity: 0.5,
+    clipPath: 'polygon(50% 0%,56% 40%,100% 50%,56% 60%,50% 100%,44% 60%,0% 50%,44% 40%)',
   },
+  cursorTrailColors: ['#f4a0b5', '#c4b0e8', '#f8c4a4', '#e88fc0'],
   cursorThrottle: 50,
   cursorMax: 8,
+  glowPaint: {
+    radius: 40,
+    opacity: 0.28,
+    nightOpacity: 0.32,
+    fadeTime: 3000,
+    minDistance: 12,
+    maxMarks: 80,
+  },
   css: `
-    .desktop-bg::before { content:''; position:absolute; width:150%; height:150%; top:-25%; left:-25%; background: radial-gradient(ellipse 600px 400px at 25% 35%,rgba(244,160,181,0.07) 0%,transparent 70%), radial-gradient(ellipse 500px 500px at 75% 25%,rgba(196,176,232,0.06) 0%,transparent 70%), radial-gradient(ellipse 400px 600px at 60% 75%,rgba(126,203,163,0.05) 0%,transparent 70%); animation:meshDrift 20s ease-in-out infinite alternate; }
+    /* === Background === */
+    .desktop-bg::before { content:''; position:absolute; width:150%; height:150%; top:-25%; left:-25%; background: radial-gradient(ellipse 600px 400px at 25% 35%,rgba(244,160,181,0.12) 0%,transparent 70%), radial-gradient(ellipse 500px 500px at 75% 25%,rgba(196,176,232,0.10) 0%,transparent 70%), radial-gradient(ellipse 400px 600px at 60% 75%,rgba(126,203,163,0.08) 0%,transparent 70%); animation:meshDrift 20s ease-in-out infinite alternate; }
     @keyframes meshDrift { 0%{transform:translate(0,0) rotate(0deg);} 33%{transform:translate(30px,-20px) rotate(1deg);} 66%{transform:translate(-20px,15px) rotate(-0.5deg);} 100%{transform:translate(10px,-10px) rotate(0.5deg);} }
-    .desktop-bg::after { content:''; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(244,160,181,0.08) 1.5px,transparent 1.5px); background-size:28px 28px; }
-    body.night-mode .desktop-bg::after { background-image:radial-gradient(circle,rgba(255,255,255,0.04) 1.5px,transparent 1.5px); }
-    .particle { position:absolute; border-radius:50%; opacity:0; animation:particleFloat linear infinite; }
-    @keyframes particleFloat { 0%{opacity:0;transform:translateY(100vh) scale(0);} 10%{opacity:0.6;} 90%{opacity:0.6;} 100%{opacity:0;transform:translateY(-10vh) scale(1);} }
-    .window { animation:winOpen 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
-    @keyframes winOpen { from{transform:scale(0.8) translateY(20px);opacity:0;} 60%{transform:scale(1.03) translateY(-3px);opacity:1;} to{transform:scale(1) translateY(0);opacity:1;} }
-    .window.minimized { animation:winMin 0.2s forwards; }
-    @keyframes winMin { to{transform:scale(0.5) translateY(100vh);opacity:0;} }
-    .window.focused { box-shadow:0 16px 48px rgba(0,0,0,0.1),0 0 0 1px rgba(244,160,181,0.2),0 0 24px var(--accent-glow); }
+    .desktop-bg::after { content:''; position:absolute; inset:0; background-image:radial-gradient(circle 1px,rgba(244,160,181,0.18) 0%,transparent 100%), radial-gradient(circle 0.5px,rgba(196,176,232,0.14) 0%,transparent 100%), radial-gradient(circle 1.5px,rgba(248,196,164,0.10) 0%,transparent 100%); background-size:60px 50px, 40px 35px, 80px 70px; animation:shimmerDrift 30s linear infinite; }
+    @keyframes shimmerDrift { 0%{background-position:0 0, 20px 10px, 40px 30px;} 100%{background-position:60px 50px, 60px 45px, 80px 70px;} }
+    body.night-mode .desktop-bg::before { background: radial-gradient(ellipse 600px 400px at 25% 35%,rgba(244,160,181,0.06) 0%,transparent 70%), radial-gradient(ellipse 500px 500px at 75% 25%,rgba(196,176,232,0.05) 0%,transparent 70%), radial-gradient(ellipse 400px 600px at 60% 75%,rgba(126,203,163,0.04) 0%,transparent 70%); }
+    body.night-mode .desktop-bg::after { background-image:radial-gradient(circle 1px,rgba(255,255,255,0.06) 0%,transparent 100%), radial-gradient(circle 0.5px,rgba(196,176,232,0.05) 0%,transparent 100%), radial-gradient(circle 1.5px,rgba(244,160,181,0.04) 0%,transparent 100%); }
+
+    /* === Cloud layers === */
+    @keyframes kawaiiCloudDrift { 0%{transform:translateX(0) translateY(0);} 25%{transform:translateX(30px) translateY(-10px);} 50%{transform:translateX(-20px) translateY(5px);} 75%{transform:translateX(15px) translateY(-15px);} 100%{transform:translateX(0) translateY(0);} }
+
+    /* === Particles === */
+    .kawaii-star { position:absolute; opacity:0; animation:kawaiiFloat linear infinite; clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+    .kawaii-sparkle { position:absolute; opacity:0; animation:kawaiiFloat linear infinite; clip-path:polygon(50% 0%,56% 40%,100% 50%,56% 60%,50% 100%,44% 60%,0% 50%,44% 40%); }
+    .kawaii-heart { position:absolute; opacity:0; animation:kawaiiFloat linear infinite; background-size:contain; background-repeat:no-repeat; background-position:center; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' fill='%23f4a0b5' opacity='0.7'/%3E%3C/svg%3E"); }
+    @keyframes kawaiiFloat { 0%{opacity:0;transform:translateY(100vh) translateX(0) rotate(0deg) scale(0);} 10%{opacity:0.6;transform:translateY(80vh) translateX(10px) rotate(30deg) scale(0.8);} 50%{transform:translateY(45vh) translateX(-15px) rotate(180deg) scale(1);} 90%{opacity:0.6;transform:translateY(5vh) translateX(10px) rotate(330deg) scale(0.9);} 100%{opacity:0;transform:translateY(-10vh) translateX(0) rotate(360deg) scale(0.5);} }
+
+    /* === Windows === */
+    .window { animation:kawaiiWinOpen 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes kawaiiWinOpen { 0%{transform:scale(0.3);opacity:0;filter:blur(4px);} 40%{transform:scale(1.08);opacity:1;filter:blur(1px);} 65%{transform:scale(0.97);filter:blur(0);} 80%{transform:scale(1.02);} 100%{transform:scale(1);opacity:1;filter:blur(0);} }
+    .window.minimized { animation:kawaiiWinMin 0.25s forwards; }
+    @keyframes kawaiiWinMin { 0%{transform:scale(1);opacity:1;filter:blur(0);} 100%{transform:scale(0.5) translateY(100vh);opacity:0;filter:blur(4px);} }
+    .window.focused { box-shadow:0 16px 48px rgba(0,0,0,0.1), 0 0 0 1px rgba(244,160,181,0.25), 0 0 20px rgba(244,160,181,0.15), 0 0 40px rgba(196,176,232,0.08); }
+    body.night-mode .window.focused { box-shadow:0 16px 48px rgba(0,0,0,0.3), 0 0 0 1px rgba(244,160,181,0.3), 0 0 24px rgba(244,160,181,0.2), 0 0 48px rgba(196,176,232,0.1); }
+
+    /* === Window header star accent === */
+    .win-header::after { content:'✦'; position:absolute; right:14px; top:50%; transform:translateY(-50%); font-size:10px; color:var(--accent); opacity:0.3; animation:headerTwinkle 3s ease-in-out infinite; pointer-events:none; }
+    @keyframes headerTwinkle { 0%,100%{opacity:0.2; transform:translateY(-50%) scale(0.9);} 50%{opacity:0.5; transform:translateY(-50%) scale(1.1);} }
+    body.night-mode .win-header::after { color:var(--lavender); }
+
+    /* === Traffic light dots === */
+    .win-dot-close { box-shadow:0 0 4px rgba(240,112,112,0.4); transition:transform 0.15s ease, box-shadow 0.15s ease; }
+    .win-dot-close:hover { transform:scale(1.25); box-shadow:0 0 8px rgba(240,112,112,0.6); }
+    .win-dot-min { box-shadow:0 0 4px rgba(245,201,126,0.4); transition:transform 0.15s ease, box-shadow 0.15s ease; }
+    .win-dot-min:hover { transform:scale(1.25); box-shadow:0 0 8px rgba(245,201,126,0.6); }
+    .win-dot-max { box-shadow:0 0 4px rgba(126,203,163,0.4); transition:transform 0.15s ease, box-shadow 0.15s ease; }
+    .win-dot-max:hover { transform:scale(1.25); box-shadow:0 0 8px rgba(126,203,163,0.6); }
+
+    /* === Icons === */
     .desktop-icon:hover { background:rgba(244,160,181,0.08); }
-    .desktop-icon:hover .icon-img { animation:iconWobble 0.5s ease-in-out; transform:scale(1.1); }
-    @keyframes iconWobble { 0%{transform:scale(1) rotate(0deg);} 20%{transform:scale(1.12) rotate(-6deg);} 40%{transform:scale(1.08) rotate(5deg);} 60%{transform:scale(1.11) rotate(-3deg);} 80%{transform:scale(1.09) rotate(2deg);} 100%{transform:scale(1.1) rotate(0deg);} }
-    .tb-app:hover { background:rgba(244,160,181,0.12); color:var(--text); transform:translateY(-2px); }
+    .desktop-icon:hover .icon-img { animation:kawaiiIconPop 0.5s cubic-bezier(0.34,1.56,0.64,1); transform:scale(1.1) translateY(-4px); box-shadow:0 0 12px rgba(244,160,181,0.3); overflow:visible; }
+    @keyframes kawaiiIconPop { 0%{transform:scale(1) translateY(0);} 30%{transform:scale(1.18) translateY(-8px);} 50%{transform:scale(1.05) translateY(-3px);} 70%{transform:scale(1.12) translateY(-5px);} 100%{transform:scale(1.1) translateY(-4px);} }
+    .desktop-icon .icon-img { overflow:visible; position:relative; }
+    .desktop-icon:hover .icon-img::before { content:'✦'; position:absolute; top:-4px; left:-6px; font-size:8px; color:var(--accent); opacity:0; animation:iconSparkle 0.6s ease-out forwards; pointer-events:none; }
+    .desktop-icon:hover .icon-img::after { content:'✦'; position:absolute; bottom:-2px; right:-6px; font-size:6px; color:var(--lavender); opacity:0; animation:iconSparkle 0.6s 0.1s ease-out forwards; pointer-events:none; }
+    @keyframes iconSparkle { 0%{opacity:0; transform:scale(0) translate(0,0);} 40%{opacity:0.8; transform:scale(1.2) translate(-3px,-3px);} 100%{opacity:0; transform:scale(0.5) translate(-6px,-8px);} }
+
+    /* === Taskbar === */
+    .tb-app { transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .tb-app:hover { background:rgba(244,160,181,0.12); color:var(--text); transform:translateY(-3px) scale(1.03); }
     .tb-app.active { background:rgba(244,160,181,0.18); color:var(--text); }
+    .tb-app.active .tb-app-dot { animation:dotPulse 2s ease-in-out infinite; }
+    @keyframes dotPulse { 0%,100%{opacity:0.8; transform:scale(1);} 50%{opacity:1; transform:scale(1.4);} }
+
+    /* === Start button === */
+    .start-btn { transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .start-btn:hover { transform:scale(1.15) rotate(-8deg); box-shadow:0 0 16px rgba(244,160,181,0.4); }
+    .start-btn:active { transform:scale(0.95); }
+
+    /* === Command palette + Context menu === */
+    .cmd-palette { animation:kawaiiMenuOpen 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+    .ctx-menu { animation:kawaiiMenuOpen 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes kawaiiMenuOpen { 0%{transform:scale(0.9);opacity:0;filter:blur(2px);} 100%{transform:scale(1);opacity:1;filter:blur(0);} }
     .cmd-item:hover,.cmd-item.selected { background:rgba(244,160,181,0.1); }
     .ctx-item:hover { background:rgba(244,160,181,0.12); }
+
+    /* === Misc === */
     .finder-item:hover { background:rgba(244,160,181,0.06); }
     .notepad-content h2 { background:linear-gradient(135deg,#f4a0b5,#f8c4a4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
     .terminal { color:var(--green); background:#0a0a0f; }
-    .desktop-toy { background:radial-gradient(circle at 35% 35%,var(--accent),var(--pink)); box-shadow:0 2px 8px rgba(0,0,0,0.15),inset 0 -2px 4px rgba(0,0,0,0.1); }
+
+    /* === Desktop toy — star shape === */
+    .desktop-toy { background:radial-gradient(circle at 35% 35%,var(--accent),var(--pink)); box-shadow:0 2px 8px rgba(0,0,0,0.15),inset 0 -2px 4px rgba(0,0,0,0.1); clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+
+    /* === Scrollbar === */
+    .win-body::-webkit-scrollbar { width:6px; }
+    .win-body::-webkit-scrollbar-track { background:transparent; }
+    .win-body::-webkit-scrollbar-thumb { background:linear-gradient(to bottom,var(--accent),var(--lavender)); border-radius:3px; }
+
+    /* === Night mode overrides === */
+    body.night-mode .kawaii-star, body.night-mode .kawaii-sparkle, body.night-mode .kawaii-heart { filter:brightness(0.8); }
+    body.night-mode .desktop-icon:hover .icon-img { box-shadow:0 0 12px rgba(196,176,232,0.25); }
+    body.night-mode .start-btn:hover { box-shadow:0 0 16px rgba(244,160,181,0.25); }
+
     @keyframes aurora1 { 0%{transform:translateX(-10%) scaleY(1);} 100%{transform:translateX(10%) scaleY(1.3);} }
     @keyframes aurora2 { 0%{transform:translateX(15%) scaleY(1.2);} 100%{transform:translateX(-15%) scaleY(0.8);} }
     @keyframes aurora3 { 0%{transform:translateX(-5%) scaleY(0.9);} 100%{transform:translateX(5%) scaleY(1.1);} }
