@@ -51,7 +51,7 @@ const HELP_TEXT = `
   <span class="prompt">open [app]</span>    Open an app
   <span class="prompt">clear</span>         Clear the terminal
   <span class="prompt">neofetch</span>      System info
-  <span class="prompt">theme [name]</span>  Switch theme
+  <span class="prompt">theme</span>         Current theme info
   <span class="prompt">fortune</span>       Get a random fortune
   <span class="prompt">cowsay [msg]</span>  Make a cow say something
   <span class="prompt">rain</span>          Toggle rain effect
@@ -103,17 +103,14 @@ export function processCmd(cmd, context) {
       return NEOFETCH(theme?.name || 'default');
 
     case 'theme': {
-      if (!args) {
-        return `Current theme: <span class="highlight">${theme?.name || 'default'}</span>\nUsage: <span class="prompt">theme [name]</span>`;
-      }
-      if (switchTheme) {
+      /* THEMES_DISABLED — Re-enable theme switching via terminal when themes are back:
+      if (args && switchTheme) {
         const result = switchTheme(args);
-        if (result === false) {
-          return `<span class="error">Unknown theme: "${args}"</span>`;
-        }
+        if (result === false) return `<span class="error">Unknown theme: "${args}"</span>`;
         return `Switched to theme: <span class="highlight">${args}</span>`;
       }
-      return '<span class="error">Theme switching not available.</span>';
+      */
+      return `Current theme: <span class="highlight">${theme?.name || 'default'}</span>\nMore themes coming soon \u2728`;
     }
 
     case 'fortune':
