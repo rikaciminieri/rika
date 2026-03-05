@@ -1,11 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useWindows } from '../../contexts/WindowContext';
-import { THEMES } from '../../themes';
 
 export default function ContextMenu({ onOpenPalette }) {
-  const { theme, switchTheme } = useTheme();
   const { lang, setLang, t } = useLanguage();
   const { openApp } = useWindows();
   const [visible, setVisible] = useState(false);
@@ -33,8 +30,6 @@ export default function ContextMenu({ onOpenPalette }) {
   }, []);
 
   if (!visible) return null;
-
-  const themeEntries = Object.values(THEMES);
 
   return (
     <div
@@ -67,18 +62,15 @@ export default function ContextMenu({ onOpenPalette }) {
         <span className="ctx-icon">{'\u2318K'}</span>Command Palette
       </div>
 
+      {/* THEMES_DISABLED — Re-enable when adding theme switching back:
       <div className="ctx-sep" />
-
-      {themeEntries.map((th) => (
-        <div
-          key={th.id}
-          className="ctx-item"
-          onClick={() => { switchTheme(th.id); close(); }}
-        >
+      {Object.values(THEMES).map((th) => (
+        <div key={th.id} className="ctx-item" onClick={() => { switchTheme(th.id); close(); }}>
           <span className="ctx-icon">{th.id === theme.id ? '\u2713' : ''}</span>
           {th.name}
         </div>
       ))}
+      */}
     </div>
   );
 }

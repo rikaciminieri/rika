@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useWindows, APP_DEFS } from '../../contexts/WindowContext';
-import { THEMES } from '../../themes';
 
 const CMD_ITEMS = [
   { icon: '\u2726', label: 'Open About', hint: 'welcome', action: 'open:welcome' },
@@ -15,14 +13,15 @@ const CMD_ITEMS = [
   { icon: '\uD83D\uDCC1', label: 'Open Trash', hint: 'files', action: 'open:trash' },
   { icon: '\uD83C\uDF10', label: 'Toggle Language', hint: 'EN \u2194 JP', action: 'toggleLang' },
   { icon: '\u2715', label: 'Close All Windows', hint: '', action: 'closeAll' },
+  /* THEMES_DISABLED — Re-enable when adding theme switching back:
   { icon: '\uD83C\uDFA8', label: 'Theme: Kawaii', hint: 'pink & warm', action: 'theme:kawaii' },
   { icon: '\uD83C\uDF43', label: 'Theme: Ghibli', hint: 'ink & nature', action: 'theme:ghibli' },
   { icon: '\uD83D\uDCA0', label: 'Theme: Holographic', hint: 'neon & glitch', action: 'theme:holographic' },
   { icon: '\uD83C\uDF31', label: 'Theme: Terrarium', hint: 'moss & glass', action: 'theme:terrarium' },
+  */
 ];
 
 export default function CommandPalette({ open, onClose }) {
-  const { switchTheme } = useTheme();
   const { lang, setLang } = useLanguage();
   const { openApp, closeAllWindows } = useWindows();
   const [query, setQuery] = useState('');
@@ -54,8 +53,10 @@ export default function CommandPalette({ open, onClose }) {
     (action) => {
       if (action.startsWith('open:')) {
         openApp(action.slice(5));
+      /* THEMES_DISABLED — Re-enable when adding theme switching back:
       } else if (action.startsWith('theme:')) {
         switchTheme(action.slice(6));
+      */
       } else if (action === 'toggleLang') {
         setLang(lang === 'en' ? 'jp' : 'en');
       } else if (action === 'closeAll') {
@@ -63,7 +64,7 @@ export default function CommandPalette({ open, onClose }) {
       }
       onClose();
     },
-    [openApp, switchTheme, setLang, lang, closeAllWindows, onClose]
+    [openApp, setLang, lang, closeAllWindows, onClose]
   );
 
   const handleKeyDown = useCallback(
