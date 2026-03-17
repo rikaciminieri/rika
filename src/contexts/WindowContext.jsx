@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useCallback, useRef, useMemo } fro
 const WindowCtx = createContext();
 
 export const APP_DEFS = [
-  { id: 'welcome', label: 'apps.about', w: 520, h: 420 },
+  { id: 'welcome', label: 'apps.about', w: 580, h: 540 },
   { id: 'projects', label: 'apps.projects', w: 700, h: 500 },
   { id: 'terminal', label: 'apps.terminal', w: 640, h: 420 },
   { id: 'gallery', label: 'apps.gallery', w: 680, h: 460 },

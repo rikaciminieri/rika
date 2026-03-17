@@ -19,6 +19,14 @@ export const onePieceTheories = {
     "Koby Will Join the Straw Hats as a True Pirate 🛡️🏴‍☠️ - Once a Marine, Koby will embrace his true calling as part of Luffy's crew.",
     "The Straw Hats Are Reincarnations of Ancient Heroes 🌞🌀 - Each crew member reflects a hero from the Ancient Kingdom, destined to finish the fight.",
     "Sanji's Flames Come from His Lunarian DNA 🔥👼 - Judge's experiments weren't just enhancements—they awakened Sanji's connection to King's fire-wielding race.",
+    "Luffy IS the Sun God Nika ☀️🥁 - Gear 5 isn't just a power-up—Luffy's fruit was always the Hito Hito no Mi, Model: Nika. The World Government renamed it to hide the truth for 800 years.",
+    "Crocodile's Secret: Ivankov Knows Everything 🐊👄 - Ivankov has leverage over Crocodile because he changed Crocodile's body in the past. That's the secret that keeps Sir Croc in line.",
+    "The One Piece is a Party That Never Ended 🍻🎶 - Roger laughed because the 'treasure' is Bink's Sake—a promise to throw the biggest feast the world has ever seen, uniting every race and nation.",
+    "Rocks D. Xebec Lives On Through Blackbeard 💀🏴‍☠️ - Xebec's will—or his literal soul—passed to Blackbeard at God Valley. That's why Teach inherited his ambition to rule everything.",
+    "Luffy Will Destroy Fishman Island to Save It 🐟💥 - Madam Shyarly's prophecy is real, but Luffy destroys the island to free the fishmen and bring them to the surface world where they belong.",
+    "Buggy Will Accidentally Become Pirate King 🤡👑 - The ultimate gag character keeps failing upward. His luck is the real Ancient Weapon—and Oda has been setting up the biggest punchline in manga history.",
+    "The Giant Straw Hat in Mariejois Belongs to Nika 👒❄️ - Imu keeps it frozen as a trophy from the Void Century war. It's proof the World Government defeated the Sun God once—and fears his return.",
+    "Dragon's Power is the Storm Itself 🌪️⛈️ - Monkey D. Dragon ate a Mythical Zoan fruit that lets him become a storm dragon or wind deity, explaining every convenient gust of wind in the series.",
   ],
   jp: [
     "「ワンピース」は世界を変える秘密 🌍📜 - 金銀財宝ではなく、世界をひっくり返し、国々を結びつけ、世界政府の嘘を暴く宝である。",
@@ -40,8 +48,26 @@ export const onePieceTheories = {
     "コビーは「真の海賊」として麦わらの一味に加わる 🛡️🏴‍☠️ - かつて海軍だった彼は、ついに自分の本当の使命を受け入れ、ルフィの仲間となる。",
     "麦わらの一味は「古代の英雄たちの生まれ変わり」 🌞🌀 - それぞれが古代王国の英雄の魂を受け継ぎ、未完の戦いを終わらせる運命を持つ。",
     "サンジの炎は「ルナーリア族の血」によるもの 🔥👼 - ジャッジの改造は単なる強化ではなく、彼の中に眠るキングと同じ「炎を操る種族」の力を呼び覚ました。",
+    "ルフィこそが太陽の神ニカ ☀️🥁 - ギア5は単なるパワーアップではない。ルフィの実は最初から「ヒトヒトの実 モデル：ニカ」だった。世界政府は800年間その真実を隠してきた。",
+    "クロコダイルの秘密：イワンコフは全てを知っている 🐊👄 - イワンコフがクロコダイルに対して切り札を持つのは、過去に彼の体を変えたから。それが「サー・クロコ」を従わせる秘密。",
+    "「ワンピース」は終わらない宴 🍻🎶 - ロジャーが笑ったのは、「宝」の正体がビンクスの酒——全種族・全国家が集う、世界最大の宴を開くという約束だったから。",
+    "ロックス・D・ジーベックは黒ひげの中に生きている 💀🏴‍☠️ - ジーベックの意志、あるいは魂そのものが、ゴッドバレーでティーチに受け継がれた。全てを支配するという野望の源泉はそこにある。",
+    "ルフィは魚人島を壊して救う 🐟💥 - マダム・シャーリーの予言は本物。だがルフィが島を壊すのは、魚人たちを解放し、地上の世界へ導くためである。",
+    "バギーはうっかり海賊王になる 🤡👑 - 究極のギャグキャラは失敗するたびにのし上がる。彼の「運」こそが真の古代兵器——尾田先生は漫画史上最大のオチを仕込んでいる。",
+    "マリージョアの巨大な麦わら帽子はニカのもの 👒❄️ - イムはそれを空白の100年の戦利品として凍結保存している。世界政府がかつて太陽の神を倒した証拠——そしてその復活を恐れている。",
+    "ドラゴンの能力は「嵐そのもの」 🌪️⛈️ - モンキー・D・ドラゴンは嵐龍か風神の幻獣種を食べた。物語中のあらゆる「都合のいい突風」の説明がつく。",
   ],
 };
+
+export const onePieceBounties = [
+  '3,000,000,000',
+  '4,048,900,000',
+  '4,388,000,000',
+  '1,500,000,000',
+  '5,564,800,000',
+  '500,000,000',
+  '3,189,000,000',
+];
 
 export const onePieceEmojis = [
   "⚔️",
