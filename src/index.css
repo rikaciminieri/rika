@@ -67,14 +67,14 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
 .notepad-content p { margin-bottom: 12px; }
 .notepad-content .aside { color: var(--text-muted); font-style: italic; font-size: 13px; }
 
-.terminal { font-family: var(--mono); font-size: 13px; line-height: 1.7; padding: 20px; height: 100%; }
-.terminal .prompt { color: var(--accent); }
-.terminal .cmd-text { color: var(--text); }
-.terminal .output { color: var(--text-muted); white-space: pre-wrap; }
-.terminal .error { color: var(--red); }
-.terminal .highlight { color: var(--amber); }
+.terminal { font-family: var(--mono); font-size: 13px; line-height: 1.7; padding: 20px; min-height: 100%; color: #d4d0d6; background: #0a0a0f; }
+.terminal .prompt { color: #f4a0b5; }
+.terminal .cmd-text { color: #e8e4ea; }
+.terminal .output { color: #a89ab0; white-space: pre-wrap; }
+.terminal .error { color: #f07070; }
+.terminal .highlight { color: #f5c97e; }
 .term-input-line { display: flex; align-items: center; gap: 0; }
-.term-input { background: transparent; border: none; outline: none; color: var(--text); font-family: var(--mono); font-size: 13px; flex: 1; caret-color: var(--accent); }
+.term-input { background: transparent; border: none; outline: none; color: #e8e4ea; font-family: var(--mono); font-size: 13px; flex: 1; caret-color: #f4a0b5; }
 
 .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
 .project-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.2s; }

@@ -8,8 +8,9 @@ export default function TerminalApp() {
   const { openApp, closeAllWindows } = useWindows();
   const [input, setInput] = useState('');
   const inputRef = useRef(null);
+  const bottomRef = useRef(null);
 
-  const { output, execute, scrollRef } = useTerminal({
+  const { output, execute } = useTerminal({
     theme,
     openApp,
     switchTheme,
@@ -20,6 +21,11 @@ export default function TerminalApp() {
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  // Auto-scroll to bottom when output changes
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [output]);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -37,17 +43,15 @@ export default function TerminalApp() {
       style={termStyle}
       onClick={() => inputRef.current?.focus()}
     >
-      <div ref={scrollRef} style={{ flex: 1, overflow: 'auto' }}>
-        {/* Welcome message */}
-        <div className="output" style={{ whiteSpace: 'pre-wrap' }}>
-          {theme.termWelcome || 'RikaOS terminal — type "help" for commands\n\n'}
-        </div>
-
-        {/* Output history */}
-        {output.map((line, i) => (
-          <div key={i} dangerouslySetInnerHTML={{ __html: line }} />
-        ))}
+      {/* Welcome message */}
+      <div className="output" style={{ whiteSpace: 'pre-wrap' }}>
+        {theme.termWelcome || 'RikaOS terminal — type "help" for commands\n\n'}
       </div>
+
+      {/* Output history */}
+      {output.map((line, i) => (
+        <div key={i} dangerouslySetInnerHTML={{ __html: line }} />
+      ))}
 
       {/* Input line */}
       <div className="term-input-line">
@@ -62,6 +66,7 @@ export default function TerminalApp() {
           autoComplete="off"
         />
       </div>
+      <div ref={bottomRef} />
     </div>
   );
 }
