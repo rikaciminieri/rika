@@ -1,8 +1,6 @@
 import PropTypes from "prop-types";
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useEmojiSpring } from "../hooks/useEmojiSpring";
-import { EmojiSpringRenderer } from "./EmojiSpringRenderer";
-import { onePieceEmojis } from "../definitions/onePiece";
+import { onePieceBounties } from "../definitions/onePiece";
 
 HoverReveal.propTypes = {
   content: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -17,12 +15,14 @@ export default function HoverReveal({
   className = "",
   audioSrc,
 }) {
-  const { emojis, createEmojis } = useEmojiSpring(onePieceEmojis);
   const [displayedContent, setDisplayedContent] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [randomBounty, setRandomBounty] = useState("");
   const timeoutRef = useRef(null);
   const audioRef = useRef(null);
+  const popupRef = useRef(null);
+  const isRevealedRef = useRef(false);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -35,7 +35,7 @@ export default function HoverReveal({
     if (audioSrc) {
       audioRef.current = new Audio(audioSrc);
       audioRef.current.loop = true;
-      audioRef.current.volume = 0.5;
+      audioRef.current.volume = 0.3;
     }
     return () => {
       if (audioRef.current) {
@@ -45,105 +45,103 @@ export default function HoverReveal({
     };
   }, [audioSrc]);
 
-  const handleMouseEnter = useCallback(
-    (event) => {
-      if (displayedContent) {
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.currentTime = 0;
-        }
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-        setDisplayedContent("");
-        setIsTyping(false);
-        return;
-      }
+  useEffect(() => {
+    if (displayedContent && popupRef.current) {
+      popupRef.current.scrollIntoView({ behavior: "instant", block: "nearest" });
+    }
+  }, [!!displayedContent]);
 
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+  const reveal = useCallback(() => {
+    if (dismissTimeoutRef.current) clearTimeout(dismissTimeoutRef.current);
+    if (isRevealedRef.current) return;
+    isRevealedRef.current = true;
 
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch(() => {});
-      }
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
-      if (event?.target) {
-        const rect = event.target.getBoundingClientRect();
-        const x = rect.left + rect.width / 2;
-        const y = rect.top;
-        createEmojis(x, y);
-      }
-
-      const randomIndex = Math.floor(Math.random() * content.length);
-      const selectedContent = content[randomIndex];
-      setIsTyping(true);
-      setDisplayedContent("");
-
-      let index = 0;
-      const typeNextChar = () => {
-        if (index < selectedContent.length) {
-          setDisplayedContent(selectedContent.slice(0, index + 1));
-          index++;
-          timeoutRef.current = setTimeout(typeNextChar, Math.random() * 5 + 10);
-        } else {
-          setIsTyping(false);
-        }
-      };
-
-      timeoutRef.current = setTimeout(typeNextChar, 10);
-    },
-    [content, displayedContent, createEmojis]
-  );
-
-  const handleMouseLeave = useCallback(() => {
     if (audioRef.current) {
-      audioRef.current.pause();
       audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {});
     }
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    setDisplayedContent("");
-    setIsTyping(false);
+
+    const randomIndex = Math.floor(Math.random() * content.length);
+    const selectedContent = content[randomIndex];
+    const bounty = onePieceBounties[Math.floor(Math.random() * onePieceBounties.length)];
+    setRandomBounty(bounty);
+    setIsTyping(true);
+    setDisplayedContent(selectedContent.charAt(0));
+
+    let index = 1;
+    const typeNextChar = () => {
+      if (index < selectedContent.length) {
+        setDisplayedContent(selectedContent.slice(0, index + 1));
+        index++;
+        timeoutRef.current = setTimeout(typeNextChar, Math.random() * 5 + 10);
+      } else {
+        setIsTyping(false);
+      }
+    };
+
+    timeoutRef.current = setTimeout(typeNextChar, 10);
+  }, [content]);
+
+  const dismissTimeoutRef = useRef(null);
+
+  const dismiss = useCallback(() => {
+    // Small delay to prevent oscillation from layout shifts
+    if (dismissTimeoutRef.current) clearTimeout(dismissTimeoutRef.current);
+    dismissTimeoutRef.current = setTimeout(() => {
+      isRevealedRef.current = false;
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      setDisplayedContent("");
+      setIsTyping(false);
+    }, 100);
   }, []);
 
   return (
-    <>
+    <span
+      className="hover-reveal-wrapper"
+      onMouseEnter={!isMobile ? reveal : undefined}
+      onMouseLeave={!isMobile ? dismiss : undefined}
+    >
       <span
-        className="hover-reveal-trigger"
-        onMouseEnter={!isMobile ? handleMouseEnter : undefined}
-        onMouseLeave={!isMobile ? handleMouseLeave : undefined}
-        onClick={isMobile ? handleMouseEnter : undefined}
+        className={`hover-reveal-text ${className}`}
+        onClick={isMobile ? () => {
+          if (isRevealedRef.current) dismiss();
+          else reveal();
+        } : undefined}
       >
-        <span className={`hover-reveal-text ${className}`}>
-          {triggerText}
-        </span>
-        {displayedContent && (
-          <div className={`hover-reveal-popup ${isMobile ? 'mobile' : 'desktop'}`}>
-            <div className="hover-reveal-inner">
-              {isMobile && (
-                <button
-                  onClick={handleMouseLeave}
-                  className="hover-reveal-close"
-                  aria-label="Close"
-                >
-                  ×
-                </button>
-              )}
-              <div className={isMobile ? 'hover-reveal-padded' : ''}>
-                <span className="hover-reveal-content">
-                  {displayedContent}
-                  {isTyping && <span className="hover-reveal-cursor">|</span>}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
+        {triggerText}
       </span>
-
-      <EmojiSpringRenderer emojis={emojis} />
-    </>
+      {displayedContent && (
+        <span
+          ref={popupRef}
+          className={`whisper-reveal ${isMobile ? "mobile" : "desktop"}`}
+        >
+          <span className="whisper-inner">
+            {isMobile && (
+              <button
+                onClick={dismiss}
+                className="whisper-close"
+                aria-label="Close"
+              >
+                &times;
+              </button>
+            )}
+            <span className="whisper-skull" aria-hidden="true">&#x2620;</span>
+            <span className="whisper-theory">
+              <span className="whisper-content">
+                {displayedContent}
+                {isTyping && <span className="whisper-cursor" />}
+              </span>
+            </span>
+            <span className="whisper-bounty">{"\u0E3F"} {randomBounty}</span>
+          </span>
+        </span>
+      )}
+    </span>
   );
 }

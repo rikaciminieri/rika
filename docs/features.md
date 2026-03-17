@@ -26,7 +26,7 @@ Running list of everything implemented. Check off when production-ready.
 - [x] Kawaii floating particles (stars, sparkles, hearts) with mouse repulsion physics
 - [x] Soft blurred cloud background layers
 - [x] Watermark canvas with glow painting cursor trail
-- [x] One Piece HoverReveal with typewriter effect + emoji spring burst
+- [x] One Piece HoverReveal with typewriter effect + 3 randomized reveal effects (Haki Crack lightning, Manga Panel ink splash, Treasure Map parchment with compass)
 - [x] Icon hover boop animations (useBoop)
 - [x] Social link spring animations
 - [x] Screensaver (120s idle)

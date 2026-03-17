@@ -83,6 +83,30 @@ I love PostHog's personality-driven approach. Hedgehogs everywhere, playful illu
 - Making it ALL personality with no substance — the engineering must speak for itself
 - Personality that feels performative or try-hard — it should feel natural
 
+## Current State
+
+**Stack:** React 19 + Vite 7 + plain CSS (no Tailwind) — bilingual EN/JP
+**Branch:** `desktop-v2`
+**Concept:** RikaOS — a desktop OS metaphor where content lives in draggable windows and apps
+
+### What's Built
+- Desktop shell with boot sequence, 8 app windows, kawaii theme
+- Window manager: drag, resize, snap-to-edge, minimize/maximize/close
+- Command palette (Cmd+K), right-click context menu, screensaver (120s idle)
+- Terminal with 12 commands + visual effects (rain/matrix/grow)
+- Bilingual EN/JP toggle with full i18n
+- Audio: icon hover scale notes, ambient hum
+- Kawaii effects: floating particles with mouse repulsion, glow cursor trail, soft cloud backgrounds
+- Easter eggs: Konami code cheese rain, bouncing ball, watermark ripple, melody unlock
+- Real content: profile photo, bilingual about, GC photos + descriptions, One Piece HoverReveal
+- Mobile: fullscreen windows, single-tap icons, responsive grids
+
+### Feature Tracking
+The full feature list lives in `docs/features.md`. **Update it whenever a feature is added, changed, or removed.** Mark items `[x]` when production-ready, `[ ]` when planned/in-progress.
+
+### Themes (DISABLED for MVP)
+4 themes were built (Kawaii, Ghibli, Holographic, Terrarium) but are commented out to ship faster. Only kawaii is active. Search `THEMES_DISABLED` to find all commented-out code. Theme files in `src/themes/` are intact and untouched.
+
 ## Workflow Orchestration
 
 ### 1. Plan Node Default

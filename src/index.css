@@ -226,34 +226,147 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
 /* Emoji spring particles */
 .emoji-spring-particle { position: fixed; pointer-events: none; }
 
-/* HoverReveal */
-.hover-reveal-trigger { display: inline; position: relative; }
+/* === HoverReveal === */
+.hover-reveal-wrapper { display: inline; }
 .hover-reveal-text { cursor: pointer; text-decoration: underline; text-decoration-style: dotted; text-decoration-thickness: 2px; text-underline-offset: 2px; transition: opacity 0.2s; }
 .hover-reveal-text:hover { opacity: 0.8; }
-.hover-reveal-popup { z-index: 50; animation: reveal-pop 0.2s ease-out; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
-.hover-reveal-popup.desktop { position: absolute; left: 50%; top: 100%; margin-top: 8px; width: auto; min-width: 250px; max-width: 600px; transform: translateX(-50%); }
-.hover-reveal-popup.mobile { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 500px; max-height: 70vh; overflow-y: auto; }
-.hover-reveal-inner { position: relative; z-index: 10; padding: 16px; }
-.hover-reveal-popup.mobile .hover-reveal-inner { padding: 20px; }
-.hover-reveal-close { position: absolute; top: 8px; right: 8px; background: none; border: none; color: var(--text-muted); font-size: 24px; font-weight: bold; line-height: 1; z-index: 20; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.hover-reveal-close:hover { color: var(--text); }
-.hover-reveal-padded { padding-right: 40px; }
-.hover-reveal-content { opacity: 0; animation: text-reveal 0.3s ease-out forwards; display: inline-block; color: var(--text); word-wrap: break-word; }
-.hover-reveal-cursor { animation: blink 0.8s step-end infinite; }
 
-/* Emoji spring animation */
-@keyframes emoji-spring {
-  0% { opacity: 1; transform: translate(-50%, -50%) scale(var(--scale)); }
-  100% { opacity: 0; transform: translate(calc(-50% + calc(var(--velocityX) * 100px)), calc(-50% + calc(var(--velocityY) * 100px))) rotate(var(--rotation)) scale(0); }
+/* === Whisper Reveal === */
+.whisper-reveal {
+  display: block;
+  position: relative;
+  z-index: 50;
+  padding: 6px 20px 8px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  animation: whisper-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* HoverReveal animations */
-@keyframes reveal-pop { from { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.96); } to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
-.animate-reveal-pop { animation: reveal-pop 0.2s ease-out; }
-@keyframes text-reveal { from { opacity: 0; } to { opacity: 1; } }
-.animate-text-reveal { animation: text-reveal 0.3s ease-out forwards; }
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-.animate-blink { animation: blink 0.8s step-end infinite; }
+.whisper-reveal.mobile {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 85%;
+  max-width: 440px;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  animation: whisper-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.whisper-inner {
+  display: block;
+  position: relative;
+}
+
+/* Skull accent */
+.whisper-skull {
+  display: block;
+  text-align: center;
+  font-size: 0.75rem;
+  opacity: 0.18;
+  margin-bottom: 0;
+  letter-spacing: 0.5em;
+}
+
+/* Theory text */
+.whisper-theory {
+  display: block;
+  min-height: 1.5em;
+}
+
+.whisper-content {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text, #1a1a1a);
+  word-wrap: break-word;
+  display: inline;
+}
+
+/* Blinking cursor — thin line, not pipe character */
+.whisper-cursor {
+  display: inline-block;
+  width: 1.5px;
+  height: 0.9em;
+  background: var(--text, #1a1a1a);
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  animation: whisper-blink 0.9s ease-in-out infinite;
+}
+
+/* Bounty — small, understated */
+.whisper-bounty {
+  display: block;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  font-family: 'Pirata One', serif;
+  font-size: 0.85rem;
+  color: var(--text-muted, #888);
+  text-align: right;
+}
+
+/* Close button (mobile) */
+.whisper-close {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: none;
+  border: none;
+  color: var(--text-muted, #888);
+  font-size: 20px;
+  line-height: 1;
+  z-index: 20;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+.whisper-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text, #1a1a1a);
+}
+
+/* Trigger glow on hover */
+.hover-reveal-wrapper:hover .hover-reveal-text {
+  text-decoration-color: var(--accent, #e88fa7);
+  opacity: 1;
+}
+
+/* === Animations === */
+@keyframes whisper-in {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes whisper-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .whisper-reveal {
+    animation: none;
+  }
+}
 
 /* Mobile */
 @media (max-width: 768px) {
