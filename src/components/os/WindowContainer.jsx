@@ -3,20 +3,22 @@ import Window from './Window';
 import AboutApp from '../apps/AboutApp';
 import ProjectsApp from '../apps/ProjectsApp';
 import TerminalApp from '../apps/TerminalApp';
-import GalleryApp from '../apps/GalleryApp';
-import CurrentlyApp from '../apps/CurrentlyApp';
+// import GalleryApp from '../apps/GalleryApp';
+// import CurrentlyApp from '../apps/CurrentlyApp';
 import GrilledCheeseApp from '../apps/GrilledCheeseApp';
-import JapanApp from '../apps/JapanApp';
+import ContactApp from '../apps/ContactApp';
+// import JapanApp from '../apps/JapanApp';
 import TrashApp from '../apps/TrashApp';
 
 const APP_COMPONENTS = {
   welcome: AboutApp,
   projects: ProjectsApp,
   terminal: TerminalApp,
-  gallery: GalleryApp,
-  currently: CurrentlyApp,
+  // gallery: GalleryApp,
+  // currently: CurrentlyApp,
   gc: GrilledCheeseApp,
-  japan: JapanApp,
+  contact: ContactApp,
+  // japan: JapanApp,
   trash: TrashApp,
 };
 

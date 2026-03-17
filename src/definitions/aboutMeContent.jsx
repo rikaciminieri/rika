@@ -2,7 +2,7 @@ import { decorationStyles } from "./reusableStyles";
 export const aboutMeContent = {
   en: [
     <>
-      Bringing people together through live experiences @{" "}
+      bringing people together through live experiences @{" "}
       <a
         className={decorationStyles.underline}
         href="https://www.eventbrite.com/"
@@ -13,9 +13,9 @@ export const aboutMeContent = {
       </a>{" "}
       🧡✨
     </>,
-    "Former microbiology student 🧫🔬 turned tech advocate 💻, finding new ways to support and empower others.",
-    "When I'm not working, you'll find me painting 🎨, doing pilates 🧘‍♀️, crafting tiny book nooks 📚✨, or diving into One Piece theories 🏴‍☠️.",
-    "Let's connect if you want to chat about pop culture, human biology, or The Rock (yes I mean Dwayne Johnson).",
+    "former microbiology student 🧫🔬 turned tech advocate 💻, finding new ways to support and empower others.",
+    "when i'm not working, you'll find me painting 🎨, doing pilates 🧘‍♀️, crafting tiny book nooks 📚✨, or diving into One Piece theories 🏴‍☠️.",
+    "let's connect if you want to chat about pop culture, human biology, or The Rock (yes i mean Dwayne Johnson).",
   ],
   jp: [
     <>
