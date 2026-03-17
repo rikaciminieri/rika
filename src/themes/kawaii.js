@@ -52,7 +52,7 @@ export const kawaii = {
   bootLineColors: { ok: '#7ecba3', warn: '#f5c97e', default: '#555' },
   termPrompt: 'rika@portfolio ~ % ',
   termBg: { color: 'var(--green)', background: '#0a0a0f' },
-  termWelcome: 'RikaOS Terminal v2.1 \u2014 type "help" for commands\n\n',
+  termWelcome: 'RikaOS terminal v2.1 \u2014 type "help" for commands\n\n',
   startButton: 'R',
   startButtonStyle: {
     background: 'linear-gradient(135deg,#f4a0b5,#f8c4a4)',
@@ -72,10 +72,11 @@ export const kawaii = {
     welcome: { freq: 523.25 },
     projects: { freq: 587.33 },
     terminal: { freq: 659.25 },
-    gallery: { freq: 783.99 },
-    currently: { freq: 880 },
+    // gallery: { freq: 783.99 },
+    // currently: { freq: 880 },
     gc: { freq: 1046.5 },
-    japan: { freq: 1174.66 },
+    contact: { freq: 1174.66 },
+    // japan: { freq: 1174.66 },
     trash: { freq: 1318.51 },
   },
   scaleNoteType: 'sine',
@@ -89,13 +90,15 @@ export const kawaii = {
       '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.3" stroke-linecap="round"><rect x="5" y="8" width="22" height="15" rx="2" fill="rgba(255,255,255,0.1)"/><path d="M3 25h26" stroke-width="1.5"/><line x1="9" y1="13" x2="18" y2="13"/><line x1="9" y1="16.5" x2="23" y2="16.5" opacity="0.5"/></svg>',
     terminal:
       '<svg viewBox="0 0 32 32" fill="none"><rect x="4" y="6" width="24" height="20" rx="3" fill="rgba(0,0,0,0.3)" stroke="rgba(126,203,163,0.5)" stroke-width="1"/><text x="10" y="20" font-family="monospace" font-size="12" font-weight="bold" fill="rgba(126,203,163,0.9)">\u203A_</text></svg>',
-    gallery:
-      '<svg viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="17" rx="12" ry="10" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/><circle cx="11" cy="14" r="2.5" fill="#ff9bb5"/><circle cx="18" cy="11" r="2" fill="#c4b0e8"/><circle cx="23" cy="16" r="2" fill="#7ecba3"/></svg>',
-    currently:
-      '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"><path d="M8 19C8 11 24 11 24 19"/><rect x="5.5" y="18" width="5" height="7" rx="2.5" fill="rgba(255,255,255,0.2)"/><rect x="21.5" y="18" width="5" height="7" rx="2.5" fill="rgba(255,255,255,0.2)"/></svg>',
+    // gallery:
+    //   '<svg viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="17" rx="12" ry="10" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/><circle cx="11" cy="14" r="2.5" fill="#ff9bb5"/><circle cx="18" cy="11" r="2" fill="#c4b0e8"/><circle cx="23" cy="16" r="2" fill="#7ecba3"/></svg>',
+    // currently:
+    //   '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"><path d="M8 19C8 11 24 11 24 19"/><rect x="5.5" y="18" width="5" height="7" rx="2.5" fill="rgba(255,255,255,0.2)"/><rect x="21.5" y="18" width="5" height="7" rx="2.5" fill="rgba(255,255,255,0.2)"/></svg>',
     gc: '<svg viewBox="0 0 32 32" fill="none"><rect x="7" y="8" width="18" height="4.5" rx="2" fill="rgba(255,255,255,0.35)" stroke="rgba(255,255,255,0.5)" stroke-width="0.8"/><path d="M7 12.5Q11.5 17 16 12.5Q20.5 17 25 12.5" fill="rgba(255,210,120,0.45)"/><rect x="7" y="15" width="18" height="4.5" rx="2" fill="rgba(255,255,255,0.3)"/></svg>',
-    japan:
-      '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round"><line x1="10" y1="12" x2="10" y2="28"/><line x1="22" y1="12" x2="22" y2="28"/><path d="M6 12Q16 8 26 12" stroke-width="2.2"/></svg>',
+    contact:
+      '<svg viewBox="0 0 32 32" fill="none"><rect x="4" y="8" width="24" height="16" rx="3" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/><path d="M4 11l12 7 12-7" stroke="rgba(255,255,255,0.7)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="10" r="4" fill="rgba(244,160,181,0.6)"/><text x="22.5" y="12.5" font-size="6" fill="white">!</text></svg>',
+    // japan:
+    //   '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round"><line x1="10" y1="12" x2="10" y2="28"/><line x1="22" y1="12" x2="22" y2="28"/><path d="M6 12Q16 8 26 12" stroke-width="2.2"/></svg>',
     trash:
       '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(150,138,156,0.7)" stroke-width="1.2" stroke-linecap="round"><rect x="9" y="11" width="14" height="16" rx="2" fill="rgba(150,138,156,0.15)"/><path d="M7 9h18"/><path d="M13 7h6" stroke-width="1.5"/></svg>',
   },
@@ -103,11 +106,12 @@ export const kawaii = {
     welcome: { background: 'linear-gradient(135deg,#f4a0b5,#f8c4a4)' },
     projects: { background: 'linear-gradient(135deg,#c4b0e8,#97b8f0)' },
     terminal: { background: '#2a2035', border: '1px solid #443a4c' },
-    gallery: { background: 'linear-gradient(135deg,#e88fc0,#c4b0e8)' },
+    // gallery: { background: 'linear-gradient(135deg,#e88fc0,#c4b0e8)' },
     gc: { background: 'linear-gradient(135deg,#f5c97e,#f8c4a4)' },
+    contact: { background: 'linear-gradient(135deg,#97b8f0,#c4b0e8)' },
     trash: { background: 'var(--surface-2)', border: '1px solid var(--border)' },
-    currently: { background: 'linear-gradient(135deg,#7ec9c0,#7ecba3)' },
-    japan: { background: 'linear-gradient(135deg,#f4a0b5,#f07070)' },
+    // currently: { background: 'linear-gradient(135deg,#7ec9c0,#7ecba3)' },
+    // japan: { background: 'linear-gradient(135deg,#f4a0b5,#f07070)' },
   },
   finderPath: '/Users/rika/Desktop/definitely-not-important/',
   cursorDotStyle: {

@@ -40,7 +40,7 @@ export default function TerminalApp() {
       <div ref={scrollRef} style={{ flex: 1, overflow: 'auto' }}>
         {/* Welcome message */}
         <div className="output" style={{ whiteSpace: 'pre-wrap' }}>
-          {theme.termWelcome || 'RikaOS Terminal — type "help" for commands\n\n'}
+          {theme.termWelcome || 'RikaOS terminal — type "help" for commands\n\n'}
         </div>
 
         {/* Output history */}

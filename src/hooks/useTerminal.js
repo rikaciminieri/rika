@@ -41,13 +41,13 @@ export function useTerminal({ theme, openApp, switchTheme, closeAllWindows }) {
     let displayResult = result;
     if (result === '__RAIN__') {
       triggerRain();
-      displayResult = 'Rain summoned...';
+      displayResult = 'rain summoned...';
     } else if (result === '__MATRIX__') {
       triggerMatrix();
-      displayResult = 'Entering the matrix...';
+      displayResult = 'entering the matrix...';
     } else if (result === '__GROW__') {
       triggerGrow();
-      displayResult = 'Growing...';
+      displayResult = 'growing...';
     }
 
     setOutput((prev) => [
