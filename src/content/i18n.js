@@ -25,12 +25,11 @@ export const i18n = {
     about: {
       greeting: '\uD83D\uDC4B\uD83C\uDFFC, i\'m Rika!',
       subtitle: 'full-stack engineer | problem solver | self-proclaimed comedian | grilled cheese enthusiast',
-      para2: 'former microbiology student \uD83E\uDDEB\uD83D\uDD2C turned tech advocate \uD83D\uDCBB. i pivoted from petri dishes to pixels because i realized i liked debugging code more than debugging cell cultures.',
-      para4: 'let\'s connect if you want to chat about pop culture, human biology, or The Rock (yes i mean Dwayne Johnson).',
-      opTrigger: 'One Piece theories',
-      opPrefix: 'when i\'m not working, you\'ll find me painting \uD83C\uDFA8, doing pilates \uD83E\uDDD8\u200D\u2640\uFE0F, crafting tiny book nooks \uD83D\uDCDA\u2728, or diving into ',
-      opSuffix: ' \uD83C\uDFF4\u200D\u2620\uFE0F',
-      tip: 'pro tip: press \u2318K to open the command palette. right-click anywhere for more options.',
+      para2: 'i went from studying medicine to building software. four years in, it\'s the best decision i\'ve ever made!',
+      para3: 'when i\'m not writing code, i\'m crafting tiny book nooks, learning something new, singing my heart out, or eating my way through a new city.',
+      opTrigger: 'one piece',
+      opPrefix: 'let\'s chat about music, your favorite book, ',
+      opSuffix: ' — or your next hire.',
     },
 
     gc: {
@@ -159,12 +158,11 @@ export const i18n = {
     about: {
       greeting: '\uD83D\uDC4B\uD83C\uDFFC 莉香です！',
       subtitle: 'フルスタックエンジニア | 問題解決者 | 自称コメディアン | グリルドチーズ大好き人間',
-      para2: '微生物学専攻の学生 \uD83E\uDDEB\uD83D\uDD2C からテックアドボケイト \uD83D\uDCBB に転身。クリエイティブな方法で人々をサポートし、エンパワーメントすることに情熱を注いでいます。',
-      para4: 'ポップカルチャー、人類生物学、そしてもちろんあの「ロック様」（そう、ドウェイン・ジョンソンのことです）についてお話ししたい方、ぜひつながりましょう！',
-      opTrigger: 'ワンピースの考察',
-      opPrefix: '仕事をしていないときは、絵を描いたり \uD83C\uDFA8、ピラティスをしたり \uD83E\uDDD8\u200D\u2640\uFE0F、小さな本の隠れ家を作ったり \uD83D\uDCDA\u2728、',
-      opSuffix: ' に夢中になったりしています \uD83C\uDFF4\u200D\u2620\uFE0F',
-      tip: 'ヒント: ⌘Kでコマンドパレットを開けます。右クリックでメニューも。',
+      para2: '医学の道からソフトウェアの世界へ。4年経った今、人生で最高の決断だったと思っています!',
+      para3: 'コードを書いていないときは、小さなブックヌックを作ったり、新しいことを学んだり、思いっきり歌ったり、知らない街を食べ歩いたりしています。',
+      opTrigger: 'ワンピース',
+      opPrefix: '音楽、おすすめの本、',
+      opSuffix: ' — または次の採用について話しましょう。',
     },
 
     gc: {
