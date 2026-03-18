@@ -17,8 +17,8 @@ export default function AboutApp() {
 
   // JSX content — can't be a flat string (contains <a> tag)
   const eventbritePara = isJP
-    ? <span>ライブ体験で、人と人がつながる瞬間をつくっています @ <a href="https://www.eventbrite.com/" target="_blank" rel="noopener noreferrer" className="about-link">Eventbrite</a> {'\uD83E\uDDE1\u2728'}</span>
-    : <span>bringing people together through live experiences @ <a href="https://www.eventbrite.com/" target="_blank" rel="noopener noreferrer" className="about-link">Eventbrite</a> {'\uD83E\uDDE1\u2728'}</span>;
+    ? <span>フルスタックソフトウェアエンジニア @ <a href="https://www.eventbrite.com/" target="_blank" rel="noopener noreferrer" className="about-link">eventbrite</a>、グローバルコミュニティのためにAI駆動のサポートシステムを構築中 {'\uD83E\uDDE1\u2728'}</span>
+    : <span>full-stack software engineer @ <a href="https://www.eventbrite.com/" target="_blank" rel="noopener noreferrer" className="about-link">eventbrite</a>, building ai-driven support systems for a global community {'\uD83E\uDDE1\u2728'}</span>;
 
   return (
     <div className="notepad-content about-app">
@@ -40,6 +40,7 @@ export default function AboutApp() {
       <div className="about-body">
         <p>{eventbritePara}</p>
         <p>{t('about.para2')}</p>
+        <p>{t('about.para3')}</p>
         <p>
           {t('about.opPrefix')}
           <HoverReveal
@@ -49,11 +50,7 @@ export default function AboutApp() {
           />
           {t('about.opSuffix')}
         </p>
-        <p>{t('about.para4')}</p>
       </div>
-
-      {/* Pro tip */}
-      <p className="about-tip">{t('about.tip')}</p>
 
       {/* Social links */}
       <div className="about-socials">
