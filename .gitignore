@@ -27,3 +27,9 @@ dist-ssr
 # Screenshots & Playwright
 *.png
 .playwright-mcp/
+
+# Personal data exports - never commit raw data
+data/exports/
+
+# Personal reference docs
+DATA-GUIDE.md

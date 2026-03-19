@@ -119,11 +119,44 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
 .finder-item .fi-meta { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
 .finder-item .fi-size { font-size: 11px; color: var(--text-muted); font-family: var(--mono); min-width: 60px; text-align: right; }
 
-.currently-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.currently-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
-.currently-card h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 8px; font-family: var(--mono); }
-.currently-card .item { font-size: 13px; padding: 4px 0; display: flex; align-items: center; gap: 8px; }
-.currently-card .item-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+/* Currently app — widget grid */
+.currently-app { padding-bottom: 8px; }
+.widget-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.widget { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.widget-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.widget-header h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-family: var(--mono); margin: 0; }
+.widget-profile-link { font-size: 11px; color: var(--accent); text-decoration: none; font-family: var(--mono); opacity: 0.8; transition: opacity 0.15s; }
+.widget-profile-link:hover { opacity: 1; text-decoration: underline; }
+
+/* Star ratings */
+.widget-stars { font-size: 11px; color: var(--amber); letter-spacing: 1px; }
+
+/* Watching widget — poster grid */
+.widget-watching { grid-column: 1 / -1; }
+.widget-posters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.widget-poster-card { text-decoration: none; color: inherit; border-radius: 8px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+.widget-poster-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+.widget-poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; border-radius: 8px; display: block; }
+.widget-poster-info { padding: 6px 2px 2px; }
+.widget-poster-title { font-size: 11px; font-weight: 600; display: block; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Reading widget — book list */
+.widget-reading { grid-column: 1 / -1; }
+.widget-book-list { display: flex; flex-direction: column; gap: 8px; }
+.widget-book { display: flex; gap: 10px; align-items: flex-start; padding: 6px; border-radius: 8px; transition: background 0.15s; text-decoration: none; color: inherit; }
+.widget-book:hover { background: rgba(0,0,0,0.03); }
+.widget-book-cover { width: 36px; height: 54px; object-fit: cover; border-radius: 4px; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.widget-book-cover-placeholder { width: 36px; height: 54px; border-radius: 4px; flex-shrink: 0; background: linear-gradient(135deg, var(--lavender), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: white; font-family: var(--display); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.widget-book-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.widget-book-title { font-size: 12px; font-weight: 600; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.widget-book-author { font-size: 11px; color: var(--text-muted); }
+.widget-book-badge { font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--green); font-family: var(--mono); font-weight: 600; }
+.widget-book-finished { border-left: 2px solid var(--green); padding-left: 8px; }
+
+/* Simple list widgets (listening, playing, learning, hills) */
+.widget-simple-list { display: flex; flex-direction: column; gap: 4px; }
+.widget-simple-item { font-size: 13px; padding: 3px 0; display: flex; align-items: center; gap: 8px; }
+.widget-simple-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
 /* Finder preview */
 .finder-preview { padding: 24px; animation: fadeIn 0.2s; }
@@ -438,7 +471,10 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
   .about-socials { justify-content: center; flex-wrap: wrap; }
   .gc-real-card { flex-direction: column; }
   .gc-card-image { width: 100%; height: 160px; }
-  .currently-grid { grid-template-columns: 1fr; }
+  .widget-grid { grid-template-columns: 1fr; }
+  .widget-watching { grid-column: 1; }
+  .widget-reading { grid-column: 1; }
+  .widget-posters { grid-template-columns: repeat(4, 1fr); }
   .projects-grid { grid-template-columns: 1fr; }
   .gc-bracket { gap: 20px; }
   .cmd-box { width: 95vw; border-radius: 16px; }

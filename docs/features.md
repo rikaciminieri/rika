@@ -48,6 +48,14 @@ Running list of everything implemented. Check off when production-ready.
 - [ ] Theme switching UI (context menu, command palette, terminal)
 - [ ] Theme transition fade overlay
 
+## Data Pipeline
+- [x] Letterboxd RSS integration (build-time Vite plugin fetches fresh data on every deploy)
+- [x] Goodreads CSV processor (`npm run data:books`)
+- [x] Currently app reads real watching/reading data from generated JSON
+- [ ] Apple Music API integration (listening data)
+- [ ] Instagram personality mining (voice/copy calibration)
+- [ ] Site copy rewrite using voice profile
+
 ## TODO for MVP
 - [ ] Review all app content for filler vs real
 - [ ] Responsive polish pass

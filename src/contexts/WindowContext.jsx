@@ -7,7 +7,7 @@ export const APP_DEFS = [
   { id: 'projects', label: 'apps.projects', w: 700, h: 500 },
   { id: 'terminal', label: 'apps.terminal', w: 640, h: 420 },
   // { id: 'gallery', label: 'apps.gallery', w: 680, h: 460 },
-  // { id: 'currently', label: 'apps.currently', w: 480, h: 400 },
+  { id: 'currently', label: 'apps.currently', w: 560, h: 520 },
   { id: 'gc', label: 'apps.gc', w: 720, h: 520 },
   { id: 'contact', label: 'apps.contact', w: 480, h: 520 },
   // { id: 'japan', label: 'apps.japan', w: 520, h: 440 },
