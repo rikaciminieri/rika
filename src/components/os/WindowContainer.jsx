@@ -4,7 +4,7 @@ import AboutApp from '../apps/AboutApp';
 import ProjectsApp from '../apps/ProjectsApp';
 import TerminalApp from '../apps/TerminalApp';
 // import GalleryApp from '../apps/GalleryApp';
-// import CurrentlyApp from '../apps/CurrentlyApp';
+import CurrentlyApp from '../apps/CurrentlyApp';
 import GrilledCheeseApp from '../apps/GrilledCheeseApp';
 import ContactApp from '../apps/ContactApp';
 // import JapanApp from '../apps/JapanApp';
@@ -15,7 +15,7 @@ const APP_COMPONENTS = {
   projects: ProjectsApp,
   terminal: TerminalApp,
   // gallery: GalleryApp,
-  // currently: CurrentlyApp,
+  currently: CurrentlyApp,
   gc: GrilledCheeseApp,
   contact: ContactApp,
   // japan: JapanApp,

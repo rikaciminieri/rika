@@ -73,7 +73,7 @@ export const kawaii = {
     projects: { freq: 587.33 },
     terminal: { freq: 659.25 },
     // gallery: { freq: 783.99 },
-    // currently: { freq: 880 },
+    currently: { freq: 880 },
     gc: { freq: 1046.5 },
     contact: { freq: 1174.66 },
     // japan: { freq: 1174.66 },
@@ -92,8 +92,8 @@ export const kawaii = {
       '<svg viewBox="0 0 32 32" fill="none"><rect x="4" y="6" width="24" height="20" rx="3" fill="rgba(0,0,0,0.3)" stroke="rgba(126,203,163,0.5)" stroke-width="1"/><text x="10" y="20" font-family="monospace" font-size="12" font-weight="bold" fill="rgba(126,203,163,0.9)">\u203A_</text></svg>',
     // gallery:
     //   '<svg viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="17" rx="12" ry="10" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/><circle cx="11" cy="14" r="2.5" fill="#ff9bb5"/><circle cx="18" cy="11" r="2" fill="#c4b0e8"/><circle cx="23" cy="16" r="2" fill="#7ecba3"/></svg>',
-    // currently:
-    //   '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"><path d="M8 19C8 11 24 11 24 19"/><rect x="5.5" y="18" width="5" height="7" rx="2.5" fill="rgba(255,255,255,0.2)"/><rect x="21.5" y="18" width="5" height="7" rx="2.5" fill="rgba(255,255,255,0.2)"/></svg>',
+    currently:
+      '<svg viewBox="0 0 32 32" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"><path d="M8 19C8 11 24 11 24 19"/><rect x="5.5" y="18" width="5" height="7" rx="2.5" fill="rgba(255,255,255,0.2)"/><rect x="21.5" y="18" width="5" height="7" rx="2.5" fill="rgba(255,255,255,0.2)"/></svg>',
     gc: '<svg viewBox="0 0 32 32" fill="none"><rect x="7" y="8" width="18" height="4.5" rx="2" fill="rgba(255,255,255,0.35)" stroke="rgba(255,255,255,0.5)" stroke-width="0.8"/><path d="M7 12.5Q11.5 17 16 12.5Q20.5 17 25 12.5" fill="rgba(255,210,120,0.45)"/><rect x="7" y="15" width="18" height="4.5" rx="2" fill="rgba(255,255,255,0.3)"/></svg>',
     contact:
       '<svg viewBox="0 0 32 32" fill="none"><rect x="4" y="8" width="24" height="16" rx="3" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/><path d="M4 11l12 7 12-7" stroke="rgba(255,255,255,0.7)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="10" r="4" fill="rgba(244,160,181,0.6)"/><text x="22.5" y="12.5" font-size="6" fill="white">!</text></svg>',
@@ -110,7 +110,7 @@ export const kawaii = {
     gc: { background: 'linear-gradient(135deg,#f5c97e,#f8c4a4)' },
     contact: { background: 'linear-gradient(135deg,#97b8f0,#c4b0e8)' },
     trash: { background: 'var(--surface-2)', border: '1px solid var(--border)' },
-    // currently: { background: 'linear-gradient(135deg,#7ec9c0,#7ecba3)' },
+    currently: { background: 'linear-gradient(135deg,#7ec9c0,#7ecba3)' },
     // japan: { background: 'linear-gradient(135deg,#f4a0b5,#f07070)' },
   },
   finderPath: '/Users/rika/Desktop/definitely-not-important/',
