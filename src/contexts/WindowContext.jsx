@@ -4,11 +4,11 @@ const WindowCtx = createContext();
 
 export const APP_DEFS = [
   { id: 'welcome', label: 'apps.about', w: 580, h: 540 },
-  { id: 'projects', label: 'apps.projects', w: 700, h: 500 },
+  { id: 'projects', label: 'apps.projects', w: 700, h: 500, hidden: true },
   { id: 'terminal', label: 'apps.terminal', w: 640, h: 420 },
   // { id: 'gallery', label: 'apps.gallery', w: 680, h: 460 },
   { id: 'currently', label: 'apps.currently', w: 560, h: 520 },
-  { id: 'gc', label: 'apps.gc', w: 720, h: 520 },
+  { id: 'gc', label: 'apps.gc', w: 720, h: 520, hidden: true },
   { id: 'contact', label: 'apps.contact', w: 480, h: 520 },
   // { id: 'japan', label: 'apps.japan', w: 520, h: 440 },
   { id: 'trash', label: 'apps.trash', w: 560, h: 420 },

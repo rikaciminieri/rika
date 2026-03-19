@@ -20,7 +20,7 @@ export default function DesktopIcons() {
 
   return (
     <div className="desktop-icons">
-      {APP_DEFS.map((app) => (
+      {APP_DEFS.filter((app) => !app.hidden).map((app) => (
         <div
           key={app.id}
           className="desktop-icon"
