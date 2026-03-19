@@ -191,8 +191,9 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
 .cursor-dot.fade { opacity: 0; transform: scale(0); }
 
 /* Screensaver */
-.screensaver { position: fixed; inset: 0; z-index: 80000; display: none; cursor: pointer; overflow: hidden; }
+.screensaver { position: fixed; inset: 0; z-index: 80000; display: none; cursor: pointer; overflow: hidden; opacity: 0; transition: opacity 0.5s ease; }
 .screensaver.active { display: block; }
+.screensaver.ss-visible { opacity: 1; transition: opacity 1s ease; }
 
 /* Cheese rain */
 .cheese-rain { position: fixed; inset: 0; pointer-events: none; z-index: 90000; }

@@ -29,7 +29,7 @@ Running list of everything implemented. Check off when production-ready.
 - [x] One Piece HoverReveal with typewriter effect + 3 randomized reveal effects (Haki Crack lightning, Manga Panel ink splash, Treasure Map parchment with compass)
 - [x] Icon hover boop animations (useBoop)
 - [x] Social link spring animations
-- [x] Screensaver (120s idle)
+- [x] Screensaver (120s idle) — pink ocean scene: sunset in light mode, moonlit in dark mode, 3-layer wave animation, fade in/out
 - [x] Night mode toggle (sun/moon)
 
 ## System Features
