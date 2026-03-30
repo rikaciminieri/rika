@@ -64,9 +64,22 @@ function pickCover(large, small) {
   const img = large || small;
   if (!img) return null;
   if (img.includes('nophoto') || img.includes('nocover') || img.includes('no-image')) return null;
-  // Goodreads uses very small placeholder images (1x1 or similar tiny dimensions)
   if (img.includes('._SY1_') || img.includes('._SX1_')) return null;
   return img;
+}
+
+// Verify cover URLs are real images (not tiny placeholders)
+async function verifyCover(url) {
+  if (!url) return null;
+  try {
+    const res = await fetch(url, { method: 'HEAD' });
+    const size = Number(res.headers.get('content-length') || 0);
+    // Real book covers are 5KB+; Goodreads placeholders are ~1KB
+    if (size < 3000) return null;
+    return url;
+  } catch {
+    return null;
+  }
 }
 
 async function fetchShelf(shelf) {
@@ -165,6 +178,14 @@ async function main() {
   const allExisting = [...(existingData.currentlyReading || []), ...(existingData.read || [])];
   const currentlyReading = mergeWithExisting(currentlyReadingFiltered, allExisting);
   const read = mergeWithExisting(readFiltered, allExisting);
+
+  // Verify covers are real images, not tiny placeholders
+  console.log('Verifying cover images...');
+  await Promise.all(
+    [...currentlyReading, ...read].map(async (book) => {
+      book.cover = await verifyCover(book.cover);
+    })
+  );
 
   const favorites = read.filter((b) => b.rating === 5);
   const allBooks = [...currentlyReading, ...read];
