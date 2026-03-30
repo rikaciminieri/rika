@@ -3,148 +3,164 @@
     {
       "title": "Smart Brevity: The Power of Saying More with Less (Revised and Updated)",
       "author": "Jim Vandehei",
+      "rating": null,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1648440594l/60703995.jpg",
+      "goodreadsId": "60703995",
       "pages": 199,
       "dateAdded": "2026/03/10",
-      "cover": null,
-      "goodreadsId": "60703995"
-    },
-    {
-      "title": "A Little Life",
-      "author": "Hanya Yanagihara",
-      "pages": 737,
-      "dateAdded": "2026/01/14",
-      "cover": "https://covers.openlibrary.org/b/id/12065783-M.jpg",
-      "goodreadsId": "55711828"
+      "dateRead": null
     },
     {
       "title": "The Things We Leave Unfinished",
       "author": "Rebecca Yarros",
+      "rating": null,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1588868246l/53345408._SY475_.jpg",
+      "goodreadsId": "53345408",
       "pages": 473,
       "dateAdded": "2026/01/06",
-      "cover": "https://covers.openlibrary.org/b/id/10240342-M.jpg",
-      "goodreadsId": "53345408"
+      "dateRead": null
+    },
+    {
+      "title": "A Little Life",
+      "author": "Hanya Yanagihara",
+      "rating": null,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1603033548l/55711828._SY475_.jpg",
+      "goodreadsId": "55711828",
+      "pages": 737,
+      "dateAdded": "2026/01/14",
+      "dateRead": null
     },
     {
       "title": "Game Changer (Game Changers, #1)",
       "author": "Rachel  Reid",
+      "rating": null,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1764957077l/220965585._SY475_.jpg",
+      "goodreadsId": "220965585",
       "pages": 400,
       "dateAdded": "2026/01/02",
-      "cover": "https://covers.openlibrary.org/b/id/11050489-M.jpg",
-      "goodreadsId": "220965585"
+      "dateRead": null
     },
     {
       "title": "Waco: A Survivor's Story",
       "author": "David Thibodeau",
+      "rating": null,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1552838940l/35716269._SY475_.jpg",
+      "goodreadsId": "35716269",
       "pages": 384,
       "dateAdded": "2025/12/09",
-      "cover": null,
-      "goodreadsId": "35716269"
+      "dateRead": null
     },
     {
       "title": "Frankenstein",
       "author": "Mary Wollstonecraft Shelley",
+      "rating": null,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1430302919l/25448995.jpg",
+      "goodreadsId": "25448995",
       "pages": 72,
       "dateAdded": "2025/12/07",
-      "cover": null,
-      "goodreadsId": "25448995"
+      "dateRead": null
     },
     {
       "title": "Magnolia Parks (The Magnolia Parks Universe, #1)",
       "author": "Jessa Hastings",
+      "rating": null,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1685517972l/168437483._SY475_.jpg",
+      "goodreadsId": "168437483",
       "pages": 442,
       "dateAdded": "2025/10/12",
-      "cover": "https://covers.openlibrary.org/b/id/13303563-M.jpg",
-      "goodreadsId": "168437483"
+      "dateRead": null
     },
     {
       "title": "Sapiens [Tenth Anniversary Edition]: A Brief History of Humankind",
       "author": "Yuval Noah Harari",
+      "rating": null,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1737542693l/221305524._SY475_.jpg",
+      "goodreadsId": "221305524",
       "pages": 599,
       "dateAdded": "2025/06/29",
-      "cover": null,
-      "goodreadsId": "221305524"
+      "dateRead": null
     }
   ],
   "read": [
     {
-      "title": "The Last Letter",
-      "author": "Rebecca Yarros",
-      "rating": 5,
-      "pages": 434,
-      "dateRead": "2026/01/14",
-      "dateAdded": "2026/01/06",
-      "cover": "https://covers.openlibrary.org/b/id/10165652-M.jpg",
-      "goodreadsId": "213613851"
-    },
-    {
-      "title": "The Housemaid's Secret (The Housemaid, #2)",
-      "author": "Freida McFadden",
+      "title": "Scarred: A Memoir of a Childhood Stolen and a Life Reclaimed",
+      "author": "Clark Fredericks",
       "rating": 4,
-      "pages": 311,
-      "dateRead": "2026/01/14",
-      "dateAdded": "2025/12/29",
-      "cover": null,
-      "goodreadsId": "62848145"
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1728327887l/220195611._SY475_.jpg",
+      "goodreadsId": "220195611",
+      "pages": 272,
+      "dateAdded": "2025/08/20",
+      "dateRead": "2026/01/14"
     },
     {
       "title": "The Housemaid (The Housemaid, #1)",
       "author": "Freida McFadden",
       "rating": 4,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1646534743l/60556912._SY475_.jpg",
+      "goodreadsId": "60556912",
       "pages": 329,
-      "dateRead": "2026/01/14",
       "dateAdded": "2025/12/25",
-      "cover": "https://covers.openlibrary.org/b/id/15105883-M.jpg",
-      "goodreadsId": "60556912"
+      "dateRead": "2026/01/14"
     },
     {
-      "title": "Scarred: A Memoir of a Childhood Stolen and a Life Reclaimed",
-      "author": "Clark Fredericks",
+      "title": "The Housemaid's Secret (The Housemaid, #2)",
+      "author": "Freida McFadden",
       "rating": 4,
-      "pages": 272,
-      "dateRead": "2026/01/14",
-      "dateAdded": "2025/08/20",
-      "cover": null,
-      "goodreadsId": "220195611"
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1664729357l/62848145._SY475_.jpg",
+      "goodreadsId": "62848145",
+      "pages": 311,
+      "dateAdded": "2025/12/29",
+      "dateRead": "2026/01/14"
+    },
+    {
+      "title": "The Last Letter",
+      "author": "Rebecca Yarros",
+      "rating": 5,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1715987942l/213613851.jpg",
+      "goodreadsId": "213613851",
+      "pages": 434,
+      "dateAdded": "2026/01/06",
+      "dateRead": "2026/01/14"
     },
     {
       "title": "Heated Rivalry (Game Changers, #2)",
       "author": "Rachel  Reid",
       "rating": 4,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1764956889l/220966494._SY475_.jpg",
+      "goodreadsId": "220966494",
       "pages": 372,
-      "dateRead": "2026/01/10",
       "dateAdded": "2026/01/02",
-      "cover": "https://covers.openlibrary.org/b/id/15152812-M.jpg",
-      "goodreadsId": "220966494"
+      "dateRead": "2026/01/10"
     },
     {
       "title": "The Housemaid Is Watching (The Housemaid, #3)",
       "author": "Freida McFadden",
       "rating": 4,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1710781153l/199228303._SY475_.jpg",
+      "goodreadsId": "199228303",
       "pages": 402,
-      "dateRead": "2026/01/02",
       "dateAdded": "2025/12/31",
-      "cover": null,
-      "goodreadsId": "199228303"
-    },
-    {
-      "title": "I'm Glad My Mom Died",
-      "author": "Jennette McCurdy",
-      "rating": 4,
-      "pages": 304,
-      "dateRead": "",
-      "dateAdded": "2025/04/09",
-      "cover": null,
-      "goodreadsId": "59366244"
+      "dateRead": "2026/01/02"
     },
     {
       "title": "Maybe You Should Talk to Someone: The Workbook: A Toolkit for Editing Your Story and Changing Your Life",
       "author": "Lori Gottlieb",
       "rating": 5,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1627806365l/58408167._SX318_.jpg",
+      "goodreadsId": "58408167",
       "pages": 120,
-      "dateRead": "",
       "dateAdded": "2025/04/09",
-      "cover": null,
-      "goodreadsId": "58408167"
+      "dateRead": ""
+    },
+    {
+      "title": "I'm Glad My Mom Died",
+      "author": "Jennette McCurdy",
+      "rating": 4,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1649228846l/59366244.jpg",
+      "goodreadsId": "59366244",
+      "pages": 304,
+      "dateAdded": "2025/04/09",
+      "dateRead": ""
     }
   ],
   "favorites": [
@@ -152,21 +168,21 @@
       "title": "The Last Letter",
       "author": "Rebecca Yarros",
       "rating": 5,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1715987942l/213613851.jpg",
+      "goodreadsId": "213613851",
       "pages": 434,
-      "dateRead": "2026/01/14",
       "dateAdded": "2026/01/06",
-      "cover": "https://covers.openlibrary.org/b/id/10165652-M.jpg",
-      "goodreadsId": "213613851"
+      "dateRead": "2026/01/14"
     },
     {
       "title": "Maybe You Should Talk to Someone: The Workbook: A Toolkit for Editing Your Story and Changing Your Life",
       "author": "Lori Gottlieb",
       "rating": 5,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1627806365l/58408167._SX318_.jpg",
+      "goodreadsId": "58408167",
       "pages": 120,
-      "dateRead": "",
       "dateAdded": "2025/04/09",
-      "cover": null,
-      "goodreadsId": "58408167"
+      "dateRead": ""
     }
   ],
   "stats": {

@@ -50,7 +50,9 @@ Running list of everything implemented. Check off when production-ready.
 
 ## Data Pipeline
 - [x] Letterboxd RSS integration (build-time Vite plugin fetches fresh data on every deploy)
-- [x] Goodreads CSV processor (`npm run data:books`)
+- [x] Goodreads CSV processor (`npm run data:books`) — manual fallback
+- [x] Goodreads RSS integration (`npm run data:books-rss`) — auto-fetches shelf data, merges with existing CSV metadata
+- [x] GitHub Actions cron workflow — runs twice daily (8am/8pm UTC), auto-commits updated data, triggers Vercel redeploy
 - [x] Currently app reads real watching/reading data from generated JSON
 - [ ] Apple Music API integration (listening data)
 - [ ] Instagram personality mining (voice/copy calibration)

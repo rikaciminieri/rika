@@ -1,6 +1,26 @@
 {
   "recentWatches": [
     {
+      "title": "Hannah Montana 20th Anniversary Special",
+      "year": 2026,
+      "rating": 3,
+      "watchedDate": "2026-03-30",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/5/0/2/8/6/0/1502860-hannah-montana-20th-anniversary-special-0-600-0-900-crop.jpg?v=6a66011e62",
+      "review": "i feel like every guest was sooooo random and brief 😭 i loved the nostalgia of it all but it kind of felt scrapped together?? id like a reboot tbh",
+      "link": "https://letterboxd.com/minieminems/film/hannah-montana-20th-anniversary-special/"
+    },
+    {
+      "title": "Ex Machina",
+      "year": 2015,
+      "rating": 3.5,
+      "watchedDate": "2026-03-21",
+      "rewatch": true,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/8/7/9/8/6/187986-ex-machina-0-600-0-900-crop.jpg?v=2b4212d498",
+      "review": "she played him like a FIDDLE",
+      "link": "https://letterboxd.com/minieminems/film/ex-machina-2015/"
+    },
+    {
       "title": "Iron Man 2",
       "year": 2010,
       "rating": 4.5,
@@ -79,29 +99,29 @@
       "poster": "https://a.ltrbxd.com/resized/film-poster/9/7/7/3/4/2/977342-zootopia-2-0-600-0-900-crop.jpg?v=00a15a97bc",
       "review": "yeah i loved it, they know how to make a good movie",
       "link": "https://letterboxd.com/minieminems/film/zootopia-2/"
-    },
-    {
-      "title": "Wicked: For Good",
-      "year": 2025,
-      "rating": 5,
-      "watchedDate": "2025-11-26",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/film-poster/8/7/1/1/4/8/871148-wicked-for-good-0-600-0-900-crop.jpg?v=f1330d6f91",
-      "review": "MM, flip it around, wicked wiiiiiitch",
-      "link": "https://letterboxd.com/minieminems/film/wicked-for-good/"
-    },
-    {
-      "title": "Freakier Friday",
-      "year": 2025,
-      "rating": 3,
-      "watchedDate": "2025-11-23",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/film-poster/1/0/1/3/8/6/7/1013867-freakier-friday-0-600-0-900-crop.jpg?v=9956bf7519",
-      "review": "why is jake still pining for gma didn’t he end up w anna at the end of the first movie 😭",
-      "link": "https://letterboxd.com/minieminems/film/freakier-friday/"
     }
   ],
   "allWatches": [
+    {
+      "title": "Hannah Montana 20th Anniversary Special",
+      "year": 2026,
+      "rating": 3,
+      "watchedDate": "2026-03-30",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/5/0/2/8/6/0/1502860-hannah-montana-20th-anniversary-special-0-600-0-900-crop.jpg?v=6a66011e62",
+      "review": "i feel like every guest was sooooo random and brief 😭 i loved the nostalgia of it all but it kind of felt scrapped together?? id like a reboot tbh",
+      "link": "https://letterboxd.com/minieminems/film/hannah-montana-20th-anniversary-special/"
+    },
+    {
+      "title": "Ex Machina",
+      "year": 2015,
+      "rating": 3.5,
+      "watchedDate": "2026-03-21",
+      "rewatch": true,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/8/7/9/8/6/187986-ex-machina-0-600-0-900-crop.jpg?v=2b4212d498",
+      "review": "she played him like a FIDDLE",
+      "link": "https://letterboxd.com/minieminems/film/ex-machina-2015/"
+    },
     {
       "title": "Iron Man 2",
       "year": 2010,
@@ -426,9 +446,9 @@
     }
   ],
   "stats": {
-    "totalLogged": 25,
+    "totalLogged": 27,
     "averageRating": 3.7,
-    "rewatches": 3
+    "rewatches": 4
   },
-  "lastUpdated": "2026-03-19"
+  "lastUpdated": "2026-03-30"
 }

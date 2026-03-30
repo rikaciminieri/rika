@@ -9,8 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "data:books": "node scripts/process-books.js",
+    "data:books-rss": "node scripts/fetch-goodreads-rss.js",
     "data:letterboxd": "node scripts/process-letterboxd.js",
-    "data:all": "node scripts/process-books.js && node scripts/process-letterboxd.js"
+    "data:all": "node scripts/fetch-goodreads-rss.js && node scripts/process-letterboxd.js"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
