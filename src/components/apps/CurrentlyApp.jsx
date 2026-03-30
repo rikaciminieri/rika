@@ -18,15 +18,26 @@ function Stars({ rating, max = 5 }) {
 function BookCover({ book }) {
   if (book.cover) {
     return (
-      <img
-        src={book.cover}
-        alt={book.title}
-        className="widget-book-cover"
-        onError={(e) => {
-          e.target.style.display = 'none';
-          e.target.nextSibling && (e.target.nextSibling.style.display = 'flex');
-        }}
-      />
+      <div className="widget-book-cover-wrapper">
+        <img
+          src={book.cover}
+          alt={book.title}
+          className="widget-book-cover"
+          onLoad={(e) => {
+            if (e.target.naturalWidth < 30 || e.target.naturalHeight < 30) {
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'flex';
+            }
+          }}
+          onError={(e) => {
+            e.target.style.display = 'none';
+            e.target.nextSibling.style.display = 'flex';
+          }}
+        />
+        <div className="widget-book-cover-placeholder" style={{ display: 'none' }}>
+          {book.title[0]}
+        </div>
+      </div>
     );
   }
   return <div className="widget-book-cover-placeholder">{book.title[0]}</div>;

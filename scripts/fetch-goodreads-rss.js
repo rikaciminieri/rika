@@ -63,7 +63,9 @@ function parseItems(xml) {
 function pickCover(large, small) {
   const img = large || small;
   if (!img) return null;
-  if (img.includes('nophoto') || img.includes('nocover')) return null;
+  if (img.includes('nophoto') || img.includes('nocover') || img.includes('no-image')) return null;
+  // Goodreads uses very small placeholder images (1x1 or similar tiny dimensions)
+  if (img.includes('._SY1_') || img.includes('._SX1_')) return null;
   return img;
 }
 
