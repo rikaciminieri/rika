@@ -13,7 +13,7 @@
       "author": "Hanya Yanagihara",
       "pages": 737,
       "dateAdded": "2026/01/14",
-      "cover": null,
+      "cover": "https://covers.openlibrary.org/b/id/12065783-M.jpg",
       "goodreadsId": "55711828"
     },
     {
@@ -29,7 +29,7 @@
       "author": "Rachel  Reid",
       "pages": 400,
       "dateAdded": "2026/01/02",
-      "cover": null,
+      "cover": "https://covers.openlibrary.org/b/id/11050489-M.jpg",
       "goodreadsId": "220965585"
     },
     {
@@ -83,7 +83,7 @@
       "pages": 311,
       "dateRead": "2026/01/14",
       "dateAdded": "2025/12/29",
-      "cover": "https://covers.openlibrary.org/b/id/13439869-M.jpg",
+      "cover": null,
       "goodreadsId": "62848145"
     },
     {
@@ -113,7 +113,7 @@
       "pages": 372,
       "dateRead": "2026/01/10",
       "dateAdded": "2026/01/02",
-      "cover": null,
+      "cover": "https://covers.openlibrary.org/b/id/15152812-M.jpg",
       "goodreadsId": "220966494"
     },
     {
@@ -133,7 +133,7 @@
       "pages": 304,
       "dateRead": "",
       "dateAdded": "2025/04/09",
-      "cover": "https://covers.openlibrary.org/b/id/12855985-M.jpg",
+      "cover": null,
       "goodreadsId": "59366244"
     },
     {
@@ -175,5 +175,5 @@
     "currentlyReading": 8,
     "averageRating": 4.3
   },
-  "lastUpdated": "2026-03-19"
+  "lastUpdated": "2026-03-30"
 }

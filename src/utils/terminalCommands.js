@@ -38,7 +38,7 @@ const NEOFETCH = (theme) => {
         <span class="prompt">font:</span>    Space Grotesk
         <span class="prompt">cpu:</span>     vibes @ 3.4GHz
         <span class="prompt">memory:</span>  847 grilled cheeses cached
-        <span class="prompt">uptime:</span>  since 1997
+        <span class="prompt">uptime:</span>  since 1998
 `;
 };
 
