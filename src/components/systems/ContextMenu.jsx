@@ -39,9 +39,11 @@ export default function ContextMenu({ onOpenPalette }) {
       <div className="ctx-item" onClick={() => { openApp('welcome'); close(); }}>
         <span className="ctx-icon">{'\u2726'}</span>Open About
       </div>
+      {/* APPS_DISABLED — Re-enable when projects app is ready:
       <div className="ctx-item" onClick={() => { openApp('projects'); close(); }}>
         <span className="ctx-icon">{'{ }'}</span>Open Projects
       </div>
+      */}
       <div className="ctx-item" onClick={() => { openApp('terminal'); close(); }}>
         <span className="ctx-icon">{'>_'}</span>Open Terminal
       </div>

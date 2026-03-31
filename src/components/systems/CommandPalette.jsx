@@ -1,15 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useWindows, APP_DEFS } from '../../contexts/WindowContext';
+import { useWindows } from '../../contexts/WindowContext';
 
 const CMD_ITEMS = [
   { icon: '\u2726', label: 'Open About', hint: 'welcome', action: 'open:welcome' },
+  /* APPS_DISABLED — Re-enable when these apps are ready:
   { icon: '{ }', label: 'Open Projects', hint: 'engineering', action: 'open:projects' },
-  { icon: '>_', label: 'Open Terminal', hint: 'commands', action: 'open:terminal' },
   { icon: '\u25C6', label: 'Open Gallery', hint: 'art + nooks', action: 'open:gallery' },
-  { icon: '\u25B6', label: 'Open Currently', hint: 'watching/reading', action: 'open:currently' },
   { icon: 'GC', label: 'Open Grilled Cheese', hint: 'rankings', action: 'open:gc' },
   { icon: '\u65E5', label: 'Open Japan', hint: 'heritage', action: 'open:japan' },
+  */
+  { icon: '>_', label: 'Open Terminal', hint: 'commands', action: 'open:terminal' },
+  { icon: '\u25B6', label: 'Open Currently', hint: 'watching/reading', action: 'open:currently' },
   { icon: '\uD83D\uDCC1', label: 'Open Trash', hint: 'files', action: 'open:trash' },
   { icon: '\uD83C\uDF10', label: 'Toggle Language', hint: 'EN \u2194 JP', action: 'toggleLang' },
   { icon: '\u2715', label: 'Close All Windows', hint: '', action: 'closeAll' },

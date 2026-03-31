@@ -6,7 +6,7 @@ export function useTerminal({ theme, openApp, switchTheme, closeAllWindows }) {
   const [output, setOutput] = useState([]);
   const scrollRef = useRef(null);
 
-  const apps = ['welcome', 'projects', 'terminal', 'gallery', 'currently', 'gc', 'japan', 'trash'];
+  const apps = ['welcome', 'terminal', 'currently', 'contact', 'trash'];
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
