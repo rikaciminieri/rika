@@ -17,7 +17,7 @@ Running list of everything implemented. Check off when production-ready.
 - [x] **Projects** — engineering portfolio (placeholder content)
 - [x] **Terminal** — 12 commands: help, whoami, ls, open, clear, neofetch, theme, fortune, cowsay, rain, matrix, grow, sudo
 - [x] **Gallery** — paintings and book nooks display
-- [x] **Currently** — watching/reading/listening
+- [x] **Currently** — watching/reading/listening with song cards (album art, Apple Music links)
 - [x] **Grilled Cheese** — rankings with photos and descriptions
 - [x] **Japan** — heritage content
 - [x] **Trash** — finder-style file browser
@@ -54,7 +54,8 @@ Running list of everything implemented. Check off when production-ready.
 - [x] Goodreads RSS integration (`npm run data:books-rss`) — auto-fetches shelf data, merges with existing CSV metadata
 - [x] GitHub Actions cron workflow — runs twice daily (8am/8pm UTC), auto-commits updated data, triggers Vercel redeploy
 - [x] Currently app reads real watching/reading data from generated JSON
-- [ ] Apple Music API integration (listening data)
+- [x] Apple Music song cards with artwork and clickable links (curated data)
+- [ ] Apple Music API automation (fetch recent/top songs via MusicKit)
 - [ ] Instagram personality mining (voice/copy calibration)
 - [ ] Site copy rewrite using voice profile
 

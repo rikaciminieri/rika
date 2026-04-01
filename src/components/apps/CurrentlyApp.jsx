@@ -1,6 +1,7 @@
 import { useLanguage } from '../../contexts/LanguageContext';
 import letterboxdData from '../../../data/generated/letterboxd.json';
 import booksData from '../../../data/generated/books.json';
+import musicData from '../../../data/generated/music.json';
 
 function Stars({ rating, max = 5 }) {
   const full = Math.floor(rating);
@@ -137,21 +138,42 @@ function ReadingWidget() {
   );
 }
 
+function SongCard({ song }) {
+  return (
+    <a
+      href={song.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="widget-song-card"
+    >
+      <img src={song.artwork} alt={song.album} className="widget-song-art" />
+      <div className="widget-song-info">
+        <span className="widget-song-name">{song.name}</span>
+        <span className="widget-song-artist">{song.artist}</span>
+      </div>
+    </a>
+  );
+}
+
 function ListeningWidget() {
+  const { t } = useLanguage();
+  const songs = [...musicData.topSongs, ...musicData.recentlyPlayed];
   return (
     <div className="widget widget-listening">
       <div className="widget-header">
-        <h3>listening</h3>
+        <h3>{t('currently.listening')}</h3>
+        <a
+          href="https://music.apple.com/us/artist/yoasobi/1490256993"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="widget-profile-link"
+        >
+          apple music ↗
+        </a>
       </div>
-      <div className="widget-simple-list">
-        {['Yoasobi', 'Dodo'].map((item) => (
-          <div key={item} className="widget-simple-item">
-            <div
-              className="widget-simple-dot"
-              style={{ background: 'var(--pink)' }}
-            />
-            {item}
-          </div>
+      <div className="widget-song-grid">
+        {songs.map((song) => (
+          <SongCard key={song.name} song={song} />
         ))}
       </div>
     </div>
@@ -188,22 +210,13 @@ export default function CurrentlyApp() {
         <ListeningWidget />
         <MiniWidget
           title={t('currently.playing')}
-          items={['Monopoly Deal', 'Learning to sing']}
+          items={['The Legend of Zelda: Breath of the Wild', 'Stardew Valley']}
           color="var(--green)"
         />
         <MiniWidget
           title={t('currently.learning')}
-          items={['AI & LLMs', 'Building agents']}
+          items={['AI & LLMs', 'Building agents', "How to Sing"]}
           color="var(--blue)"
-        />
-        <MiniWidget
-          title={t('currently.hills')}
-          items={[
-            'MJ is the king of pop',
-            "The Rock's Jumanji is good",
-            'Health > everything',
-          ]}
-          color="var(--amber)"
         />
       </div>
     </div>

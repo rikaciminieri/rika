@@ -210,7 +210,7 @@ export default function ContactApp() {
       <div className="contact-mail-header">
         <div className="contact-mail-row">
           <span className="contact-mail-label">To:</span>
-          <span className="contact-mail-value">rika@rikaciminieri.dev</span>
+          <span className="contact-mail-value">rika@rika.lol</span>
         </div>
         <div className="contact-mail-row">
           <span className="contact-mail-label">From:</span>
