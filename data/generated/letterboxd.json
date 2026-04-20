@@ -1,6 +1,16 @@
 {
   "recentWatches": [
     {
+      "title": "Don&#039;t Look Up",
+      "year": 2021,
+      "rating": 3.5,
+      "watchedDate": "2026-04-20",
+      "rewatch": true,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/5/7/2/2/5/5/572255-don-t-look-up-0-600-0-900-crop.jpg?v=a58cc4aba2",
+      "review": "just a big riley bina fan so i gave it a watch",
+      "link": "https://letterboxd.com/minieminems/film/dont-look-up-2021/"
+    },
+    {
       "title": "Hannah Montana 20th Anniversary Special",
       "year": 2026,
       "rating": 3,
@@ -89,19 +99,19 @@
       "poster": "https://a.ltrbxd.com/resized/film-poster/2/9/3/4/6/5/293465-top-gun-maverick-0-600-0-900-crop.jpg?v=9f8af0f61b",
       "review": "rly great movie unfortunately a dub for military propaganda",
       "link": "https://letterboxd.com/minieminems/film/top-gun-maverick/"
-    },
-    {
-      "title": "Zootopia 2",
-      "year": 2025,
-      "rating": 4.5,
-      "watchedDate": "2025-11-30",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/film-poster/9/7/7/3/4/2/977342-zootopia-2-0-600-0-900-crop.jpg?v=00a15a97bc",
-      "review": "yeah i loved it, they know how to make a good movie",
-      "link": "https://letterboxd.com/minieminems/film/zootopia-2/"
     }
   ],
   "allWatches": [
+    {
+      "title": "Don&#039;t Look Up",
+      "year": 2021,
+      "rating": 3.5,
+      "watchedDate": "2026-04-20",
+      "rewatch": true,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/5/7/2/2/5/5/572255-don-t-look-up-0-600-0-900-crop.jpg?v=a58cc4aba2",
+      "review": "just a big riley bina fan so i gave it a watch",
+      "link": "https://letterboxd.com/minieminems/film/dont-look-up-2021/"
+    },
     {
       "title": "Hannah Montana 20th Anniversary Special",
       "year": 2026,
@@ -446,9 +456,9 @@
     }
   ],
   "stats": {
-    "totalLogged": 27,
+    "totalLogged": 28,
     "averageRating": 3.7,
-    "rewatches": 4
+    "rewatches": 5
   },
   "lastUpdated": "2026-04-20"
 }
