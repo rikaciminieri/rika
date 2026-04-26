@@ -1,6 +1,16 @@
 {
   "recentWatches": [
     {
+      "title": "Pretty Woman",
+      "year": 1990,
+      "rating": 4,
+      "watchedDate": "2026-04-25",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/5/1/9/3/6/51936-pretty-woman-0-600-0-900-crop.jpg?v=b190c1d6bc",
+      "review": "i can’t believe this is my first time finally seeing this movie lmao",
+      "link": "https://letterboxd.com/minieminems/film/pretty-woman/"
+    },
+    {
       "title": "The Iron Claw",
       "year": 2023,
       "rating": 4.5,
@@ -89,19 +99,19 @@
       "poster": "https://a.ltrbxd.com/resized/film-poster/1/1/9/7/4/9/9/1197499-marty-supreme-0-600-0-900-crop.jpg?v=b14a26bb43",
       "review": "he was stressing me OUT",
       "link": "https://letterboxd.com/minieminems/film/marty-supreme/"
-    },
-    {
-      "title": "Avatar: Fire and Ash",
-      "year": 2025,
-      "rating": 4,
-      "watchedDate": "2025-12-25",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/film-poster/7/0/0/0/7/70007-avatar-fire-and-ash-0-600-0-900-crop.jpg?v=5d2f8b35b1",
-      "review": "matter fact where’s everybody from??",
-      "link": "https://letterboxd.com/minieminems/film/avatar-fire-and-ash/"
     }
   ],
   "allWatches": [
+    {
+      "title": "Pretty Woman",
+      "year": 1990,
+      "rating": 4,
+      "watchedDate": "2026-04-25",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/5/1/9/3/6/51936-pretty-woman-0-600-0-900-crop.jpg?v=b190c1d6bc",
+      "review": "i can’t believe this is my first time finally seeing this movie lmao",
+      "link": "https://letterboxd.com/minieminems/film/pretty-woman/"
+    },
     {
       "title": "The Iron Claw",
       "year": 2023,
@@ -476,9 +486,9 @@
     }
   ],
   "stats": {
-    "totalLogged": 29,
+    "totalLogged": 30,
     "averageRating": 3.7,
     "rewatches": 5
   },
-  "lastUpdated": "2026-04-25"
+  "lastUpdated": "2026-04-26"
 }
