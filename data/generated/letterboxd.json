@@ -1,6 +1,16 @@
 {
   "recentWatches": [
     {
+      "title": "Michael",
+      "year": 2026,
+      "rating": 5,
+      "watchedDate": "2026-04-26",
+      "rewatch": true,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/8/4/1/1/0/3/841103-michael-2026-0-600-0-900-crop.jpg?v=1e8e478e40",
+      "review": "jaafar did such an amazing job portraying michael, and it was just so nice to pretend like i was seeing him on stage in 4k.",
+      "link": "https://letterboxd.com/minieminems/film/michael-2026/"
+    },
+    {
       "title": "Pretty Woman",
       "year": 1990,
       "rating": 4,
@@ -89,19 +99,19 @@
       "poster": "https://a.ltrbxd.com/resized/film-poster/2/5/8/5/9/25859-tangled-2010-0-600-0-900-crop.jpg?v=1c22f51536",
       "review": "yeah i love a disney princess movie they know how to make em idk what to tell you",
       "link": "https://letterboxd.com/minieminems/film/tangled-2010/"
-    },
-    {
-      "title": "Marty Supreme",
-      "year": 2025,
-      "rating": 4,
-      "watchedDate": "2026-02-01",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/film-poster/1/1/9/7/4/9/9/1197499-marty-supreme-0-600-0-900-crop.jpg?v=b14a26bb43",
-      "review": "he was stressing me OUT",
-      "link": "https://letterboxd.com/minieminems/film/marty-supreme/"
     }
   ],
   "allWatches": [
+    {
+      "title": "Michael",
+      "year": 2026,
+      "rating": 5,
+      "watchedDate": "2026-04-26",
+      "rewatch": true,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/8/4/1/1/0/3/841103-michael-2026-0-600-0-900-crop.jpg?v=1e8e478e40",
+      "review": "jaafar did such an amazing job portraying michael, and it was just so nice to pretend like i was seeing him on stage in 4k.",
+      "link": "https://letterboxd.com/minieminems/film/michael-2026/"
+    },
     {
       "title": "Pretty Woman",
       "year": 1990,
@@ -405,6 +415,16 @@
   ],
   "favorites": [
     {
+      "title": "Michael",
+      "year": 2026,
+      "rating": 5,
+      "watchedDate": "2026-04-26",
+      "rewatch": true,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/8/4/1/1/0/3/841103-michael-2026-0-600-0-900-crop.jpg?v=1e8e478e40",
+      "review": "jaafar did such an amazing job portraying michael, and it was just so nice to pretend like i was seeing him on stage in 4k.",
+      "link": "https://letterboxd.com/minieminems/film/michael-2026/"
+    },
+    {
       "title": "The Iron Claw",
       "year": 2023,
       "rating": 4.5,
@@ -486,9 +506,9 @@
     }
   ],
   "stats": {
-    "totalLogged": 30,
-    "averageRating": 3.7,
-    "rewatches": 5
+    "totalLogged": 31,
+    "averageRating": 3.8,
+    "rewatches": 6
   },
-  "lastUpdated": "2026-04-28"
+  "lastUpdated": "2026-04-29"
 }
