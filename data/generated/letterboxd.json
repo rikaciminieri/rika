@@ -127,7 +127,11 @@
       "year": 1990,
       "rating": 4,
       "watchedDate": "2026-04-25",
+      "watchedDate": "2026-04-25",
       "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/5/1/9/3/6/51936-pretty-woman-0-600-0-900-crop.jpg?v=b190c1d6bc",
+      "review": "i can’t believe this is my first time finally seeing this movie lmao",
+      "link": "https://letterboxd.com/minieminems/film/pretty-woman/"
       "poster": "https://a.ltrbxd.com/resized/film-poster/5/1/9/3/6/51936-pretty-woman-0-600-0-900-crop.jpg?v=b190c1d6bc",
       "review": "i can’t believe this is my first time finally seeing this movie lmao",
       "link": "https://letterboxd.com/minieminems/film/pretty-woman/"
@@ -137,7 +141,14 @@
       "year": 2023,
       "rating": 4.5,
       "watchedDate": "2026-04-24",
+      "title": "The Iron Claw",
+      "year": 2023,
+      "rating": 4.5,
+      "watchedDate": "2026-04-24",
       "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/7/6/4/8/9/0/764890-the-iron-claw-0-600-0-900-crop.jpg?v=321a07c4f2",
+      "review": "i just threw this on casually and holy what a friday night buzzkill 😭😭",
+      "link": "https://letterboxd.com/minieminems/film/the-iron-claw-2023/"
       "poster": "https://a.ltrbxd.com/resized/film-poster/7/6/4/8/9/0/764890-the-iron-claw-0-600-0-900-crop.jpg?v=321a07c4f2",
       "review": "i just threw this on casually and holy what a friday night buzzkill 😭😭",
       "link": "https://letterboxd.com/minieminems/film/the-iron-claw-2023/"
@@ -424,6 +435,26 @@
     }
   ],
   "favorites": [
+    {
+      "title": "Michael",
+      "year": 2026,
+      "rating": 5,
+      "watchedDate": "2026-04-26",
+      "rewatch": true,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/8/4/1/1/0/3/841103-michael-2026-0-600-0-900-crop.jpg?v=1e8e478e40",
+      "review": "jaafar did such an amazing job portraying michael, and it was just so nice to pretend like i was seeing him on stage in 4k.",
+      "link": "https://letterboxd.com/minieminems/film/michael-2026/"
+    },
+    {
+      "title": "The Iron Claw",
+      "year": 2023,
+      "rating": 4.5,
+      "watchedDate": "2026-04-24",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/7/6/4/8/9/0/764890-the-iron-claw-0-600-0-900-crop.jpg?v=321a07c4f2",
+      "review": "i just threw this on casually and holy what a friday night buzzkill 😭😭",
+      "link": "https://letterboxd.com/minieminems/film/the-iron-claw-2023/"
+    },
     {
       "title": "Michael",
       "year": 2026,
