@@ -55,7 +55,7 @@ Running list of everything implemented. Check off when production-ready.
 - [x] GitHub Actions cron workflow — runs twice daily (8am/8pm UTC), auto-commits updated data, triggers Vercel redeploy
 - [x] Currently app reads real watching/reading data from generated JSON
 - [x] Apple Music song cards with artwork and clickable links (curated data)
-- [ ] Apple Music API automation (fetch recent/top songs via MusicKit)
+- [ ] Last.fm scrobbling integration (fetch top/recent tracks via Last.fm API)
 - [ ] Instagram personality mining (voice/copy calibration)
 - [ ] Site copy rewrite using voice profile
 

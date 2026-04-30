@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "data:books": "node scripts/fetch-goodreads-rss.js",
     "data:letterboxd": "node scripts/process-letterboxd.js",
-    "data:all": "node scripts/fetch-goodreads-rss.js && node scripts/process-letterboxd.js"
+    "data:music": "node scripts/fetch-lastfm.js",
+    "data:all": "node scripts/fetch-goodreads-rss.js && node scripts/process-letterboxd.js && node scripts/fetch-lastfm.js"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
