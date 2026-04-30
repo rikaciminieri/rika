@@ -54,15 +54,15 @@ export default function WatermarkCanvas() {
       offCtx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
 
       const text = t('watermark.text');
-      const fontSize = lang === 'jp' ? 160 : 120;
+      const fontSize = 200;
       const fontFamily = lang === 'jp'
         ? "'Noto Sans JP', sans-serif"
-        : "'Space Grotesk', var(--display), sans-serif";
+        : "'Space Grotesk', 'Inter', sans-serif";
       offCtx.font = `800 ${fontSize}px ${fontFamily}`;
       const accent = getComputedStyle(document.documentElement)
         .getPropertyValue('--accent').trim() || '#f4a0b5';
       offCtx.fillStyle = accent;
-      offCtx.globalAlpha = 0.06;
+      offCtx.globalAlpha = 0.1;
       offCtx.textAlign = 'right';
       offCtx.textBaseline = 'bottom';
       offCtx.fillText(text, s.w - 60, s.h - 80);

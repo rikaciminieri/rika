@@ -45,18 +45,19 @@ function BookCover({ book }) {
 }
 
 function WatchingWidget() {
+  const { t } = useLanguage();
   const watches = letterboxdData.recentWatches.slice(0, 4);
   return (
     <div className="widget widget-watching">
       <div className="widget-header">
-        <h3>watching</h3>
+        <h3>{t('currently.watching')}</h3>
         <a
           href="https://letterboxd.com/minieminems/"
           target="_blank"
           rel="noopener noreferrer"
           className="widget-profile-link"
         >
-          letterboxd ↗
+          {t('currently.letterboxdLink')}
         </a>
       </div>
       <div className="widget-posters">
@@ -81,19 +82,20 @@ function WatchingWidget() {
 }
 
 function ReadingWidget() {
+  const { t } = useLanguage();
   const reading = booksData.currentlyReading.slice(0, 3);
   const recentRead = booksData.read.slice(0, 1);
   return (
     <div className="widget widget-reading">
       <div className="widget-header">
-        <h3>reading</h3>
+        <h3>{t('currently.reading')}</h3>
         <a
           href="https://www.goodreads.com/user/show/189394697-rika-ciminieri"
           target="_blank"
           rel="noopener noreferrer"
           className="widget-profile-link"
         >
-          goodreads ↗
+          {t('currently.goodreadsLink')}
         </a>
       </div>
       <div className="widget-book-list">
@@ -129,7 +131,7 @@ function ReadingWidget() {
               </span>
               <span className="widget-book-author">{b.author}</span>
               {b.rating && <Stars rating={b.rating} />}
-              <span className="widget-book-badge">finished</span>
+              <span className="widget-book-badge">{t('currently.finished')}</span>
             </div>
           </a>
         ))}
@@ -168,7 +170,7 @@ function ListeningWidget() {
           rel="noopener noreferrer"
           className="widget-profile-link"
         >
-          apple music ↗
+          {t('currently.appleMusicLink')}
         </a>
       </div>
       <div className="widget-song-grid">
@@ -190,7 +192,8 @@ function MiniWidget({ title, items, color }) {
         {items.map((item) => (
           <div key={item} className="widget-simple-item">
             <div className="widget-simple-dot" style={{ background: color }} />
-            {item}
+            <span>{item}</span>
+            {item === 'Stardew Valley' && <span className="junimo" aria-hidden="true" />}
           </div>
         ))}
       </div>
@@ -210,7 +213,7 @@ export default function CurrentlyApp() {
         <ListeningWidget />
         <MiniWidget
           title={t('currently.playing')}
-          items={['The Legend of Zelda: Breath of the Wild', 'Stardew Valley']}
+          items={['Stardew Valley','The Legend of Zelda: Breath of the Wild' ]}
           color="var(--green)"
         />
         <MiniWidget

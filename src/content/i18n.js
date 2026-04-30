@@ -75,6 +75,10 @@ export const i18n = {
       learning: 'learning',
       listening: 'listening',
       hills: 'hills i\'ll die on',
+      finished: 'finished',
+      letterboxdLink: 'letterboxd ↗',
+      goodreadsLink: 'goodreads ↗',
+      appleMusicLink: 'apple music ↗',
     },
 
     japan: {
@@ -133,7 +137,7 @@ export const i18n = {
     },
 
     watermark: {
-      text: 'rika ciminieri',
+      text: 'RIKA',
     },
   },
 
@@ -208,6 +212,10 @@ export const i18n = {
       learning: '学んでる',
       listening: '聴いてる',
       hills: '譲れないこと',
+      finished: '読み終わった',
+      letterboxdLink: 'Letterboxd ↗',
+      goodreadsLink: 'Goodreads ↗',
+      appleMusicLink: 'Apple Music ↗',
     },
 
     japan: {
@@ -266,7 +274,7 @@ export const i18n = {
     },
 
     watermark: {
-      text: '莉香チミニエリ',
+      text: '莉香',
     },
   },
 };

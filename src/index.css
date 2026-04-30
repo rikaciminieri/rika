@@ -168,6 +168,14 @@ html, body { height: 100%; overflow: hidden; font-family: var(--font); backgroun
 .widget-simple-item { font-size: 13px; padding: 3px 0; display: flex; align-items: center; gap: 8px; }
 .widget-simple-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
+/* Junimo — tiny Stardew Valley forest spirit that bounces next to the game name */
+.junimo { width: 11px; height: 12px; margin-left: 6px; background: #7ec850; border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%; position: relative; display: inline-block; flex-shrink: 0; box-shadow: inset -1px -1px 0 rgba(0,0,0,0.12), 0 1px 0 rgba(0,0,0,0.08); animation: junimo-bounce 1.4s ease-in-out infinite, junimo-color 8s linear infinite; }
+.junimo::before, .junimo::after { content: ''; position: absolute; width: 2px; height: 2px; background: #1a1a1a; border-radius: 50%; top: 38%; }
+.junimo::before { left: 24%; }
+.junimo::after { right: 24%; }
+@keyframes junimo-bounce { 0%, 100% { transform: translateY(0) scaleY(1); } 45% { transform: translateY(-4px) scaleY(1.05); } 55% { transform: translateY(-4px) scaleY(1.05); } }
+@keyframes junimo-color { 0%, 100% { background: #7ec850; } 16% { background: #c878d8; } 33% { background: #f06464; } 50% { background: #6cb4f0; } 66% { background: #f0d864; } 83% { background: #f0f0f0; } }
+
 /* Finder preview */
 .finder-preview { padding: 24px; animation: fadeIn 0.2s; }
 .finder-preview h3 { font-size: 16px; margin-bottom: 12px; font-family: var(--display); }

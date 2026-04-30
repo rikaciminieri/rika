@@ -24,8 +24,7 @@ export default function DesktopIcons() {
         <div
           key={app.id}
           className="desktop-icon"
-          onClick={isMobile ? () => openApp(app.id) : undefined}
-          onDoubleClick={isMobile ? undefined : () => openApp(app.id)}
+          onClick={() => openApp(app.id)}
           onMouseEnter={() => playScaleNote(app.id)}
         >
           <div
