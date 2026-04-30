@@ -7,6 +7,18 @@ const ROOT = join(__dirname, '..');
 
 const RSS_URL = 'https://letterboxd.com/minieminems/rss/';
 
+function decodeEntities(str) {
+  if (!str) return str;
+  return str
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&apos;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+}
+
 async function fetchAndProcess() {
   const res = await fetch(RSS_URL);
   const xml = await res.text();
@@ -19,7 +31,7 @@ async function fetchAndProcess() {
     const block = match[1];
     const get = (tag) => {
       const m = block.match(new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`));
-      return m ? m[1].trim() : null;
+      return m ? decodeEntities(m[1].trim()) : null;
     };
 
     const title = get('letterboxd:filmTitle');
@@ -38,7 +50,7 @@ async function fetchAndProcess() {
     // Extract review text (after the image tag)
     const reviewMatch = desc.match(/<\/p>\s*<p>([\s\S]*?)<\/p>/);
     const review = reviewMatch
-      ? reviewMatch[1].replace(/<[^>]+>/g, '').trim()
+      ? decodeEntities(reviewMatch[1].replace(/<[^>]+>/g, '').trim())
       : null;
 
     if (title) {
