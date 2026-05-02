@@ -1,6 +1,16 @@
 {
   "recentWatches": [
     {
+      "title": "The Karate Kid",
+      "year": 2010,
+      "rating": 4,
+      "watchedDate": "2026-05-01",
+      "rewatch": true,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/2/6/0/2/5/26025-the-karate-kid-0-600-0-900-crop.jpg?v=e1397c637d",
+      "review": "holy shit i love this movie",
+      "link": "https://letterboxd.com/minieminems/film/the-karate-kid-2010/"
+    },
+    {
       "title": "The Drama",
       "year": 2026,
       "rating": 4,
@@ -89,19 +99,19 @@
       "poster": "https://a.ltrbxd.com/resized/sm/upload/dn/nz/ds/9v/l1kkUKGrI07kOzxznPpF4WJUrJw-0-600-0-900-crop.jpg?v=6155bf42b9",
       "review": "tbh i was kinda in and out and that’s what happens when im not fully engaged in the movie",
       "link": "https://letterboxd.com/minieminems/film/inside-man/"
-    },
-    {
-      "title": "The Town",
-      "year": 2010,
-      "rating": 4,
-      "watchedDate": "2026-03-06",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/sm/upload/am/yz/8g/am/c7zMl6igI6LMBuuov0tEz7fN2EH-0-600-0-900-crop.jpg?v=b15a92a025",
-      "review": "can’t stop doing boston accent since watching",
-      "link": "https://letterboxd.com/minieminems/film/the-town/"
     }
   ],
   "allWatches": [
+    {
+      "title": "The Karate Kid",
+      "year": 2010,
+      "rating": 4,
+      "watchedDate": "2026-05-01",
+      "rewatch": true,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/2/6/0/2/5/26025-the-karate-kid-0-600-0-900-crop.jpg?v=e1397c637d",
+      "review": "holy shit i love this movie",
+      "link": "https://letterboxd.com/minieminems/film/the-karate-kid-2010/"
+    },
     {
       "title": "The Drama",
       "year": 2026,
@@ -516,9 +526,9 @@
     }
   ],
   "stats": {
-    "totalLogged": 32,
+    "totalLogged": 33,
     "averageRating": 3.8,
-    "rewatches": 6
+    "rewatches": 7
   },
-  "lastUpdated": "2026-05-01"
+  "lastUpdated": "2026-05-02"
 }
