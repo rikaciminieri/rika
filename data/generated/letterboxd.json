@@ -1,6 +1,26 @@
 {
   "recentWatches": [
     {
+      "title": "Kick-Ass",
+      "year": 2010,
+      "rating": 2.5,
+      "watchedDate": "2026-05-09",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/sm/upload/qp/bw/k2/ia/jP8kukObEty5liW76QxJ1o5qlFL-0-600-0-900-crop.jpg?v=d066c2ed48",
+      "review": "This review may contain spoilers.",
+      "link": "https://letterboxd.com/minieminems/film/kick-ass/"
+    },
+    {
+      "title": "Charlie's Angels",
+      "year": 2000,
+      "rating": 3.5,
+      "watchedDate": "2026-05-08",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/sm/upload/1m/yy/vt/1n/eBzf9d09Vgq2HSVC4fIZm1QNQd-0-600-0-900-crop.jpg?v=2ad9c80809",
+      "review": "if i was 7 i would have rated this 500 stars",
+      "link": "https://letterboxd.com/minieminems/film/charlies-angels/"
+    },
+    {
       "title": "The Karate Kid",
       "year": 2010,
       "rating": 4,
@@ -79,29 +99,29 @@
       "poster": "https://a.ltrbxd.com/resized/film-poster/1/8/7/9/8/6/187986-ex-machina-0-600-0-900-crop.jpg?v=2b4212d498",
       "review": "she played him like a FIDDLE",
       "link": "https://letterboxd.com/minieminems/film/ex-machina-2015/"
-    },
-    {
-      "title": "Iron Man 2",
-      "year": 2010,
-      "rating": 4.5,
-      "watchedDate": "2026-03-08",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/film-poster/4/6/5/1/1/46511-iron-man-2-0-600-0-900-crop.jpg?v=67e856ad63",
-      "review": "i love tony stark 😭😭",
-      "link": "https://letterboxd.com/minieminems/film/iron-man-2/"
-    },
-    {
-      "title": "Inside Man",
-      "year": 2006,
-      "rating": 2.5,
-      "watchedDate": "2026-03-07",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/sm/upload/dn/nz/ds/9v/l1kkUKGrI07kOzxznPpF4WJUrJw-0-600-0-900-crop.jpg?v=6155bf42b9",
-      "review": "tbh i was kinda in and out and that’s what happens when im not fully engaged in the movie",
-      "link": "https://letterboxd.com/minieminems/film/inside-man/"
     }
   ],
   "allWatches": [
+    {
+      "title": "Kick-Ass",
+      "year": 2010,
+      "rating": 2.5,
+      "watchedDate": "2026-05-09",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/sm/upload/qp/bw/k2/ia/jP8kukObEty5liW76QxJ1o5qlFL-0-600-0-900-crop.jpg?v=d066c2ed48",
+      "review": "This review may contain spoilers.",
+      "link": "https://letterboxd.com/minieminems/film/kick-ass/"
+    },
+    {
+      "title": "Charlie's Angels",
+      "year": 2000,
+      "rating": 3.5,
+      "watchedDate": "2026-05-08",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/sm/upload/1m/yy/vt/1n/eBzf9d09Vgq2HSVC4fIZm1QNQd-0-600-0-900-crop.jpg?v=2ad9c80809",
+      "review": "if i was 7 i would have rated this 500 stars",
+      "link": "https://letterboxd.com/minieminems/film/charlies-angels/"
+    },
     {
       "title": "The Karate Kid",
       "year": 2010,
@@ -526,9 +546,9 @@
     }
   ],
   "stats": {
-    "totalLogged": 33,
-    "averageRating": 3.8,
+    "totalLogged": 35,
+    "averageRating": 3.7,
     "rewatches": 7
   },
-  "lastUpdated": "2026-05-09"
+  "lastUpdated": "2026-05-10"
 }
