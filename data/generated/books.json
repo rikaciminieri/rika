@@ -1,6 +1,16 @@
 {
   "currentlyReading": [
     {
+      "title": "Moonwalk: A Memoir",
+      "author": "Michael  Jackson",
+      "rating": null,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1328331169l/13338132.jpg",
+      "goodreadsId": "13338132",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
+    {
       "title": "Smart Brevity: The Power of Saying More with Less (Revised and Updated)",
       "author": "Jim Vandehei",
       "rating": null,
@@ -8,16 +18,6 @@
       "goodreadsId": "60703995",
       "pages": 199,
       "dateAdded": "2026/03/10",
-      "dateRead": null
-    },
-    {
-      "title": "The Things We Leave Unfinished",
-      "author": "Rebecca Yarros",
-      "rating": null,
-      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1588868246l/53345408._SY475_.jpg",
-      "goodreadsId": "53345408",
-      "pages": 473,
-      "dateAdded": "2026/01/06",
       "dateRead": null
     },
     {
@@ -82,6 +82,16 @@
     }
   ],
   "read": [
+    {
+      "title": "The Things We Leave Unfinished",
+      "author": "Rebecca Yarros",
+      "rating": 4,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1588868246l/53345408._SY475_.jpg",
+      "goodreadsId": "53345408",
+      "pages": 473,
+      "dateAdded": "2026/01/06",
+      "dateRead": null
+    },
     {
       "title": "Scarred: A Memoir of a Childhood Stolen and a Life Reclaimed",
       "author": "Clark Fredericks",
@@ -186,10 +196,10 @@
     }
   ],
   "stats": {
-    "totalBooks": 16,
-    "booksRead": 8,
+    "totalBooks": 17,
+    "booksRead": 9,
     "currentlyReading": 8,
-    "averageRating": 4.3
+    "averageRating": 4.2
   },
-  "lastUpdated": "2026-05-13"
+  "lastUpdated": "2026-05-14"
 }
