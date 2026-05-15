@@ -1,6 +1,16 @@
 {
   "recentWatches": [
     {
+      "title": "Obsession",
+      "year": 2025,
+      "rating": 4,
+      "watchedDate": "2026-05-14",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/3/4/4/7/2/1234472-obsession-2025-2-0-600-0-900-crop.jpg?v=cff6fc00b6",
+      "review": "horror is NOT my genre at all, but Inde Navarrette blew me away as freaky nikki 😭 she needs to win an award for this performance. this movie takes “be careful what you wish for” for a wild ride",
+      "link": "https://letterboxd.com/minieminems/film/obsession-2025-2/"
+    },
+    {
       "title": "Kick-Ass",
       "year": 2010,
       "rating": 2.5,
@@ -89,19 +99,19 @@
       "poster": "https://a.ltrbxd.com/resized/film-poster/1/5/0/2/8/6/0/1502860-hannah-montana-20th-anniversary-special-0-600-0-900-crop.jpg?v=6a66011e62",
       "review": "i feel like every guest was sooooo random and brief 😭 i loved the nostalgia of it all but it kind of felt scrapped together?? id like a reboot tbh",
       "link": "https://letterboxd.com/minieminems/film/hannah-montana-20th-anniversary-special/"
-    },
-    {
-      "title": "Ex Machina",
-      "year": 2015,
-      "rating": 3.5,
-      "watchedDate": "2026-03-21",
-      "rewatch": true,
-      "poster": "https://a.ltrbxd.com/resized/film-poster/1/8/7/9/8/6/187986-ex-machina-0-600-0-900-crop.jpg?v=2b4212d498",
-      "review": "she played him like a FIDDLE",
-      "link": "https://letterboxd.com/minieminems/film/ex-machina-2015/"
     }
   ],
   "allWatches": [
+    {
+      "title": "Obsession",
+      "year": 2025,
+      "rating": 4,
+      "watchedDate": "2026-05-14",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/3/4/4/7/2/1234472-obsession-2025-2-0-600-0-900-crop.jpg?v=cff6fc00b6",
+      "review": "horror is NOT my genre at all, but Inde Navarrette blew me away as freaky nikki 😭 she needs to win an award for this performance. this movie takes “be careful what you wish for” for a wild ride",
+      "link": "https://letterboxd.com/minieminems/film/obsession-2025-2/"
+    },
     {
       "title": "Kick-Ass",
       "year": 2010,
@@ -546,8 +556,8 @@
     }
   ],
   "stats": {
-    "totalLogged": 35,
-    "averageRating": 3.7,
+    "totalLogged": 36,
+    "averageRating": 3.8,
     "rewatches": 7
   },
   "lastUpdated": "2026-05-15"
