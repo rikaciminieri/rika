@@ -1,6 +1,16 @@
 {
   "currentlyReading": [
     {
+      "title": "Never Lie",
+      "author": "Freida McFadden",
+      "rating": null,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1661428846l/62080187._SY475_.jpg",
+      "goodreadsId": "62080187",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
+    {
       "title": "Moonwalk: A Memoir",
       "author": "Michael  Jackson",
       "rating": null,
@@ -196,9 +206,9 @@
     }
   ],
   "stats": {
-    "totalBooks": 17,
+    "totalBooks": 18,
     "booksRead": 9,
-    "currentlyReading": 8,
+    "currentlyReading": 9,
     "averageRating": 4.2
   },
   "lastUpdated": "2026-05-30"
