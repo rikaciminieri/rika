@@ -1,11 +1,11 @@
 {
   "currentlyReading": [
     {
-      "title": "Never Lie",
+      "title": "The Locked Door",
       "author": "Freida McFadden",
       "rating": null,
-      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1661428846l/62080187._SY475_.jpg",
-      "goodreadsId": "62080187",
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1618859577l/57795665._SY475_.jpg",
+      "goodreadsId": "57795665",
       "pages": null,
       "dateAdded": null,
       "dateRead": null
@@ -92,6 +92,16 @@
     }
   ],
   "read": [
+    {
+      "title": "Never Lie",
+      "author": "Freida McFadden",
+      "rating": 3,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1661428846l/62080187._SY475_.jpg",
+      "goodreadsId": "62080187",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
     {
       "title": "The Things We Leave Unfinished",
       "author": "Rebecca Yarros",
@@ -206,10 +216,10 @@
     }
   ],
   "stats": {
-    "totalBooks": 18,
-    "booksRead": 9,
+    "totalBooks": 19,
+    "booksRead": 10,
     "currentlyReading": 9,
-    "averageRating": 4.2
+    "averageRating": 4.1
   },
-  "lastUpdated": "2026-06-01"
+  "lastUpdated": "2026-06-02"
 }
