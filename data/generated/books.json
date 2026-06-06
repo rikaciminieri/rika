@@ -1,16 +1,6 @@
 {
   "currentlyReading": [
     {
-      "title": "The Locked Door",
-      "author": "Freida McFadden",
-      "rating": null,
-      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1618859577l/57795665._SY475_.jpg",
-      "goodreadsId": "57795665",
-      "pages": null,
-      "dateAdded": null,
-      "dateRead": null
-    },
-    {
       "title": "Moonwalk: A Memoir",
       "author": "Michael  Jackson",
       "rating": null,
@@ -92,6 +82,16 @@
     }
   ],
   "read": [
+    {
+      "title": "The Locked Door",
+      "author": "Freida McFadden",
+      "rating": 3,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1618859577l/57795665._SY475_.jpg",
+      "goodreadsId": "57795665",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
     {
       "title": "Never Lie",
       "author": "Freida McFadden",
@@ -217,9 +217,9 @@
   ],
   "stats": {
     "totalBooks": 19,
-    "booksRead": 10,
-    "currentlyReading": 9,
-    "averageRating": 4.1
+    "booksRead": 11,
+    "currentlyReading": 8,
+    "averageRating": 4
   },
-  "lastUpdated": "2026-06-05"
+  "lastUpdated": "2026-06-06"
 }
