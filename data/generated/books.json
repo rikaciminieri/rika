@@ -1,16 +1,6 @@
 {
   "currentlyReading": [
     {
-      "title": "The Inmate",
-      "author": "Freida McFadden",
-      "rating": null,
-      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1653271523l/61149872._SY475_.jpg",
-      "goodreadsId": "61149872",
-      "pages": null,
-      "dateAdded": null,
-      "dateRead": null
-    },
-    {
       "title": "Moonwalk: A Memoir",
       "author": "Michael  Jackson",
       "rating": null,
@@ -92,6 +82,16 @@
     }
   ],
   "read": [
+    {
+      "title": "The Inmate",
+      "author": "Freida McFadden",
+      "rating": 4,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1653271523l/61149872._SY475_.jpg",
+      "goodreadsId": "61149872",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
     {
       "title": "The Locked Door",
       "author": "Freida McFadden",
@@ -227,9 +227,9 @@
   ],
   "stats": {
     "totalBooks": 20,
-    "booksRead": 11,
-    "currentlyReading": 9,
+    "booksRead": 12,
+    "currentlyReading": 8,
     "averageRating": 4
   },
-  "lastUpdated": "2026-06-10"
+  "lastUpdated": "2026-06-11"
 }
