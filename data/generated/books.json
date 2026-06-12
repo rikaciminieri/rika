@@ -1,6 +1,16 @@
 {
   "currentlyReading": [
     {
+      "title": "The Perfect Son",
+      "author": "Freida McFadden",
+      "rating": null,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1570489697l/52616342._SX318_SY475_.jpg",
+      "goodreadsId": "52616342",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
+    {
       "title": "Moonwalk: A Memoir",
       "author": "Michael  Jackson",
       "rating": null,
@@ -226,10 +236,10 @@
     }
   ],
   "stats": {
-    "totalBooks": 20,
+    "totalBooks": 21,
     "booksRead": 12,
-    "currentlyReading": 8,
+    "currentlyReading": 9,
     "averageRating": 4
   },
-  "lastUpdated": "2026-06-11"
+  "lastUpdated": "2026-06-12"
 }
