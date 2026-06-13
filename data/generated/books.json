@@ -1,11 +1,11 @@
 {
   "currentlyReading": [
     {
-      "title": "The Perfect Son",
-      "author": "Freida McFadden",
+      "title": "The Deal (Off-Campus, #1)",
+      "author": "Elle Kennedy",
       "rating": null,
-      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1570489697l/52616342._SX318_SY475_.jpg",
-      "goodreadsId": "52616342",
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1777063919l/58953626._SY475_.jpg",
+      "goodreadsId": "58953626",
       "pages": null,
       "dateAdded": null,
       "dateRead": null
@@ -92,6 +92,16 @@
     }
   ],
   "read": [
+    {
+      "title": "The Perfect Son",
+      "author": "Freida McFadden",
+      "rating": 4,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1570489697l/52616342._SX318_SY475_.jpg",
+      "goodreadsId": "52616342",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
     {
       "title": "The Inmate",
       "author": "Freida McFadden",
@@ -236,10 +246,10 @@
     }
   ],
   "stats": {
-    "totalBooks": 21,
-    "booksRead": 12,
+    "totalBooks": 22,
+    "booksRead": 13,
     "currentlyReading": 9,
     "averageRating": 4
   },
-  "lastUpdated": "2026-06-12"
+  "lastUpdated": "2026-06-13"
 }
