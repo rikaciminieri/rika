@@ -1,6 +1,16 @@
 {
   "recentWatches": [
     {
+      "title": "Grown Ups",
+      "year": 2010,
+      "rating": 4,
+      "watchedDate": "2026-07-04",
+      "rewatch": true,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/2/6/1/9/6/26196-grown-ups-0-600-0-900-crop.jpg?v=214c173d2a",
+      "review": "on the 4th of july!!!",
+      "link": "https://letterboxd.com/minieminems/film/grown-ups/"
+    },
+    {
       "title": "Bad Teacher",
       "year": 2011,
       "rating": 4,
@@ -89,19 +99,19 @@
       "poster": "https://a.ltrbxd.com/resized/film-poster/2/6/0/2/5/26025-the-karate-kid-0-600-0-900-crop.jpg?v=e1397c637d",
       "review": "holy shit i love this movie",
       "link": "https://letterboxd.com/minieminems/film/the-karate-kid-2010/"
-    },
-    {
-      "title": "The Drama",
-      "year": 2026,
-      "rating": 4,
-      "watchedDate": "2026-04-29",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/0/5/4/9/4/1205494-the-drama-0-600-0-900-crop.jpg?v=2320acafd5",
-      "review": "rachel 👎",
-      "link": "https://letterboxd.com/minieminems/film/the-drama/"
     }
   ],
   "allWatches": [
+    {
+      "title": "Grown Ups",
+      "year": 2010,
+      "rating": 4,
+      "watchedDate": "2026-07-04",
+      "rewatch": true,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/2/6/1/9/6/26196-grown-ups-0-600-0-900-crop.jpg?v=214c173d2a",
+      "review": "on the 4th of july!!!",
+      "link": "https://letterboxd.com/minieminems/film/grown-ups/"
+    },
     {
       "title": "Bad Teacher",
       "year": 2011,
@@ -606,9 +616,9 @@
     }
   ],
   "stats": {
-    "totalLogged": 41,
+    "totalLogged": 42,
     "averageRating": 3.7,
-    "rewatches": 8
+    "rewatches": 9
   },
-  "lastUpdated": "2026-07-04"
+  "lastUpdated": "2026-07-05"
 }
