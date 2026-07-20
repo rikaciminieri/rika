@@ -1,11 +1,11 @@
 {
   "currentlyReading": [
     {
-      "title": "The BFG",
-      "author": "Roald Dahl",
+      "title": "I Will Find You",
+      "author": "Harlan Coben",
       "rating": null,
-      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1655956913l/58504799._SY475_.jpg",
-      "goodreadsId": "58504799",
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1657046867l/61392438._SY475_.jpg",
+      "goodreadsId": "61392438",
       "pages": null,
       "dateAdded": null,
       "dateRead": null
@@ -92,6 +92,16 @@
     }
   ],
   "read": [
+    {
+      "title": "The BFG",
+      "author": "Roald Dahl",
+      "rating": 5,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1655956913l/58504799._SY475_.jpg",
+      "goodreadsId": "58504799",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
     {
       "title": "The Deal (Off-Campus, #1)",
       "author": "Elle Kennedy",
@@ -235,6 +245,16 @@
   ],
   "favorites": [
     {
+      "title": "The BFG",
+      "author": "Roald Dahl",
+      "rating": 5,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1655956913l/58504799._SY475_.jpg",
+      "goodreadsId": "58504799",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
+    {
       "title": "The Last Letter",
       "author": "Rebecca Yarros",
       "rating": 5,
@@ -256,10 +276,10 @@
     }
   ],
   "stats": {
-    "totalBooks": 23,
-    "booksRead": 14,
+    "totalBooks": 24,
+    "booksRead": 15,
     "currentlyReading": 9,
-    "averageRating": 3.9
+    "averageRating": 4
   },
-  "lastUpdated": "2026-07-19"
+  "lastUpdated": "2026-07-20"
 }
