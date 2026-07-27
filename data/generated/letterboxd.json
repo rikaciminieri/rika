@@ -1,6 +1,16 @@
 {
   "recentWatches": [
     {
+      "title": "The Odyssey",
+      "year": 2026,
+      "rating": 4.5,
+      "watchedDate": "2026-07-26",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/5/5/3/9/4/1255394-the-odyssey-2026-0-600-0-900-crop.jpg?v=1eed046d0c",
+      "review": "great retelling of percy jackson ❤️",
+      "link": "https://letterboxd.com/minieminems/film/the-odyssey-2026/"
+    },
+    {
       "title": "Grown Ups",
       "year": 2010,
       "rating": 4,
@@ -89,19 +99,19 @@
       "poster": "https://a.ltrbxd.com/resized/sm/upload/1m/yy/vt/1n/eBzf9d09Vgq2HSVC4fIZm1QNQd-0-600-0-900-crop.jpg?v=2ad9c80809",
       "review": "if i was 7 i would have rated this 500 stars",
       "link": "https://letterboxd.com/minieminems/film/charlies-angels/"
-    },
-    {
-      "title": "The Karate Kid",
-      "year": 2010,
-      "rating": 4,
-      "watchedDate": "2026-05-01",
-      "rewatch": true,
-      "poster": "https://a.ltrbxd.com/resized/film-poster/2/6/0/2/5/26025-the-karate-kid-0-600-0-900-crop.jpg?v=e1397c637d",
-      "review": "holy shit i love this movie",
-      "link": "https://letterboxd.com/minieminems/film/the-karate-kid-2010/"
     }
   ],
   "allWatches": [
+    {
+      "title": "The Odyssey",
+      "year": 2026,
+      "rating": 4.5,
+      "watchedDate": "2026-07-26",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/5/5/3/9/4/1255394-the-odyssey-2026-0-600-0-900-crop.jpg?v=1eed046d0c",
+      "review": "great retelling of percy jackson ❤️",
+      "link": "https://letterboxd.com/minieminems/film/the-odyssey-2026/"
+    },
     {
       "title": "Grown Ups",
       "year": 2010,
@@ -525,6 +535,16 @@
   ],
   "favorites": [
     {
+      "title": "The Odyssey",
+      "year": 2026,
+      "rating": 4.5,
+      "watchedDate": "2026-07-26",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/5/5/3/9/4/1255394-the-odyssey-2026-0-600-0-900-crop.jpg?v=1eed046d0c",
+      "review": "great retelling of percy jackson ❤️",
+      "link": "https://letterboxd.com/minieminems/film/the-odyssey-2026/"
+    },
+    {
       "title": "Michael",
       "year": 2026,
       "rating": 5,
@@ -616,9 +636,9 @@
     }
   ],
   "stats": {
-    "totalLogged": 42,
+    "totalLogged": 43,
     "averageRating": 3.7,
     "rewatches": 9
   },
-  "lastUpdated": "2026-07-26"
+  "lastUpdated": "2026-07-27"
 }
