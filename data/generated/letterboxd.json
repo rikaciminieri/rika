@@ -1,6 +1,16 @@
 {
   "recentWatches": [
     {
+      "title": "Spider-Man: Brand New Day",
+      "year": 2026,
+      "rating": 5,
+      "watchedDate": "2026-07-31",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/8/7/2/8/7/1/872871-spider-man-brand-new-day-0-600-0-900-crop.jpg?v=ebe6beb4fc",
+      "review": "😭😭😭😭😭😭😭",
+      "link": "https://letterboxd.com/minieminems/film/spider-man-brand-new-day/"
+    },
+    {
       "title": "The Odyssey",
       "year": 2026,
       "rating": 4.5,
@@ -89,19 +99,19 @@
       "poster": "https://a.ltrbxd.com/resized/sm/upload/qp/bw/k2/ia/jP8kukObEty5liW76QxJ1o5qlFL-0-600-0-900-crop.jpg?v=d066c2ed48",
       "review": "This review may contain spoilers.",
       "link": "https://letterboxd.com/minieminems/film/kick-ass/"
-    },
-    {
-      "title": "Charlie's Angels",
-      "year": 2000,
-      "rating": 3.5,
-      "watchedDate": "2026-05-08",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/sm/upload/1m/yy/vt/1n/eBzf9d09Vgq2HSVC4fIZm1QNQd-0-600-0-900-crop.jpg?v=2ad9c80809",
-      "review": "if i was 7 i would have rated this 500 stars",
-      "link": "https://letterboxd.com/minieminems/film/charlies-angels/"
     }
   ],
   "allWatches": [
+    {
+      "title": "Spider-Man: Brand New Day",
+      "year": 2026,
+      "rating": 5,
+      "watchedDate": "2026-07-31",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/8/7/2/8/7/1/872871-spider-man-brand-new-day-0-600-0-900-crop.jpg?v=ebe6beb4fc",
+      "review": "😭😭😭😭😭😭😭",
+      "link": "https://letterboxd.com/minieminems/film/spider-man-brand-new-day/"
+    },
     {
       "title": "The Odyssey",
       "year": 2026,
@@ -535,6 +545,16 @@
   ],
   "favorites": [
     {
+      "title": "Spider-Man: Brand New Day",
+      "year": 2026,
+      "rating": 5,
+      "watchedDate": "2026-07-31",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/8/7/2/8/7/1/872871-spider-man-brand-new-day-0-600-0-900-crop.jpg?v=ebe6beb4fc",
+      "review": "😭😭😭😭😭😭😭",
+      "link": "https://letterboxd.com/minieminems/film/spider-man-brand-new-day/"
+    },
+    {
       "title": "The Odyssey",
       "year": 2026,
       "rating": 4.5,
@@ -636,9 +656,9 @@
     }
   ],
   "stats": {
-    "totalLogged": 43,
-    "averageRating": 3.7,
+    "totalLogged": 44,
+    "averageRating": 3.8,
     "rewatches": 9
   },
-  "lastUpdated": "2026-07-31"
+  "lastUpdated": "2026-08-01"
 }
