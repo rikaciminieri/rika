@@ -1,6 +1,16 @@
 {
   "recentWatches": [
     {
+      "title": "No Country for Old Men",
+      "year": 2007,
+      "rating": 3.5,
+      "watchedDate": "2026-08-01",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/sm/upload/dr/hr/pz/ez/ehLb2SQ3djlA1FrQKbP2WO3VH09-0-600-0-900-crop.jpg?v=6489920a92",
+      "review": "sugars bob and sugar were very scary",
+      "link": "https://letterboxd.com/minieminems/film/no-country-for-old-men/"
+    },
+    {
       "title": "Spider-Man: Brand New Day",
       "year": 2026,
       "rating": 5,
@@ -89,19 +99,19 @@
       "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/3/4/4/7/2/1234472-obsession-2025-2-0-600-0-900-crop.jpg?v=cff6fc00b6",
       "review": "horror is NOT my genre at all, but Inde Navarrette blew me away as freaky nikki 😭 she needs to win an award for this performance. this movie takes “be careful what you wish for” for a wild ride",
       "link": "https://letterboxd.com/minieminems/film/obsession-2025/"
-    },
-    {
-      "title": "Kick-Ass",
-      "year": 2010,
-      "rating": 2.5,
-      "watchedDate": "2026-05-09",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/sm/upload/qp/bw/k2/ia/jP8kukObEty5liW76QxJ1o5qlFL-0-600-0-900-crop.jpg?v=d066c2ed48",
-      "review": "This review may contain spoilers.",
-      "link": "https://letterboxd.com/minieminems/film/kick-ass/"
     }
   ],
   "allWatches": [
+    {
+      "title": "No Country for Old Men",
+      "year": 2007,
+      "rating": 3.5,
+      "watchedDate": "2026-08-01",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/sm/upload/dr/hr/pz/ez/ehLb2SQ3djlA1FrQKbP2WO3VH09-0-600-0-900-crop.jpg?v=6489920a92",
+      "review": "sugars bob and sugar were very scary",
+      "link": "https://letterboxd.com/minieminems/film/no-country-for-old-men/"
+    },
     {
       "title": "Spider-Man: Brand New Day",
       "year": 2026,
@@ -656,9 +666,9 @@
     }
   ],
   "stats": {
-    "totalLogged": 44,
+    "totalLogged": 45,
     "averageRating": 3.8,
     "rewatches": 9
   },
-  "lastUpdated": "2026-08-01"
+  "lastUpdated": "2026-08-02"
 }
