@@ -1,16 +1,6 @@
 {
   "currentlyReading": [
     {
-      "title": "I Will Find You",
-      "author": "Harlan Coben",
-      "rating": null,
-      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1657046867l/61392438._SY475_.jpg",
-      "goodreadsId": "61392438",
-      "pages": null,
-      "dateAdded": null,
-      "dateRead": null
-    },
-    {
       "title": "Moonwalk: A Memoir",
       "author": "Michael  Jackson",
       "rating": null,
@@ -92,6 +82,16 @@
     }
   ],
   "read": [
+    {
+      "title": "I Will Find You",
+      "author": "Harlan Coben",
+      "rating": 3,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1657046867l/61392438._SY475_.jpg",
+      "goodreadsId": "61392438",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
     {
       "title": "The BFG",
       "author": "Roald Dahl",
@@ -277,9 +277,9 @@
   ],
   "stats": {
     "totalBooks": 24,
-    "booksRead": 15,
-    "currentlyReading": 9,
-    "averageRating": 4
+    "booksRead": 16,
+    "currentlyReading": 8,
+    "averageRating": 3.9
   },
-  "lastUpdated": "2026-08-16"
+  "lastUpdated": "2026-08-17"
 }
