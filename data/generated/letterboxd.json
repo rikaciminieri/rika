@@ -1,6 +1,16 @@
 {
   "recentWatches": [
     {
+      "title": "Shutter Island",
+      "year": 2010,
+      "rating": 4,
+      "watchedDate": "2026-08-21",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/4/5/4/0/9/45409-shutter-island-0-600-0-900-crop.jpg?v=85dd4c38e3",
+      "review": "nooooo i was rooting for edward :/ team edward",
+      "link": "https://letterboxd.com/minieminems/film/shutter-island/"
+    },
+    {
       "title": "No Country for Old Men",
       "year": 2007,
       "rating": 3.5,
@@ -89,19 +99,19 @@
       "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/9/7/2/13972-limitless-0-600-0-900-crop.jpg?v=7599c9da90",
       "review": "this is adderall propaganda",
       "link": "https://letterboxd.com/minieminems/film/limitless/"
-    },
-    {
-      "title": "Obsession",
-      "year": 2025,
-      "rating": 4,
-      "watchedDate": "2026-05-14",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/3/4/4/7/2/1234472-obsession-2025-2-0-600-0-900-crop.jpg?v=cff6fc00b6",
-      "review": "horror is NOT my genre at all, but Inde Navarrette blew me away as freaky nikki 😭 she needs to win an award for this performance. this movie takes “be careful what you wish for” for a wild ride",
-      "link": "https://letterboxd.com/minieminems/film/obsession-2025/"
     }
   ],
   "allWatches": [
+    {
+      "title": "Shutter Island",
+      "year": 2010,
+      "rating": 4,
+      "watchedDate": "2026-08-21",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/4/5/4/0/9/45409-shutter-island-0-600-0-900-crop.jpg?v=85dd4c38e3",
+      "review": "nooooo i was rooting for edward :/ team edward",
+      "link": "https://letterboxd.com/minieminems/film/shutter-island/"
+    },
     {
       "title": "No Country for Old Men",
       "year": 2007,
@@ -666,9 +676,9 @@
     }
   ],
   "stats": {
-    "totalLogged": 45,
+    "totalLogged": 46,
     "averageRating": 3.8,
     "rewatches": 9
   },
-  "lastUpdated": "2026-08-21"
+  "lastUpdated": "2026-08-22"
 }
