@@ -1,6 +1,16 @@
 {
   "recentWatches": [
     {
+      "title": "Juror #2",
+      "year": 2024,
+      "rating": 3.5,
+      "watchedDate": "2026-09-05",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/9/9/7/7/2/2/997722-juror-2-0-600-0-900-crop.jpg?v=14601fa694",
+      "review": "ending was a little corny but good trolley problem movie, i honestly don’t know what i would do",
+      "link": "https://letterboxd.com/minieminems/film/juror-2/"
+    },
+    {
       "title": "The Princess and the Frog",
       "year": 2009,
       "rating": 4,
@@ -89,19 +99,19 @@
       "poster": "https://a.ltrbxd.com/resized/film-poster/4/6/8/5/2/46852-norbit-0-600-0-900-crop.jpg?v=4af5fcd522",
       "review": "this movie was so funny when i was a kid",
       "link": "https://letterboxd.com/minieminems/film/norbit/"
-    },
-    {
-      "title": "The Wedding Singer",
-      "year": 1998,
-      "rating": 3,
-      "watchedDate": "2026-05-31",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/sm/upload/2m/05/gu/7h/t4M6RrwBQKTqbnG9vqG339G7FCC-0-600-0-900-crop.jpg?v=a02306754a",
-      "review": "first time watching and this might be a “you had to be there” movie - i’m so desensitized by recent media that i wasn’t fully stimulated but that’s my fault. i get why it’s such a classic. i love when adam sandler romances drew barrymore",
-      "link": "https://letterboxd.com/minieminems/film/the-wedding-singer/"
     }
   ],
   "allWatches": [
+    {
+      "title": "Juror #2",
+      "year": 2024,
+      "rating": 3.5,
+      "watchedDate": "2026-09-05",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/9/9/7/7/2/2/997722-juror-2-0-600-0-900-crop.jpg?v=14601fa694",
+      "review": "ending was a little corny but good trolley problem movie, i honestly don’t know what i would do",
+      "link": "https://letterboxd.com/minieminems/film/juror-2/"
+    },
     {
       "title": "The Princess and the Frog",
       "year": 2009,
@@ -686,9 +696,9 @@
     }
   ],
   "stats": {
-    "totalLogged": 47,
+    "totalLogged": 48,
     "averageRating": 3.8,
     "rewatches": 10
   },
-  "lastUpdated": "2026-09-05"
+  "lastUpdated": "2026-09-06"
 }
