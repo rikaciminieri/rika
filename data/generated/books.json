@@ -1,6 +1,16 @@
 {
   "currentlyReading": [
     {
+      "title": "Self-Compassion: The Proven Power of Being Kind to Yourself",
+      "author": "Kristin Neff",
+      "rating": null,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1630188281l/11257748._SY475_.jpg",
+      "goodreadsId": "11257748",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
+    {
       "title": "Judge Stone",
       "author": "Viola Davis",
       "rating": null,
@@ -286,9 +296,9 @@
     }
   ],
   "stats": {
-    "totalBooks": 25,
+    "totalBooks": 26,
     "booksRead": 16,
-    "currentlyReading": 9,
+    "currentlyReading": 10,
     "averageRating": 3.9
   },
   "lastUpdated": "2026-09-06"
