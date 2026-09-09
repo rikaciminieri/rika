@@ -11,16 +11,6 @@
       "dateRead": null
     },
     {
-      "title": "Judge Stone",
-      "author": "Viola Davis",
-      "rating": null,
-      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1775047193l/242482097._SY475_.jpg",
-      "goodreadsId": "242482097",
-      "pages": null,
-      "dateAdded": null,
-      "dateRead": null
-    },
-    {
       "title": "Moonwalk: A Memoir",
       "author": "Michael  Jackson",
       "rating": null,
@@ -102,6 +92,16 @@
     }
   ],
   "read": [
+    {
+      "title": "Judge Stone",
+      "author": "Viola Davis",
+      "rating": 4,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1775047193l/242482097._SY475_.jpg",
+      "goodreadsId": "242482097",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
     {
       "title": "I Will Find You",
       "author": "Harlan Coben",
@@ -297,9 +297,9 @@
   ],
   "stats": {
     "totalBooks": 26,
-    "booksRead": 16,
-    "currentlyReading": 10,
+    "booksRead": 17,
+    "currentlyReading": 9,
     "averageRating": 3.9
   },
-  "lastUpdated": "2026-09-08"
+  "lastUpdated": "2026-09-09"
 }
