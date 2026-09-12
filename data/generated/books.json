@@ -1,6 +1,16 @@
 {
   "currentlyReading": [
     {
+      "title": "The Bright Years",
+      "author": "Sarah Damoff",
+      "rating": null,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1717697026l/214195483._SY475_.jpg",
+      "goodreadsId": "214195483",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
+    {
       "title": "Self-Compassion: The Proven Power of Being Kind to Yourself",
       "author": "Kristin Neff",
       "rating": null,
@@ -296,10 +306,10 @@
     }
   ],
   "stats": {
-    "totalBooks": 26,
+    "totalBooks": 27,
     "booksRead": 17,
-    "currentlyReading": 9,
+    "currentlyReading": 10,
     "averageRating": 3.9
   },
-  "lastUpdated": "2026-09-11"
+  "lastUpdated": "2026-09-12"
 }
