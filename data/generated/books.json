@@ -1,11 +1,11 @@
 {
   "currentlyReading": [
     {
-      "title": "The Bright Years",
-      "author": "Sarah Damoff",
+      "title": "Fruit Fly",
+      "author": "Josh  Silver",
       "rating": null,
-      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1717697026l/214195483._SY475_.jpg",
-      "goodreadsId": "214195483",
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1774321434l/243599031._SY475_.jpg",
+      "goodreadsId": "243599031",
       "pages": null,
       "dateAdded": null,
       "dateRead": null
@@ -103,11 +103,11 @@
   ],
   "read": [
     {
-      "title": "Judge Stone",
-      "author": "Viola Davis",
+      "title": "The Bright Years",
+      "author": "Sarah Damoff",
       "rating": 4,
-      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1775047193l/242482097._SY475_.jpg",
-      "goodreadsId": "242482097",
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1717697026l/214195483._SY475_.jpg",
+      "goodreadsId": "214195483",
       "pages": null,
       "dateAdded": null,
       "dateRead": null
@@ -118,6 +118,16 @@
       "rating": 3,
       "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1657046867l/61392438._SY475_.jpg",
       "goodreadsId": "61392438",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
+    {
+      "title": "Judge Stone",
+      "author": "Viola Davis",
+      "rating": 4,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1775047193l/242482097._SY475_.jpg",
+      "goodreadsId": "242482097",
       "pages": null,
       "dateAdded": null,
       "dateRead": null
@@ -306,10 +316,10 @@
     }
   ],
   "stats": {
-    "totalBooks": 27,
-    "booksRead": 17,
+    "totalBooks": 28,
+    "booksRead": 18,
     "currentlyReading": 10,
     "averageRating": 3.9
   },
-  "lastUpdated": "2026-09-30"
+  "lastUpdated": "2026-10-01"
 }
