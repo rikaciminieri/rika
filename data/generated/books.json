@@ -1,11 +1,11 @@
 {
   "currentlyReading": [
     {
-      "title": "Fruit Fly",
-      "author": "Josh  Silver",
+      "title": "Bad Blood: Secrets and Lies in a Silicon Valley Startup",
+      "author": "John Carreyrou",
       "rating": null,
-      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1774321434l/243599031._SY475_.jpg",
-      "goodreadsId": "243599031",
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1522685770l/38799469.jpg",
+      "goodreadsId": "38799469",
       "pages": null,
       "dateAdded": null,
       "dateRead": null
@@ -102,6 +102,16 @@
     }
   ],
   "read": [
+    {
+      "title": "Fruit Fly",
+      "author": "Josh  Silver",
+      "rating": 4,
+      "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1774321434l/243599031._SY475_.jpg",
+      "goodreadsId": "243599031",
+      "pages": null,
+      "dateAdded": null,
+      "dateRead": null
+    },
     {
       "title": "The Bright Years",
       "author": "Sarah Damoff",
@@ -316,10 +326,10 @@
     }
   ],
   "stats": {
-    "totalBooks": 28,
-    "booksRead": 18,
+    "totalBooks": 29,
+    "booksRead": 19,
     "currentlyReading": 10,
     "averageRating": 3.9
   },
-  "lastUpdated": "2026-10-24"
+  "lastUpdated": "2026-10-25"
 }
