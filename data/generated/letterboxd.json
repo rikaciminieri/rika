@@ -1,6 +1,16 @@
 {
   "recentWatches": [
     {
+      "title": "You Can See Everything",
+      "year": 2026,
+      "rating": 4.5,
+      "watchedDate": "2026-10-26",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/6/2/9/4/4/3/1629443-you-can-see-everything-0-600-0-900-crop.jpg?v=84f6724d74",
+      "review": "only nathan fielder could have made this",
+      "link": "https://letterboxd.com/minieminems/film/you-can-see-everything/"
+    },
+    {
       "title": "Signs",
       "year": 2002,
       "rating": 2,
@@ -89,19 +99,19 @@
       "poster": "https://a.ltrbxd.com/resized/film-poster/9/9/7/7/2/2/997722-juror-2-0-600-0-900-crop.jpg?v=14601fa694",
       "review": "ending was a little corny but good trolley problem movie, i honestly don’t know what i would do",
       "link": "https://letterboxd.com/minieminems/film/juror-2/"
-    },
-    {
-      "title": "The Princess and the Frog",
-      "year": 2009,
-      "rating": 4,
-      "watchedDate": "2026-08-27",
-      "rewatch": true,
-      "poster": "https://a.ltrbxd.com/resized/sm/upload/hl/8a/0u/3l/bVRHirC6uIZL9VtRqYRxdedYnOG-0-600-0-900-crop.jpg?v=4a94cf20d3",
-      "review": "almost there is an incredible song 😭",
-      "link": "https://letterboxd.com/minieminems/film/the-princess-and-the-frog/"
     }
   ],
   "allWatches": [
+    {
+      "title": "You Can See Everything",
+      "year": 2026,
+      "rating": 4.5,
+      "watchedDate": "2026-10-26",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/6/2/9/4/4/3/1629443-you-can-see-everything-0-600-0-900-crop.jpg?v=84f6724d74",
+      "review": "only nathan fielder could have made this",
+      "link": "https://letterboxd.com/minieminems/film/you-can-see-everything/"
+    },
     {
       "title": "Signs",
       "year": 2002,
@@ -591,19 +601,19 @@
       "poster": "https://a.ltrbxd.com/resized/film-poster/3/9/5/0/8/2/395082-the-dark-0-600-0-900-crop.jpg?v=82f84a6684",
       "review": "i’ve watched the opening scene and fallen asleep like 10 times (not the fault of the movie) and i’m glad i finally watched it all the way through",
       "link": "https://letterboxd.com/minieminems/film/the-dark-2018/"
-    },
-    {
-      "title": "Inception",
-      "year": 2010,
-      "rating": 4,
-      "watchedDate": "2025-08-10",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/sm/upload/sv/95/s9/4j/inception-0-600-0-900-crop.jpg?v=30d7224316",
-      "review": "i can’t believe i’m just watching this now",
-      "link": "https://letterboxd.com/minieminems/film/inception/"
     }
   ],
   "favorites": [
+    {
+      "title": "You Can See Everything",
+      "year": 2026,
+      "rating": 4.5,
+      "watchedDate": "2026-10-26",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/6/2/9/4/4/3/1629443-you-can-see-everything-0-600-0-900-crop.jpg?v=84f6724d74",
+      "review": "only nathan fielder could have made this",
+      "link": "https://letterboxd.com/minieminems/film/you-can-see-everything/"
+    },
     {
       "title": "The Twilight Saga: Breaking Dawn – Part 2",
       "year": 2012,
@@ -730,5 +740,5 @@
     "averageRating": 3.8,
     "rewatches": 13
   },
-  "lastUpdated": "2026-10-26"
+  "lastUpdated": "2026-10-27"
 }
