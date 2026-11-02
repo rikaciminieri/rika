@@ -1,6 +1,16 @@
 {
   "recentWatches": [
     {
+      "title": "The Proposal",
+      "year": 2009,
+      "rating": 4,
+      "watchedDate": "2026-11-01",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/4/0/4/7/9/40479-the-proposal-0-600-0-900-crop.jpg?v=3ae07535cc",
+      "review": "i love this kind of movie so much",
+      "link": "https://letterboxd.com/minieminems/film/the-proposal-2009/"
+    },
+    {
       "title": "You Can See Everything",
       "year": 2026,
       "rating": 4.5,
@@ -89,19 +99,19 @@
       "poster": "https://a.ltrbxd.com/resized/film-poster/4/0/4/8/0/40480-the-twilight-saga-new-moon-0-600-0-900-crop.jpg?v=ba5ab4ba1e",
       "review": "not enough edward in this movie and bella is PLAYINNG my poor boy jacob :( she belongs to the streets 👉🏼",
       "link": "https://letterboxd.com/minieminems/film/the-twilight-saga-new-moon/"
-    },
-    {
-      "title": "Juror #2",
-      "year": 2024,
-      "rating": 3.5,
-      "watchedDate": "2026-09-05",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/film-poster/9/9/7/7/2/2/997722-juror-2-0-600-0-900-crop.jpg?v=14601fa694",
-      "review": "ending was a little corny but good trolley problem movie, i honestly don’t know what i would do",
-      "link": "https://letterboxd.com/minieminems/film/juror-2/"
     }
   ],
   "allWatches": [
+    {
+      "title": "The Proposal",
+      "year": 2009,
+      "rating": 4,
+      "watchedDate": "2026-11-01",
+      "rewatch": false,
+      "poster": "https://a.ltrbxd.com/resized/film-poster/4/0/4/7/9/40479-the-proposal-0-600-0-900-crop.jpg?v=3ae07535cc",
+      "review": "i love this kind of movie so much",
+      "link": "https://letterboxd.com/minieminems/film/the-proposal-2009/"
+    },
     {
       "title": "You Can See Everything",
       "year": 2026,
@@ -591,16 +601,6 @@
       "poster": "https://a.ltrbxd.com/resized/film-poster/8/7/7/2/4/0/877240-another-simple-favor-0-600-0-900-crop.jpg?v=88c4688885",
       "review": "what the damn hell",
       "link": "https://letterboxd.com/minieminems/film/another-simple-favor/"
-    },
-    {
-      "title": "The Dark",
-      "year": 2018,
-      "rating": 4,
-      "watchedDate": "2025-08-15",
-      "rewatch": false,
-      "poster": "https://a.ltrbxd.com/resized/film-poster/3/9/5/0/8/2/395082-the-dark-0-600-0-900-crop.jpg?v=82f84a6684",
-      "review": "i’ve watched the opening scene and fallen asleep like 10 times (not the fault of the movie) and i’m glad i finally watched it all the way through",
-      "link": "https://letterboxd.com/minieminems/film/the-dark-2018/"
     }
   ],
   "favorites": [
@@ -740,5 +740,5 @@
     "averageRating": 3.8,
     "rewatches": 13
   },
-  "lastUpdated": "2026-11-01"
+  "lastUpdated": "2026-11-02"
 }
